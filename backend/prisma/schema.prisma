@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id           String @id @default(uuid())
+  name         String
+  contactEmail String
+  phone        String
+  sites        Site[]
+  createdAt    DateTime @default(now())
+}
+
+model Site {
+  id        String  @id @default(uuid())
+  name      String
+  address   String
+  latitude  Float
+  longitude Float
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+  alarms    Alarm[]
+}
+
+model Alarm {
+  id          String    @id @default(uuid())
+  triggeredAt DateTime
+  alarmType   String
+  priority    Int
+  status      String
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id])
+  obLogs      ObLog[]
+  aiCall      AiCall?
+  dispatch    Dispatch?
+}
+
+model ObLog {
+  id      String   @id @default(uuid())
+  logTime DateTime
+  message String
+  source  String
+  alarmId String?
+  alarm   Alarm?    @relation(fields: [alarmId], references: [id])
+  guardId String?
+  guard   Guard?   @relation(fields: [guardId], references: [id])
+}
+
+model AiCall {
+  id              String   @id @default(uuid())
+  aiDecision      String
+  confidenceScore Float
+  evaluatedAt     DateTime
+  notes           String?
+
+  alarmId String @unique
+  alarm   Alarm  @relation(fields: [alarmId], references: [id])
+}
+
+model Dispatch {
+  id            String    @id @default(uuid())
+  dispatchedAt  DateTime
+  arrivalTime   DateTime?
+  resolvedAt    DateTime?
+  responseNotes String?
+
+  alarmId String @unique
+  alarm   Alarm  @relation(fields: [alarmId], references: [id])
+
+  guardId String?
+  guard   Guard?  @relation(fields: [guardId], references: [id])
+
+  vehicleId String?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime  @default(now())
+  lastLogin    DateTime?
+
+  roleId String
+  role   UserRole @relation(fields: [roleId], references: [id])
+}
+
+model UserRole {
+  id    String @id @default(uuid())
+  name  String @unique // e.g., "admin", "controller", "supervisor"
+  users User[]
+}
+
+model Vehicle {
+  id          String  @id @default(uuid())
+  plateNumber String  @unique
+  description String?
+  status      String // e.g., "active", "maintenance", "out_of_service"
+
+  dispatches Dispatch[]
+  guards     Guard[]
+}
+
+model Guard {
+  id     String @id @default(uuid())
+  name   String
+  phone  String
+  status String
+
+  assignedVehicleId String?
+  assignedVehicle   Vehicle? @relation(fields: [assignedVehicleId], references: [id])
+
+  dispatches Dispatch[]
+  obLogs     ObLog[] 
+}
