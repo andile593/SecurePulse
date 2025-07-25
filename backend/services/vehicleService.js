@@ -7,7 +7,7 @@ async function createVehicle(data) {
 
 async function getAllVehicles() {
   return prisma.vehicle.findMany({
-    include: { guard: true },
+    include: { guards: true },
   });
 }
 

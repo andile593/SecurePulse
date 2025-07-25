@@ -93,15 +93,16 @@ model User {
 
 model UserRole {
   id    String @id @default(uuid())
-  name  String @unique // e.g., "admin", "controller", "supervisor"
+  name  String @unique 
   users User[]
 }
 
 model Vehicle {
-  id          String  @id @default(uuid())
+  id         String   @id @default(uuid())
   plateNumber String  @unique
+  model      String
+  status     String
   description String?
-  status      String // e.g., "active", "maintenance", "out_of_service"
 
   dispatches Dispatch[]
   guards     Guard[]
