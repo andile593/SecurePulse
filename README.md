@@ -1,4 +1,4 @@
-# 🔐 SecurePulse – AI-Driven Security Management Platform
+# SecurePulse – AI-Driven Security Management Platform
 
 SecurePulse is a full-stack AI-powered security management system that integrates real-time alerts, automated patrol monitoring, drone telemetry, incident reports, and dispatch control.
 
@@ -11,15 +11,7 @@ Built with:
 
 ---
 
-## 📁 Folder Structure 
-
- SecurePulse/
-- backend             # Express API server 
-- frontend             # React + Vite SPA
-- README.md             # Project documentation
-
-
-## 🧠 Features Overview
+## Features Overview
 
 | Feature       | Description |
 |--------------|-------------|
@@ -42,24 +34,9 @@ Built with:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/SecurePulse.git
+git clone https://github.com/andile593/SecurePulse.git
+
 cd SecurePulse
 
 ---
 
-
-src/
-├── assets/          # Static assets
-├── components/      # UI components (Header, Sidebar, Modals, etc.)
-├── features/        # Domain-specific logic (auth, drones, guards, etc.)
-├── hooks/           # Custom React hooks
-├── lib/             # API clients, socket helpers, utilities
-├── context/         # React Context providers
-├── store/           # Zustand/Redux state slices
-├── routes/          # Centralized route configuration
-├── pages/           # Top-level routed pages
-├── types/           # DTOs and global types
-├── constants/       # Enums and constant values
-├── App.tsx          # Root app layout
-├── main.tsx         # Entry point
-└── index.css        # Tailwind base styles
