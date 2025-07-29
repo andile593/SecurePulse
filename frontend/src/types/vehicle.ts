@@ -1,7 +1,12 @@
+import type { Dispatch } from '@/types';
+import type { Guard } from '@/types';
+
 export interface Vehicle {
   id?: string;
   plateNumber: string;
-  type: "car" | "bike" | "van";
-  status: "available" | "in_use" | "maintenance";
-  assignedGuardId?: string;
+  model: string;
+  status: string;
+  description?: string;
+  dispatches?: Dispatch[];
+  guards?: Guard[];
 }

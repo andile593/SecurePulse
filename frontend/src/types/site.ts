@@ -1,8 +1,13 @@
+import type { Alarm } from '@/types';
+import type { Client } from '@/types';
+
 export interface Site {
   id?: string;
   name: string;
-  location: string;
-  clientId?: string;
-  contactPerson?: string;
-  contactPhone?: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  clientId: string;
+  client?: Client;
+  alarms?: Alarm[];
 }

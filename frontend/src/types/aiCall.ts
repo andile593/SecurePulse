@@ -1,7 +1,11 @@
+import type { Alarm } from '@/types';
+
 export interface AiCall {
   id?: string;
-  message: string;
-  severity: "low" | "medium" | "high";
-  timestamp: string;
-  source?: string; // e.g., drone ID or camera ID
+  aiDecision: string;
+  confidenceScore: number;
+  evaluatedAt: string;
+  notes?: string;
+  alarmId: string;
+  alarm?: Alarm;
 }

@@ -1,9 +1,14 @@
+import type { ObLog } from '@/types';
+import type { Vehicle } from '@/types';
+import type { Dispatch } from '@/types';
+
 export interface Guard {
   id?: string;
   name: string;
-  badgeNumber: string;
-  phone?: string;
-  email?: string;
-  status: "on_duty" | "off_duty" | "inactive";
-  assignedSiteId?: string;
+  phone: string;
+  status: string;
+  assignedVehicleId?: string;
+  assignedVehicle?: Vehicle;
+  dispatches?: Dispatch[];
+  obLogs?: ObLog[];
 }

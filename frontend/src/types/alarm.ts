@@ -1,8 +1,17 @@
+import type { Site } from '@/types';
+import type { ObLog } from '@/types';
+import type { Dispatch } from '@/types';
+import type { AiCall } from '@/types';
+
 export interface Alarm {
   id?: string;
-  type: string; // e.g., "motion", "tamper", "door"
-  location: string;
   triggeredAt: string;
-  resolved?: boolean;
-  resolvedAt?: string;
+  alarmType: string;
+  priority: number;
+  status: string;
+  siteId: string;
+  site?: Site;
+  obLogs?: ObLog[];
+  aiCall?: AiCall;
+  dispatch?: Dispatch;
 }

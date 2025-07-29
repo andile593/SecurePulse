@@ -1,9 +1,13 @@
+
+
+
 export interface User {
   id?: string;
-  username: string;
   email: string;
-  role: "admin" | "guard" | "client" | "dispatcher";
-  status: "active" | "inactive";
+  passwordHash?: string; // used only server-side
+  name: string;
   createdAt?: string;
-  updatedAt?: string;
+  lastLogin?: string;
+  roleId: string;
+  // role?: UserRole;
 }

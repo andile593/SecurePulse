@@ -1,10 +1,10 @@
+import type { Site } from '@/types';
+
 export interface Client {
   id?: string;
   name: string;
-  email: string;
+  contactEmail: string;
   phone: string;
-  company?: string;
-  address?: string;
   createdAt?: string;
-  updatedAt?: string;
+  sites?: Site[]; // Related
 }

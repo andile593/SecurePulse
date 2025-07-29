@@ -1,9 +1,17 @@
+import type { Guard } from '@/types';
+import type { Alarm } from '@/types';
+import type { Vehicle } from '@/types';
+
 export interface Dispatch {
   id?: string;
-  guardId: string;
-  siteId: string;
+  dispatchedAt: string;
+  arrivalTime?: string;
+  resolvedAt?: string;
+  responseNotes?: string;
+  alarmId: string;
+  alarm?: Alarm;
+  guardId?: string;
+  guard?: Guard;
   vehicleId?: string;
-  status: "pending" | "en_route" | "arrived" | "completed";
-  createdAt?: string;
-  updatedAt?: string;
+  vehicle?: Vehicle;
 }
