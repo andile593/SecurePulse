@@ -1,5 +1,5 @@
 import Routes from "./routes";
-import "./index.css"; // Tailwind styles
+import "./index.css";
 
 function App() {
   return (

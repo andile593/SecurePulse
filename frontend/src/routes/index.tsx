@@ -2,10 +2,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 
 
-import Home from "../pages/Standard/Home";
-import Login from "../pages/Standard/Login";
-import Dashboard from "../pages/Standard/Dashboard";
-import NotFound from "../pages/Standard/NotFound";
+import Home from "@/pages/Common/Home";
+import Login from "../pages/Common/Login";
+import Dashboard from "../pages/Common/Dashboard";
+import NotFound from "../pages/Common/NotFound";
 
 // Clients
 import Clients from "../pages/Clients/Clients";
@@ -106,7 +106,7 @@ export default function AppRoutes() {
         path="/ob-logs"
         element={
           <AppLayout>
-            <OBLogs />
+            <ObLogs />
           </AppLayout>
         }
       />
@@ -114,7 +114,7 @@ export default function AppRoutes() {
         path="/ob-logs/:id"
         element={
           <AppLayout>
-            <OBLogDetail />
+            <ObLogDetail />
           </AppLayout>
         }
       />
@@ -174,7 +174,7 @@ export default function AppRoutes() {
         path="/ai-calls"
         element={
           <AppLayout>
-            <AICalls />
+            <AiCalls />
           </AppLayout>
         }
       />
@@ -182,7 +182,7 @@ export default function AppRoutes() {
         path="/ai-calls/:id"
         element={
           <AppLayout>
-            <AICallDetail />
+            <AiCallDetail />
           </AppLayout>
         }
       />
