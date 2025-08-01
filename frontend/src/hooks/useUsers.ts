@@ -13,7 +13,10 @@ type DeleteUserInput = { id: string };
 export function useUsers() {
   return useQuery<User[]>({
     queryKey: ['users'],
-    queryFn: getUsers,
+    queryFn: async () => {
+      const res = await getUsers();
+      return res.data
+    }
   });
 }
 

@@ -10,7 +10,10 @@ import type { Dispatch } from '@/types/dispatch';
 export function useDispatches() {
   return useQuery<Dispatch[]>({
     queryKey: ['dispatches'],
-    queryFn: getDispatches,
+    queryFn: async () => {
+      const res = await getDispatches();
+      return res.data
+    }
   });
 }
 

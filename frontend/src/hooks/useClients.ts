@@ -23,7 +23,10 @@ type DeleteClientInput = {
 export function useClients() {
   return useQuery<Client[]>({
     queryKey: ['clients'],
-    queryFn: getClients,
+    queryFn: async () => {
+      const res = await getClients();
+      return res.data; 
+    },
   });
 }
 

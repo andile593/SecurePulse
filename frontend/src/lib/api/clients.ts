@@ -10,7 +10,6 @@ export type UpdateClientInput = {
   id: string;
   client: Partial<Client>;
 };
-
 export const updateClient = ({ id, client }: UpdateClientInput) => 
   api.put(`/clients/${id}`, client);
 

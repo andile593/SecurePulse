@@ -13,7 +13,10 @@ type DeleteAlarmInput = { id: string };
 export function useAlarms() {
   return useQuery<Alarm[]>({
     queryKey: ['alarms'],
-    queryFn: getAlarms,
+     queryFn: async () => {
+      const res = await getAlarms();
+      return res.data;
+    },
   });
 }
 

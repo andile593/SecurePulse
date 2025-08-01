@@ -10,7 +10,10 @@ import type { AiCall } from '@/types/aiCall';
 export function useAiCalls() {
   return useQuery<AiCall[]>({
     queryKey: ['aiCalls'],
-    queryFn: getAiCalls,
+    queryFn: async () => {
+      const res = await getAiCalls();
+      return res.data
+    }
   });
 }
 

@@ -10,7 +10,10 @@ import type { ObLog } from '@/types/obLog';
 export function useObLogs() {
   return useQuery<ObLog[]>({
     queryKey: ['obLogs'],
-    queryFn: getObLogs,
+    queryFn: async ( )=> {
+      const res = await getObLogs();
+      return res.data
+    } 
   });
 }
 

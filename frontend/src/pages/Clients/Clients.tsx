@@ -1,43 +1,73 @@
-import { useClients, useDeleteClient } from '@/hooks/useClients';
+import { useClients, useCreateClient, useUpdateClient } from '@/hooks/useClients';
+import ClientForm from '@/components/forms/ClientForm';
 import type { Client } from '@/types/client';
+import { useState } from 'react';
 
 const Clients = () => {
   const { data: clients = [], isLoading, error } = useClients();
-  const { mutate: deleteClient } = useDeleteClient(); 
+  const { mutate: createClient } = useCreateClient();
+  const { mutate: updateClient } = useUpdateClient();
+
+  const [showForm, setShowForm] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+
+  const handleCreate = () => {
+    setEditingClient(null);
+    setShowForm(true);
+  };
+
+  const handleEdit = (client: Client) => {
+    setEditingClient(client);
+    setShowForm(true);
+  };
+
+  const handleSubmit = (data: Partial<Client>) => {
+    if (editingClient?.id) {
+      updateClient({ id: editingClient.id, client: data });
+    } else {
+      createClient(data as Client);
+    }
+    setShowForm(false);
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Something went wrong</div>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold mb-4">Clients</h1>
-      <table className="min-w-full bg-white shadow rounded">
-        <thead>
-          <tr className="bg-gray-100 text-left text-sm font-medium">
-            <th className="p-2">Name</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Phone</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clients.map((client: Client) => (
-            <tr key={client.id} className="border-t text-sm">
-              <td className="p-2">{client.name}</td>
-              <td className="p-2">{client.email}</td>
-              <td className="p-2">{client.phone}</td>
-              <td className="p-2">
-                <button
-                  className="text-red-600 hover:underline"
-                  onClick={() => deleteClient({ id: client.id! })} 
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Clients</h1>
+        <button
+          onClick={handleCreate}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          New Client
+        </button>
+      </div>
+
+      {showForm && (
+        <ClientForm
+          initialData={editingClient ?? {}}
+          onSubmit={handleSubmit}
+          onClose={() => setShowForm(false)}
+        />
+      )}
+
+      <ul className="space-y-4 mt-6">
+        {clients.map((client: Client) => (
+          <li key={client.id} className="bg-white shadow-md p-4 rounded-md">
+            <p className="font-bold">{client.name}</p>
+            <p className="text-sm text-gray-600">{client.email}</p>
+            <p className="text-sm text-gray-600">{client.phone}</p>
+            <button
+              className="text-blue-600 hover:underline mt-2"
+              onClick={() => handleEdit(client)}
+            >
+              Edit
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

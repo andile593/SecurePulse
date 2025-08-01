@@ -17,7 +17,10 @@ type DeleteGuardInput = { id: string };
 export function useGuards() {
   return useQuery<Guard[]>({
     queryKey: ['guards'],
-    queryFn: getGuards,
+    queryFn: async () => {
+      const res = await getGuards();
+      return res.data; // unwrap data here
+    },
   });
 }
 

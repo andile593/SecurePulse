@@ -13,7 +13,10 @@ type DeleteSiteInput = { id: string };
 export function useSites() {
   return useQuery<Site[]>({
     queryKey: ['sites'],
-    queryFn: getSites,
+    queryFn: async () => {
+      const res = await getSites();
+      return res.data
+    },
   });
 }
 

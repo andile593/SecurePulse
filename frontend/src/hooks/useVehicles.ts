@@ -13,7 +13,10 @@ type DeleteVehicleInput = { id: string };
 export function useVehicles() {
   return useQuery<Vehicle[]>({
     queryKey: ['vehicles'],
-    queryFn: getVehicles,
+    queryFn: async () => {
+      const res = await getVehicles();
+      return res.data;
+    },
   });
 }
 
