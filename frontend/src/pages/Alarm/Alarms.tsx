@@ -20,6 +20,6 @@ const Alarms = () => {
       </ul>
     </div>
   );
-};
+}
 
 export default Alarms;
