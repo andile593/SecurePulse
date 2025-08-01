@@ -1,8 +1,14 @@
 import api from './axios';
-import { User } from '@/types/user';
+import type { User } from '@/types/user';
 
 export const getUsers = () => api.get<User[]>('/users');
 export const getUserById = (id: string) => api.get<User>(`/users/${id}`);
-export const createUser = (data: User) => api.post<User>('/users', data);
-export const updateUser = (id: string, data: Partial<User>) => api.put(`/users/${id}`, data);
-export const deleteUser = (id: string) => api.delete(`/users/${id}`);
+export const createUser = (user: User) => api.post<User>('/users', user);
+
+export type UpdateUserInput = { id: string; user: Partial<User> };
+export const updateUser = ({ id, user }: UpdateUserInput) => 
+  api.put(`/users/${id}`, user);
+
+export type DeleteUserInput = { id: string };
+export const deleteUser = ({ id }: DeleteUserInput) => 
+  api.delete(`/users/${id}`);

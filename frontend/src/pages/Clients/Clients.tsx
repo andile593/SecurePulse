@@ -1,5 +1,5 @@
 import { useClients } from '@/hooks/useClients';
-import { Client } from '@/types/Client'
+import type { Client } from '@/types/client'
 
 const Clients = () => {
   const { data: clients, isLoading, error } = useClients();

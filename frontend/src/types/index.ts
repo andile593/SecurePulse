@@ -1,5 +1,5 @@
 // src/types/index.ts
-export * from './Client';
+export * from './client';
 export * from './site';
 export * from './alarm';
 export * from './obLog';

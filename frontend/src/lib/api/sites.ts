@@ -1,8 +1,14 @@
 import api from './axios';
-import { Site } from '@/types/site';
+import type { Site } from '@/types/site';
 
 export const getSites = () => api.get<Site[]>('/sites');
 export const getSiteById = (id: string) => api.get<Site>(`/sites/${id}`);
-export const createSite = (data: Site) => api.post<Site>('/sites', data);
-export const updateSite = (id: string, data: Partial<Site>) => api.put(`/sites/${id}`, data);
-export const deleteSite = (id: string) => api.delete(`/sites/${id}`);
+export const createSite = (site: Site) => api.post<Site>('/sites', site);
+
+export type UpdateSiteInput = { id: string; site: Partial<Site> };
+export const updateSite = ({ id, site }: UpdateSiteInput) => 
+  api.put(`/sites/${id}`, site);
+
+export type DeleteSiteInput = { id: string };
+export const deleteSite = ({ id }: DeleteSiteInput) => 
+  api.delete(`/sites/${id}`);
