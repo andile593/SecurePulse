@@ -8,57 +8,93 @@ type AiCallFormProps = {
 };
 
 const AiCallForm = ({ initialData = {}, onSubmit, onClose }: AiCallFormProps) => {
-  const [caller, setCaller] = useState('');
-  const [topic, setTopic] = useState('');
-  const [timestamp, setTimestamp] = useState('');
+  const [aiDecision, setAiDecision] = useState('');
+  const [confidenceScore, setConfidenceScore] = useState(0.5);
+  const [evaluatedAt, setEvaluatedAt] = useState('');
+  const [notes, setNotes] = useState('');
+  const [alarmId, setAlarmId] = useState('');
 
   useEffect(() => {
-    setCaller(initialData.caller ?? '');
-    setTopic(initialData.topic ?? '');
-    setTimestamp(initialData.timestamp ?? '');
+    setAiDecision(initialData.aiDecision ?? '');
+    setConfidenceScore(initialData.confidenceScore ?? 0.5);
+    setEvaluatedAt(initialData.evaluatedAt ?? new Date().toISOString().slice(0, 16));
+    setNotes(initialData.notes ?? '');
+    setAlarmId(initialData.alarmId ?? '');
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ caller, topic, timestamp });
+    onSubmit({ aiDecision, confidenceScore, evaluatedAt, notes, alarmId });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white shadow p-4 rounded max-w-md">
       <div>
-        <label className="block text-sm font-medium mb-1">Caller</label>
-        <input
+        <label className="block text-sm font-medium mb-1">AI Decision</label>
+        <select
+          value={aiDecision}
+          onChange={(e) => setAiDecision(e.target.value)}
           className="w-full border p-2 rounded"
-          value={caller}
-          onChange={(e) => setCaller(e.target.value)}
+          required
+        >
+          <option value="">Select Decision</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="escalated">Escalated</option>
+          <option value="inconclusive">Inconclusive</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Confidence Score</label>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          max="1"
+          value={confidenceScore}
+          onChange={(e) => setConfidenceScore(parseFloat(e.target.value))}
+          className="w-full border p-2 rounded"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Topic</label>
-        <input
-          className="w-full border p-2 rounded"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Timestamp</label>
+        <label className="block text-sm font-medium mb-1">Evaluated At</label>
         <input
           type="datetime-local"
+          value={evaluatedAt}
+          onChange={(e) => setEvaluatedAt(e.target.value)}
           className="w-full border p-2 rounded"
-          value={timestamp}
-          onChange={(e) => setTimestamp(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Notes</label>
+        <textarea
+          className="w-full border p-2 rounded"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Alarm ID</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={alarmId}
+          onChange={(e) => setAlarmId(e.target.value)}
           required
         />
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">Cancel</button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Save
+        </button>
+        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">
+          Cancel
+        </button>
       </div>
     </form>
   );

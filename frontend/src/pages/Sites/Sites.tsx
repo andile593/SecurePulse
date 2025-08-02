@@ -1,77 +1,94 @@
-import { useSites, useCreateSite, useUpdateSite } from '@/hooks/useSites';
-import SiteForm from '@/components/forms/SiteForm';
-import type { Site } from '@/types/site';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Site } from "@/types";
+import { getSites, deleteSite } from "@/lib/api/sites";
 
-const Sites = () => {
-  const { data: sites = [], isLoading, error } = useSites();
-  const { mutate: createSite } = useCreateSite();
-  const { mutate: updateSite } = useUpdateSite();
+export default function SiteList() {
+  const [sites, setSites] = useState<Site[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingSite, setEditingSite] = useState<Site | null>(null);
-
-  const handleCreate = () => {
-    setEditingSite(null);
-    setShowForm(true);
-  };
-
-  const handleEdit = (site: Site) => {
-    setEditingSite(site);
-    setShowForm(true);
-  };
-
-  const handleSubmit = (data: Partial<Site>) => {
-    if (editingSite?.id) {
-      updateSite({ id: editingSite.id, site: data });
-    } else {
-      createSite(data as Site);
+  const fetchSites = async () => {
+    try {
+      const data = await getSites();
+      setSites(data);
+    } catch {
+      setError("Failed to load sites.");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  useEffect(() => {
+    fetchSites();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this site?")) return;
+    try {
+      await deleteSite(id);
+      setSites((prev) => prev.filter((site) => site.id !== id));
+    } catch {
+      alert("Failed to delete site.");
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading sites...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Sites</h1>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+        <Link
+          to="/sites/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          New Site
-        </button>
+          + New Site
+        </Link>
       </div>
 
-      {showForm && (
-        <SiteForm
-          initialData={editingSite ?? {}}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-        />
+      {sites.length === 0 ? (
+        <div>No sites found.</div>
+      ) : (
+        <table className="w-full border text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="p-2">Name</th>
+              <th className="p-2">Location</th>
+              <th className="p-2">Client ID</th>
+              <th className="p-2">Contact Person</th>
+              <th className="p-2">Contact Phone</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sites.map((site) => (
+              <tr key={site.id} className="border-t">
+                <td className="p-2">{site.name}</td>
+                <td className="p-2">{site.location}</td>
+                <td className="p-2">{site.clientId || "—"}</td>
+                <td className="p-2">{site.contactPerson || "—"}</td>
+                <td className="p-2">{site.contactPhone || "—"}</td>
+                <td className="p-2 space-x-2">
+                  <Link
+                    to={`/sites/${site.id}/edit`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(site.id!)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      <ul className="space-y-4 mt-6">
-        {sites.map((site: Site) => (
-          <li key={site.id} className="bg-white shadow-md p-4 rounded-md">
-            <p className="font-bold">{site.name}</p>
-            <p className="text-sm text-gray-600">{site.address}</p>
-            {/* {site.description && (
-              <p className="text-sm text-gray-500">{site.description}</p>
-            )} */}
-            <button
-              className="text-blue-600 hover:underline mt-2"
-              onClick={() => handleEdit(site)}
-            >
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default Sites;
+}

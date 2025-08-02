@@ -1,75 +1,92 @@
-import { useGuards, useCreateGuard, useUpdateGuard } from '@/hooks/useGuards';
-import GuardForm from '@/components/forms/GuardForm';
-import type { Guard } from '@/types/guard';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Guard } from "@/types";
+import { getGuards, deleteGuard } from "@/lib/api/guards";
 
-const Guards = () => {
-  const { data: guards = [], isLoading, error } = useGuards();
-  const { mutate: createGuard } = useCreateGuard();
-  const { mutate: updateGuard } = useUpdateGuard();
+export default function GuardList() {
+  const [guards, setGuards] = useState<Guard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingGuard, setEditingGuard] = useState<Guard | null>(null);
-
-  const handleCreate = () => {
-    setEditingGuard(null);
-    setShowForm(true);
-  };
-
-  const handleEdit = (guard: Guard) => {
-    setEditingGuard(guard);
-    setShowForm(true);
-  };
-
-  const handleSubmit = (data: Partial<Guard>) => {
-    if (editingGuard?.id) {
-      updateGuard({ id: editingGuard.id, guard: data });
-    } else {
-      createGuard(data as Guard);
+  const fetchGuards = async () => {
+    try {
+      const data = await getGuards();
+      setGuards(data);
+    } catch {
+      setError("Failed to load guards.");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  useEffect(() => {
+    fetchGuards();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this guard?")) return;
+    try {
+      await deleteGuard(id);
+      setGuards((prev) => prev.filter((g) => g.id !== id));
+    } catch {
+      alert("Delete failed.");
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading guards...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Guards</h1>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+        <Link
+          to="/guards/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          New Guard
-        </button>
+          + New Guard
+        </Link>
       </div>
 
-      {showForm && (
-        <GuardForm
-          initialData={editingGuard ?? {}}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-        />
+      {guards.length === 0 ? (
+        <div>No guards found.</div>
+      ) : (
+        <table className="w-full border text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="p-2">Name</th>
+              <th className="p-2">Phone</th>
+              <th className="p-2">Status</th>
+              <th className="p-2">Assigned Vehicle</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {guards.map((guard) => (
+              <tr key={guard.id} className="border-t">
+                <td className="p-2">{guard.name}</td>
+                <td className="p-2">{guard.phone}</td>
+                <td className="p-2 capitalize">{guard.status}</td>
+                <td className="p-2">{guard.assignedVehicleId || "—"}</td>
+                <td className="p-2 space-x-2">
+                  <Link
+                    to={`/guards/${guard.id}/edit`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(guard.id!)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      <ul className="space-y-4 mt-6">
-        {guards.map((guard: Guard) => (
-          <li key={guard.id} className="bg-white shadow-md p-4 rounded-md">
-            <p className="font-bold">{guard.name}</p>
-            <p className="text-sm text-gray-600">Badge #: {guard.status}</p>
-            <p className="text-sm text-gray-600">{guard.phone}</p>
-            <button
-              className="text-blue-600 hover:underline mt-2"
-              onClick={() => handleEdit(guard)}
-            >
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default Guards;
+}

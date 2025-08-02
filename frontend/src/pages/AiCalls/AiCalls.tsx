@@ -1,75 +1,92 @@
-import { useAiCalls, useCreateAiCall, useUpdateAiCall } from '@/hooks/useAiCalls';
-import AiCallForm from '@/components/forms/AiCallForm';
-import type { AiCall } from '@/types/aiCall';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { AiCall } from "@/types";
+import { getAiCalls, deleteAiCall } from "@/lib/api/aiCalls";
 
-const AiCalls = () => {
-  const { data: aiCalls = [], isLoading, error } = useAiCalls();
-  const { mutate: createAiCall } = useCreateAiCall();
-  const { mutate: updateAiCall } = useUpdateAiCall();
+export default function AiCallList() {
+  const [aiCalls, setAiCalls] = useState<AiCall[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingAiCall, setEditingAiCall] = useState<AiCall | null>(null);
-
-  const handleCreate = () => {
-    setEditingAiCall(null);
-    setShowForm(true);
-  };
-
-  const handleEdit = (aiCall: AiCall) => {
-    setEditingAiCall(aiCall);
-    setShowForm(true);
-  };
-
-  const handleSubmit = (data: Partial<AiCall>) => {
-    if (editingAiCall?.id) {
-      updateAiCall({ id: editingAiCall.id, aiCall: data });
-    } else {
-      createAiCall(data as AiCall);
+  const fetchAiCalls = async () => {
+    try {
+      const data = await getAiCalls();
+      setAiCalls(data);
+    } catch (err) {
+      setError("Failed to load AI calls.");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  useEffect(() => {
+    fetchAiCalls();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this AI call?")) return;
+    try {
+      await deleteAiCall(id);
+      setAiCalls((prev) => prev.filter((c) => c.id !== id));
+    } catch {
+      alert("Delete failed.");
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading AI calls...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">AI Calls</h1>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+        <Link
+          to="/ai-calls/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          New Call
-        </button>
+          + New AI Call
+        </Link>
       </div>
 
-      {showForm && (
-        <AiCallForm
-          initialData={editingAiCall ?? {}}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-        />
+      {aiCalls.length === 0 ? (
+        <div>No AI calls found.</div>
+      ) : (
+        <table className="w-full border text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="p-2">Decision</th>
+              <th className="p-2">Confidence</th>
+              <th className="p-2">Evaluated At</th>
+              <th className="p-2">Notes</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {aiCalls.map((call) => (
+              <tr key={call.id} className="border-t">
+                <td className="p-2">{call.aiDecision}</td>
+                <td className="p-2">{call.confidenceScore.toFixed(2)}</td>
+                <td className="p-2">{new Date(call.evaluatedAt).toLocaleString()}</td>
+                <td className="p-2">{call.notes || "—"}</td>
+                <td className="p-2 space-x-2">
+                  <Link
+                    to={`/ai-calls/${call.id}/edit`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(call.id!)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      <ul className="space-y-4 mt-6">
-        {aiCalls.map((call: AiCall) => (
-          <li key={call.id} className="bg-white shadow-md p-4 rounded-md">
-            <p className="font-bold">{call.caller}</p>
-            <p className="text-sm text-gray-600">Topic: {call.topic}</p>
-            <p className="text-sm text-gray-500">Time: {call.timestamp}</p>
-            <button
-              className="text-blue-600 hover:underline mt-2"
-              onClick={() => handleEdit(call)}
-            >
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default AiCalls;
+}

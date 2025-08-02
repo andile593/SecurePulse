@@ -1,75 +1,99 @@
-import { useDispatches, useCreateDispatch, useUpdateDispatch } from '@/hooks/useDispatches';
-import DispatchForm from '@/components/forms/DispatchForm';
-import type { Dispatch } from '@/types/dispatch';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Dispatch } from "@/types";
+import { getDispatches, deleteDispatch } from "@/lib/api/dispatches";
 
-const Dispatches = () => {
-  const { data: dispatches = [], isLoading, error } = useDispatches();
-  const { mutate: createDispatch } = useCreateDispatch();
-  const { mutate: updateDispatch } = useUpdateDispatch();
+export default function DispatchList() {
+  const [dispatches, setDispatches] = useState<Dispatch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingDispatch, setEditingDispatch] = useState<Dispatch | null>(null);
-
-  const handleCreate = () => {
-    setEditingDispatch(null);
-    setShowForm(true);
-  };
-
-  const handleEdit = (dispatch: Dispatch) => {
-    setEditingDispatch(dispatch);
-    setShowForm(true);
-  };
-
-  const handleSubmit = (data: Partial<Dispatch>) => {
-    if (editingDispatch?.id) {
-      updateDispatch({ id: editingDispatch.id, dispatch: data });
-    } else {
-      createDispatch(data as Dispatch);
+  const fetchDispatches = async () => {
+    try {
+      const data = await getDispatches();
+      setDispatches(data);
+    } catch {
+      setError("Failed to fetch dispatches.");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  useEffect(() => {
+    fetchDispatches();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this dispatch?")) return;
+    try {
+      await deleteDispatch(id);
+      setDispatches((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+      alert("Failed to delete dispatch.");
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading dispatches...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Dispatches</h1>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+        <Link
+          to="/dispatches/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          New Dispatch
-        </button>
+          + New Dispatch
+        </Link>
       </div>
 
-      {showForm && (
-        <DispatchForm
-          initialData={editingDispatch ?? {}}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-        />
+      {dispatches.length === 0 ? (
+        <div>No dispatches found.</div>
+      ) : (
+        <table className="w-full border text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="p-2">Dispatched At</th>
+              <th className="p-2">Arrival Time</th>
+              <th className="p-2">Resolved At</th>
+              <th className="p-2">Response Notes</th>
+              <th className="p-2">Alarm ID</th>
+              <th className="p-2">Guard ID</th>
+              <th className="p-2">Vehicle ID</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dispatches.map((d) => (
+              <tr key={d.id} className="border-t">
+                <td className="p-2">{new Date(d.dispatchedAt).toLocaleString()}</td>
+                <td className="p-2">
+                  {d.arrivalTime ? new Date(d.arrivalTime).toLocaleString() : "—"}
+                </td>
+                <td className="p-2">
+                  {d.resolvedAt ? new Date(d.resolvedAt).toLocaleString() : "—"}
+                </td>
+                <td className="p-2">{d.responseNotes || "—"}</td>
+                <td className="p-2">{d.alarmId || "—"}</td>
+                <td className="p-2">{d.guardId || "—"}</td>
+                <td className="p-2">{d.vehicleId || "—"}</td>
+                <td className="p-2 space-x-2">
+                  <Link to={`/dispatches/${d.id}/edit`} className="text-blue-600 hover:underline">
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(d.id!)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      <ul className="space-y-4 mt-6">
-        {dispatches.map((dispatch: Dispatch) => (
-          <li key={dispatch.id} className="bg-white shadow-md p-4 rounded-md">
-            <p className="font-bold">{dispatch.guardName}</p>
-            <p className="text-sm text-gray-600">Site: {dispatch.site}</p>
-            <p className="text-sm text-gray-500">Time: {dispatch.time}</p>
-            <button
-              className="text-blue-600 hover:underline mt-2"
-              onClick={() => handleEdit(dispatch)}
-            >
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default Dispatches;
+}

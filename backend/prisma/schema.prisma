@@ -1,4 +1,4 @@
-generator client {
+content://com.android.externalstorage.documents/tree/primary%3ADownload%2FSecurePulse::primary:Download/SecurePulse/backend/prisma/schema.prismagenerator client {
   provider = "prisma-client-js"
 }
 
@@ -38,7 +38,7 @@ model Alarm {
   obLogs      ObLog[]
   aiCall      AiCall?
   dispatch    Dispatch?
-}
+}"
 
 model ObLog {
   id      String   @id @default(uuid())

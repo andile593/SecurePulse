@@ -1,75 +1,91 @@
-import { useObLogs, useCreateObLog, useUpdateObLog } from '@/hooks/useObLogs';
-import ObLogForm from '@/components/forms/ObLogForm';
-import type { ObLog } from '@/types/obLog';
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ObLog } from "@/types";
+import { getObLogs, deleteObLog } from "@/lib/api/oblogs";
 
-const ObLogs = () => {
-  const { data: obLogs = [], isLoading, error } = useObLogs();
-  const { mutate: createObLog } = useCreateObLog();
-  const { mutate: updateObLog } = useUpdateObLog();
+export default function ObLogList() {
+  const [logs, setLogs] = useState<ObLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [showForm, setShowForm] = useState(false);
-  const [editingObLog, setEditingObLog] = useState<ObLog | null>(null);
-
-  const handleCreate = () => {
-    setEditingObLog(null);
-    setShowForm(true);
-  };
-
-  const handleEdit = (obLog: ObLog) => {
-    setEditingObLog(obLog);
-    setShowForm(true);
-  };
-
-  const handleSubmit = (data: Partial<ObLog>) => {
-    if (editingObLog?.id) {
-      updateObLog({ id: editingObLog.id, obLog: data });
-    } else {
-      createObLog(data as ObLog);
+  const fetchLogs = async () => {
+    try {
+      const data = await getObLogs();
+      setLogs(data);
+    } catch {
+      setError("Failed to fetch OB logs.");
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Something went wrong</div>;
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this log?")) return;
+    try {
+      await deleteObLog(id);
+      setLogs((prev) => prev.filter((log) => log.id !== id));
+    } catch {
+      alert("Failed to delete log.");
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading logs...</div>;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">Observation Logs</h1>
-        <button
-          onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+        <h1 className="text-2xl font-semibold">OB Logs</h1>
+        <Link
+          to="/oblogs/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          New Log
-        </button>
+          + New Log
+        </Link>
       </div>
 
-      {showForm && (
-        <ObLogForm
-          initialData={editingObLog ?? {}}
-          onSubmit={handleSubmit}
-          onClose={() => setShowForm(false)}
-        />
+      {logs.length === 0 ? (
+        <div>No logs found.</div>
+      ) : (
+        <table className="w-full border text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="p-2">Title</th>
+              <th className="p-2">Content</th>
+              <th className="p-2">Created By</th>
+              <th className="p-2">Created At</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {logs.map((log) => (
+              <tr key={log.id} className="border-t">
+                <td className="p-2">{log.title}</td>
+                <td className="p-2">{log.content}</td>
+                <td className="p-2">{log.createdBy}</td>
+                <td className="p-2">
+                  {log.createdAt ? new Date(log.createdAt).toLocaleString() : "—"}
+                </td>
+                <td className="p-2 space-x-2">
+                  <Link to={`/oblogs/${log.id}/edit`} className="text-blue-600 hover:underline">
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(log.id!)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
-
-      <ul className="space-y-4 mt-6">
-        {obLogs.map((log: ObLog) => (
-          <li key={log.id} className="bg-white shadow-md p-4 rounded-md">
-            <p className="font-bold">{log.guardName}</p>
-            <p className="text-sm text-gray-600">{log.message}</p>
-            <p className="text-sm text-gray-500">Time: {log.timestamp}</p>
-            <button
-              className="text-blue-600 hover:underline mt-2"
-              onClick={() => handleEdit(log)}
-            >
-              Edit
-            </button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default ObLogs;
+}
