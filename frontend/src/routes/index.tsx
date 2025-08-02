@@ -1,5 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
+import ProtectedRoute from './ProtectedRoute';
+
+<Route path="/dashboard" element={
+<ProtectedRoute>
+  <Dashboard />
+  </ProtectedRoute>} 
+  />
 
 
 import Home from "@/pages/Common/Home";
