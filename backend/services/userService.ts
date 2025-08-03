@@ -1,19 +1,20 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient, User, Prisma } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-async function createUser(data) {
+export async function createUser(data: Prisma.UserCreateInput): Promise<User> {
   return prisma.user.create({ data });
 }
 
-async function getAllUsers() {
+export async function getAllUsers(): Promise<User[]> {
   return prisma.user.findMany();
 }
 
-async function getUserById(id) {
+export async function getUserById(id: number): Promise<User | null> {
   return prisma.user.findUnique({ where: { id } });
 }
 
-async function updateUser(id, data) {
+export async function updateUser(id: number, data: Prisma.UserUpdateInput): Promise<User | null> {
   try {
     return await prisma.user.update({ where: { id }, data });
   } catch {
@@ -21,7 +22,7 @@ async function updateUser(id, data) {
   }
 }
 
-async function deleteUser(id) {
+export async function deleteUser(id: number): Promise<boolean> {
   try {
     await prisma.user.delete({ where: { id } });
     return true;
@@ -29,11 +30,3 @@ async function deleteUser(id) {
     return false;
   }
 }
-
-module.exports = {
-  createUser,
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-};

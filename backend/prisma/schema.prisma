@@ -24,8 +24,9 @@ model Site {
   longitude Float
   clientId  String
   client    Client  @relation(fields: [clientId], references: [id])
+  company   Company?  @relation(fields: [companyId], references: [id])
   alarms    Alarm[]
-}
+ }
 
 model Alarm {
   id          String    @id @default(uuid())
@@ -80,22 +81,33 @@ model Dispatch {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime  @default(now())
-  lastLogin    DateTime?
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  name        String
+  role        Role     @default(CONTROLLER)
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+  createdAt   DateTime @default(now())
+  resetToken       String? 
+  resetTokenExpiry DateTime?
 
-  roleId String
-  role   UserRole @relation(fields: [roleId], references: [id])
 }
+
 
 model UserRole {
   id    String @id @default(uuid())
   name  String @unique 
   users User[]
 }
+
+model Company {
+  id      String  @id @default(uuid())
+  name    String
+  users   User[]
+  sites   Site[]
+}
+
 
 model Vehicle {
   id         String   @id @default(uuid())
@@ -119,4 +131,12 @@ model Guard {
 
   dispatches Dispatch[]
   obLogs     ObLog[] 
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  CONTROLLER
+  CLIENT
+  GUARD
 }

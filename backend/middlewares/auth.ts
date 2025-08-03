@@ -17,3 +17,22 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     return res.sendStatus(403);
   }
 };
+
+export function requireAuth(roles: string[] = []) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.sendStatus(401);
+
+    const token = authHeader.split(' ')[1];
+    try {
+      const user = jwt.verify(token, JWT_SECRET) as any;
+      if (roles.length && !roles.includes(user.role)) {
+        return res.sendStatus(403);
+      }
+      req.user = user; // attach user object to request
+      next();
+    } catch {
+      return res.sendStatus(403);
+    }
+  };
+}
