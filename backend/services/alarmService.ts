@@ -1,45 +1,46 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient, Alarm } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-async function createAlarm(data) {
+export async function createAlarm(data: Omit<Alarm, 'id'>): Promise<Alarm> {
   return prisma.alarm.create({ data });
 }
 
-async function getAllAlarms() {
+export async function getAllAlarms(): Promise<Alarm[]> {
   return prisma.alarm.findMany({
     include: {
       site: true,
       obLogs: true,
       aiCall: true,
-      dispatch: true
-    }
+      dispatch: true,
+    },
   });
 }
 
-async function getAlarmById(id) {
+export async function getAlarmById(id: number): Promise<Alarm | null> {
   return prisma.alarm.findUnique({
     where: { id },
     include: {
       site: true,
       obLogs: true,
       aiCall: true,
-      dispatch: true
-    }
+      dispatch: true,
+    },
   });
 }
 
-async function updateAlarm(id, data) {
+export async function updateAlarm(id: number, data: Partial<Alarm>): Promise<Alarm | null> {
   try {
     return await prisma.alarm.update({
       where: { id },
-      data
+      data,
     });
   } catch {
     return null;
   }
 }
 
-async function deleteAlarm(id) {
+export async function deleteAlarm(id: number): Promise<boolean> {
   try {
     await prisma.alarm.delete({ where: { id } });
     return true;
@@ -47,11 +48,3 @@ async function deleteAlarm(id) {
     return false;
   }
 }
-
-module.exports = {
-  createAlarm,
-  getAllAlarms,
-  getAlarmById,
-  updateAlarm,
-  deleteAlarm
-};

@@ -1,24 +1,25 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient, Guard } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-async function createGuard(data) {
+export async function createGuard(data: Prisma.GuardCreateInput): Promise<Guard> {
   return prisma.guard.create({ data });
 }
 
-async function getAllGuards() {
+export async function getAllGuards(): Promise<Guard[]> {
   return prisma.guard.findMany({
     include: { assignedVehicle: true, obLogs: true, dispatches: true },
   });
 }
 
-async function getGuardById(id) {
+export async function getGuardById(id: number): Promise<Guard | null> {
   return prisma.guard.findUnique({
     where: { id },
     include: { assignedVehicle: true, obLogs: true, dispatches: true },
   });
 }
 
-async function updateGuard(id, data) {
+export async function updateGuard(id: number, data: Prisma.GuardUpdateInput): Promise<Guard | null> {
   try {
     return await prisma.guard.update({ where: { id }, data });
   } catch {
@@ -26,7 +27,7 @@ async function updateGuard(id, data) {
   }
 }
 
-async function deleteGuard(id) {
+export async function deleteGuard(id: number): Promise<boolean> {
   try {
     await prisma.guard.delete({ where: { id } });
     return true;
@@ -34,11 +35,3 @@ async function deleteGuard(id) {
     return false;
   }
 }
-
-module.exports = {
-  createGuard,
-  getAllGuards,
-  getGuardById,
-  updateGuard,
-  deleteGuard,
-};

@@ -1,6 +1,10 @@
-const express = require('express');
+import express from 'express';
+import * as vehicleController from '../controllers/vehicleController';
+import { authenticateToken } from '../middlewares/auth';
+
 const router = express.Router();
-const vehicleController = require('../controllers/vehicleController');
+
+router.use(authenticateToken); // secure all endpoints
 
 router.post('/', vehicleController.createVehicle);
 router.get('/', vehicleController.getVehicles);
@@ -8,4 +12,4 @@ router.get('/:id', vehicleController.getVehicleById);
 router.put('/:id', vehicleController.updateVehicle);
 router.delete('/:id', vehicleController.deleteVehicle);
 
-module.exports = router;
+export default router;

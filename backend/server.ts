@@ -16,6 +16,7 @@ app.use('/vehicles', require('./routes/vehicle'));
 app.use('/ai-calls', require('./routes/aiCall'));
 app.use('/users', require('./routes/user'));
 app.use('/dispatches', require('./routes/dispatch'));
+app.use('/auth', require('./routes/auth'));
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server running at http://localhost:${process.env.SERVER_PORT}`);

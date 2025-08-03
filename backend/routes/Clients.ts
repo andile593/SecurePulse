@@ -1,6 +1,10 @@
-const express = require('express');
+import express from 'express';
+import * as clientController from '../controllers/clientController';
+import { authenticateToken } from '../middlewares/auth';
+
 const router = express.Router();
-const clientController = require('../controllers/clientController');
+
+router.use(authenticateToken); // protect all routes
 
 router.post('/', clientController.createClient);
 router.get('/', clientController.getClients);
@@ -8,4 +12,4 @@ router.get('/:id', clientController.getClientById);
 router.put('/:id', clientController.updateClient);
 router.delete('/:id', clientController.deleteClient);
 
-module.exports = router;
+export default router;

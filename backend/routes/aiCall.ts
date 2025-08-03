@@ -1,6 +1,10 @@
-const express = require('express');
+import express from 'express';
+import * as aiCallController from '../controllers/aiCallController';
+import { authenticateToken } from '../middlewares/auth';
+
 const router = express.Router();
-const aiCallController = require('../controllers/aiCallController');
+
+router.use(authenticateToken); // protect all aiCall routes
 
 router.post('/', aiCallController.createAiCall);
 router.get('/', aiCallController.getAiCalls);
@@ -8,4 +12,4 @@ router.get('/:id', aiCallController.getAiCallById);
 router.put('/:id', aiCallController.updateAiCall);
 router.delete('/:id', aiCallController.deleteAiCall);
 
-module.exports = router;
+export default router;
