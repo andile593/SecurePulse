@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Alarm } from "@/types";
+import type { Alarm } from "@/types";
 import { getAlarms, deleteAlarm } from "@/lib/api/alarms";
 
 export default function AlarmList() {
@@ -10,8 +10,8 @@ export default function AlarmList() {
 
   const fetchAlarms = async () => {
     try {
-      const data = await getAlarms();
-      setAlarms(data);
+      const response = await getAlarms();
+      setAlarms(response.data);
     } catch {
       setError("Failed to load alarms.");
     } finally {
@@ -26,7 +26,7 @@ export default function AlarmList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this alarm?")) return;
     try {
-      await deleteAlarm(id);
+      await deleteAlarm({id});
       setAlarms((prev) => prev.filter((alarm) => alarm.id !== id));
     } catch {
       alert("Error deleting alarm.");

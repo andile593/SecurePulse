@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { ObLog } from '@/types/obLog';
+import { useState, useEffect } from "react";
+import type { ObLog } from "@/types/obLog";
 
 type ObLogFormProps = {
   initialData?: Partial<ObLog>;
@@ -8,29 +8,31 @@ type ObLogFormProps = {
 };
 
 const ObLogForm = ({ initialData = {}, onSubmit, onClose }: ObLogFormProps) => {
-  const [guardName, setGuardName] = useState('');
-  const [message, setMessage] = useState('');
-  const [timestamp, setTimestamp] = useState('');
+  const [source, setSource] = useState("");
+  const [logTime, setLogTime] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setGuardName(initialData.guardName ?? '');
-    setMessage(initialData.message ?? '');
-    setTimestamp(initialData.timestamp ?? '');
+    setSource(initialData.source ?? "");
+    setLogTime(initialData.logTime ?? "");
+    setMessage(initialData.message ?? "");
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ guardName, message, timestamp });
+    onSubmit({ source, message, logTime });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white shadow p-4 rounded max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white shadow p-4 rounded max-w-md"
+    >
       <div>
-        <label className="block text-sm font-medium mb-1">Guard Name</label>
+        <label className="block text-sm font-medium mb-1">Source Name</label>
         <input
-          className="w-full border p-2 rounded"
-          value={guardName}
-          onChange={(e) => setGuardName(e.target.value)}
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
           required
         />
       </div>
@@ -49,16 +51,26 @@ const ObLogForm = ({ initialData = {}, onSubmit, onClose }: ObLogFormProps) => {
         <label className="block text-sm font-medium mb-1">Timestamp</label>
         <input
           type="datetime-local"
-          className="w-full border p-2 rounded"
-          value={timestamp}
-          onChange={(e) => setTimestamp(e.target.value)}
+          value={logTime}
+          onChange={(e) => setLogTime(e.target.value)}
           required
         />
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">Cancel</button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-600 hover:underline"
+        >
+          Cancel
+        </button>
       </div>
     </form>
   );

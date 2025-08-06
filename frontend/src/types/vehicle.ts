@@ -3,7 +3,8 @@ import type { Guard } from '@/types';
 
 export interface Vehicle {
   id?: string;
-  plateNumber: string;
+  name: string;
+  plate: string;
   model: string;
   status: string;
   description?: string;

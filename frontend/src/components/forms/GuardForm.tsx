@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Guard } from '@/types/guard';
+import { useVehicles } from '@/hooks/useVehicles'; // <-- Assuming this hook exists
 
 type GuardFormProps = {
   initialData?: Partial<Guard>;
@@ -11,18 +12,22 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
   const [name, setName] = useState('');
   const [status, setStatus] = useState('');
   const [phone, setPhone] = useState('');
+  const [assignedVehicleId, setAssignedVehicleId] = useState('');
+
+  const { data: vehicles = [] } = useVehicles(); // Hook to fetch vehicles
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name ?? '');
       setStatus(initialData.status ?? '');
       setPhone(initialData.phone ?? '');
+      setAssignedVehicleId(initialData.assignedVehicleId ?? '');
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, status, phone });
+    onSubmit({ name, status, phone, assignedVehicleId });
   };
 
   return (
@@ -39,7 +44,7 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Badge Number</label>
+        <label className="block text-sm font-medium mb-1">Status</label>
         <input
           type="text"
           className="w-full border p-2 rounded"
@@ -57,6 +62,22 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Assigned Vehicle</label>
+        <select
+          className="w-full border p-2 rounded"
+          value={assignedVehicleId}
+          onChange={(e) => setAssignedVehicleId(e.target.value)}
+        >
+          <option value="">None</option>
+          {vehicles.map((vehicle) => (
+            <option key={vehicle.id} value={vehicle.id}>
+              {vehicle.plate ?? vehicle.name ?? vehicle.id}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex gap-2">

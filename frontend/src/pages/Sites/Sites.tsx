@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Site } from "@/types";
+import type { Site } from "@/types";
 import { getSites, deleteSite } from "@/lib/api/sites";
 
 export default function SiteList() {
@@ -10,8 +10,8 @@ export default function SiteList() {
 
   const fetchSites = async () => {
     try {
-      const data = await getSites();
-      setSites(data);
+      const response = await getSites();
+      setSites(response.data);
     } catch {
       setError("Failed to load sites.");
     } finally {
@@ -26,7 +26,7 @@ export default function SiteList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this site?")) return;
     try {
-      await deleteSite(id);
+      await deleteSite({id});
       setSites((prev) => prev.filter((site) => site.id !== id));
     } catch {
       alert("Failed to delete site.");
@@ -55,7 +55,6 @@ export default function SiteList() {
           <thead className="bg-gray-100 text-left">
             <tr>
               <th className="p-2">Name</th>
-              <th className="p-2">Location</th>
               <th className="p-2">Client ID</th>
               <th className="p-2">Contact Person</th>
               <th className="p-2">Contact Phone</th>
@@ -66,10 +65,7 @@ export default function SiteList() {
             {sites.map((site) => (
               <tr key={site.id} className="border-t">
                 <td className="p-2">{site.name}</td>
-                <td className="p-2">{site.location}</td>
                 <td className="p-2">{site.clientId || "—"}</td>
-                <td className="p-2">{site.contactPerson || "—"}</td>
-                <td className="p-2">{site.contactPhone || "—"}</td>
                 <td className="p-2 space-x-2">
                   <Link
                     to={`/sites/${site.id}/edit`}

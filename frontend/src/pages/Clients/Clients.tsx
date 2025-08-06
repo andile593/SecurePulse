@@ -10,8 +10,8 @@ export default function ClientList() {
 
   const fetchClients = async () => {
     try {
-      const data = await getClients();
-      setClients(data);
+      const response = await getClients();
+      setClients(response.data);
     } catch (err) {
       setError("Failed to load clients.");
     } finally {
@@ -26,7 +26,7 @@ export default function ClientList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this client?")) return;
     try {
-      await deleteClient(id);
+      await deleteClient({id});
       setClients((prev) => prev.filter((c) => c.id !== id));
     } catch {
       alert("Delete failed.");
@@ -64,7 +64,7 @@ export default function ClientList() {
             {clients.map((client) => (
               <tr key={client.id} className="border-t">
                 <td className="p-2">{client.name}</td>
-                <td className="p-2">{client.email}</td>
+                <td className="p-2">{client.contactEmail}</td>
                 <td className="p-2">{client.phone}</td>
                 <td className="p-2 space-x-2">
                   <Link

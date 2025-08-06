@@ -1,5 +1,5 @@
 
-
+import type { Role } from '@/types'
 
 export interface User {
   id?: string;
@@ -9,5 +9,5 @@ export interface User {
   createdAt?: string;
   lastLogin?: string;
   roleId: string;
-  // role?: UserRole;
+  role?: Role;
 }

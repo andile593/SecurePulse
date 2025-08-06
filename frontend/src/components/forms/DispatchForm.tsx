@@ -8,36 +8,43 @@ type DispatchFormProps = {
 };
 
 const DispatchForm = ({ initialData = {}, onSubmit, onClose }: DispatchFormProps) => {
-  const [responseNotes, setResponseNotes ] = useState('');
   const [dispatchedAt, setDispatchedAt] = useState('');
-  const [guard, setGuard] = useState('');
+  const [arrivalTime, setArrivalTime] = useState('');
+  const [resolvedAt, setResolvedAt] = useState('');
+  const [responseNotes, setResponseNotes] = useState('');
+  const [alarmId, setAlarmId] = useState('');
+  const [guardId, setGuardId] = useState('');
+  const [vehicleId, setVehicleId] = useState('');
 
   useEffect(() => {
-    setResponseNotes(initialData.responseNotes ?? '');
     setDispatchedAt(initialData.dispatchedAt ?? '');
-    setGuard(initialData.guard ?? '');
+    setArrivalTime(initialData.arrivalTime ?? '');
+    setResolvedAt(initialData.resolvedAt ?? '');
+    setResponseNotes(initialData.responseNotes ?? '');
+    setAlarmId(initialData.alarmId ?? '');
+    setGuardId(initialData.guardId ?? '');
+    setVehicleId(initialData.vehicleId ?? '');
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ responseNotes, dispatchedAt, guard });
+    onSubmit({
+      dispatchedAt,
+      arrivalTime,
+      resolvedAt,
+      responseNotes,
+      alarmId,
+      guardId,
+      vehicleId,
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white shadow rounded max-w-md">
       <div>
-        <label className="block text-sm font-medium mb-1">Unit</label>
+        <label className="block text-sm font-medium mb-1">Dispatched At</label>
         <input
-          className="w-full border p-2 rounded"
-          value={responseNotes}
-          onChange={(e) => setResponseNotes(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-1">Status</label>
-        <input
+          type="datetime-local"
           className="w-full border p-2 rounded"
           value={dispatchedAt}
           onChange={(e) => setDispatchedAt(e.target.value)}
@@ -46,17 +53,69 @@ const DispatchForm = ({ initialData = {}, onSubmit, onClose }: DispatchFormProps
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Assigned To</label>
+        <label className="block text-sm font-medium mb-1">Arrival Time</label>
+        <input
+          type="datetime-local"
+          className="w-full border p-2 rounded"
+          value={arrivalTime}
+          onChange={(e) => setArrivalTime(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Resolved At</label>
+        <input
+          type="datetime-local"
+          className="w-full border p-2 rounded"
+          value={resolvedAt}
+          onChange={(e) => setResolvedAt(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Response Notes</label>
+        <textarea
+          className="w-full border p-2 rounded"
+          value={responseNotes}
+          onChange={(e) => setResponseNotes(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Alarm ID</label>
         <input
           className="w-full border p-2 rounded"
-          value={guard}
-          onChange={(e) => setGuard(e.target.value)}
+          value={alarmId}
+          onChange={(e) => setAlarmId(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Guard ID</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={guardId}
+          onChange={(e) => setGuardId(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Vehicle ID</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={vehicleId}
+          onChange={(e) => setVehicleId(e.target.value)}
         />
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline px-4 py-2">Cancel</button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Save
+        </button>
+        <button type="button" onClick={onClose} className="text-gray-600 hover:underline px-4 py-2">
+          Cancel
+        </button>
       </div>
     </form>
   );

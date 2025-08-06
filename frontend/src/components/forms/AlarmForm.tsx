@@ -10,17 +10,29 @@ type AlarmFormProps = {
 const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
   const [alarmType, setAlarmType] = useState('');
   const [status, setStatus] = useState('');
+  const [triggeredAt, setTriggeredAt] = useState('');
+  const [priority, setPriority] = useState(1);
+  const [siteId, setSiteId] = useState('');
 
   useEffect(() => {
     if (initialData) {
       setAlarmType(initialData.alarmType ?? '');
       setStatus(initialData.status ?? '');
+      setTriggeredAt(initialData.triggeredAt?.slice(0, 16) ?? '');
+      setPriority(initialData.priority ?? 1);
+      setSiteId(initialData.siteId ?? '');
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ alarmType, status });
+    onSubmit({
+      alarmType,
+      status,
+      triggeredAt,
+      priority,
+      siteId,
+    });
   };
 
   return (
@@ -31,16 +43,54 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
           className="w-full border p-2 rounded"
           value={alarmType}
           onChange={(e) => setAlarmType(e.target.value)}
+          required
         />
       </div>
+
       <div>
         <label className="block text-sm font-medium">Status</label>
         <input
           className="w-full border p-2 rounded"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          required
         />
       </div>
+
+      <div>
+        <label className="block text-sm font-medium">Triggered At</label>
+        <input
+          type="datetime-local"
+          className="w-full border p-2 rounded"
+          value={triggeredAt}
+          onChange={(e) => setTriggeredAt(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Priority</label>
+        <input
+          type="number"
+          min="1"
+          max="5"
+          className="w-full border p-2 rounded"
+          value={priority}
+          onChange={(e) => setPriority(parseInt(e.target.value))}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Site ID</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={siteId}
+          onChange={(e) => setSiteId(e.target.value)}
+          required
+        />
+      </div>
+
       <div className="flex gap-2">
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
           Save

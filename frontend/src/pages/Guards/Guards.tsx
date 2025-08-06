@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Guard } from "@/types";
+import type { Guard } from "@/types";
 import { getGuards, deleteGuard } from "@/lib/api/guards";
 
 export default function GuardList() {
@@ -10,8 +10,8 @@ export default function GuardList() {
 
   const fetchGuards = async () => {
     try {
-      const data = await getGuards();
-      setGuards(data);
+      const response = await getGuards();
+      setGuards(response.data);
     } catch {
       setError("Failed to load guards.");
     } finally {
@@ -26,7 +26,7 @@ export default function GuardList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this guard?")) return;
     try {
-      await deleteGuard(id);
+      await deleteGuard({id});
       setGuards((prev) => prev.filter((g) => g.id !== id));
     } catch {
       alert("Delete failed.");

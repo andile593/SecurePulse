@@ -111,7 +111,8 @@ model Company {
 
 model Vehicle {
   id         String   @id @default(uuid())
-  plateNumber String  @unique
+  name       String
+  plate      String  @unique
   model      String
   status     String
   description String?

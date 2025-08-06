@@ -1,24 +1,33 @@
 import { useEffect, useState } from 'react';
 import type { User } from '@/types/user';
 
+
+type Role = {
+  id: string;
+  name: string;
+};
+
 type Props = {
   initialData?: Partial<User>;
+  roles: Role[];
   onSubmit: (data: Partial<User>) => void;
   onClose: () => void;
 };
 
-const UserForm = ({ initialData = {}, onSubmit, onClose }: Props) => {
+const UserForm = ({ initialData = {}, roles, onSubmit, onClose }: Props) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [roleId, setRoleId] = useState('');
 
   useEffect(() => {
     setName(initialData.name ?? '');
     setEmail(initialData.email ?? '');
-  }, [initialData]);
+    setRoleId(initialData.roleId ?? (roles.length > 0 ? roles[0].id : ''));
+  }, [initialData, roles]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, email });
+    onSubmit({ name, email, roleId });
   };
 
   return (
@@ -42,6 +51,20 @@ const UserForm = ({ initialData = {}, onSubmit, onClose }: Props) => {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Role</label>
+        <select
+          className="w-full border p-2 rounded"
+          value={roleId}
+          onChange={(e) => setRoleId(e.target.value)}
+          required
+        >
+          {roles.map(role => (
+            <option key={role.id} value={role.id}>{role.name}</option>
+          ))}
+        </select>
       </div>
 
       <div className="flex gap-2">

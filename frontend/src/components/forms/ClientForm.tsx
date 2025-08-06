@@ -9,20 +9,20 @@ type ClientFormProps = {
 
 const ClientForm = ({ initialData = {}, onSubmit, onClose }: ClientFormProps) => {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
   const [phone, setPhone] = useState('');
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name ?? '');
-      setEmail(initialData.email ?? '');
+      setContactEmail(initialData.contactEmail ?? '');
       setPhone(initialData.phone ?? '');
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, email, phone });
+    onSubmit({ name, contactEmail, phone });
   };
 
   return (
@@ -43,8 +43,8 @@ const ClientForm = ({ initialData = {}, onSubmit, onClose }: ClientFormProps) =>
         <input
           type="email"
           className="w-full border p-2 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={contactEmail}
+          onChange={(e) => setContactEmail(e.target.value)}
           required
         />
       </div>
@@ -70,5 +70,6 @@ const ClientForm = ({ initialData = {}, onSubmit, onClose }: ClientFormProps) =>
     </form>
   );
 };
+
 
 export default ClientForm;

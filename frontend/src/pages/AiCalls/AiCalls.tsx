@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { AiCall } from "@/types";
+import type { AiCall } from "@/types";
 import { getAiCalls, deleteAiCall } from "@/lib/api/aiCalls";
 
 export default function AiCallList() {
@@ -10,8 +10,8 @@ export default function AiCallList() {
 
   const fetchAiCalls = async () => {
     try {
-      const data = await getAiCalls();
-      setAiCalls(data);
+      const response = await getAiCalls();
+      setAiCalls(response.data);
     } catch (err) {
       setError("Failed to load AI calls.");
     } finally {
@@ -26,7 +26,7 @@ export default function AiCallList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this AI call?")) return;
     try {
-      await deleteAiCall(id);
+      await deleteAiCall({id});
       setAiCalls((prev) => prev.filter((c) => c.id !== id));
     } catch {
       alert("Delete failed.");

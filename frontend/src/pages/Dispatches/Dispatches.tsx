@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Dispatch } from "@/types";
+import type { Dispatch } from "@/types";
 import { getDispatches, deleteDispatch } from "@/lib/api/dispatches";
 
 export default function DispatchList() {
@@ -10,8 +10,8 @@ export default function DispatchList() {
 
   const fetchDispatches = async () => {
     try {
-      const data = await getDispatches();
-      setDispatches(data);
+      const response = await getDispatches();
+      setDispatches(response.data);
     } catch {
       setError("Failed to fetch dispatches.");
     } finally {
@@ -26,7 +26,7 @@ export default function DispatchList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this dispatch?")) return;
     try {
-      await deleteDispatch(id);
+      await deleteDispatch({id});
       setDispatches((prev) => prev.filter((item) => item.id !== id));
     } catch {
       alert("Failed to delete dispatch.");

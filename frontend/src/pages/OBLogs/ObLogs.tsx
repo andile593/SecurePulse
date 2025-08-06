@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ObLog } from "@/types";
-import { getObLogs, deleteObLog } from "@/lib/api/oblogs";
+import type { ObLog } from "@/types";
+import { getObLogs, deleteObLog } from "@/lib/api/obLogs";
 
 export default function ObLogList() {
   const [logs, setLogs] = useState<ObLog[]>([]);
@@ -10,8 +10,8 @@ export default function ObLogList() {
 
   const fetchLogs = async () => {
     try {
-      const data = await getObLogs();
-      setLogs(data);
+      const response = await getObLogs();
+      setLogs(response.data);
     } catch {
       setError("Failed to fetch OB logs.");
     } finally {
@@ -26,7 +26,7 @@ export default function ObLogList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this log?")) return;
     try {
-      await deleteObLog(id);
+      await deleteObLog({ id });
       setLogs((prev) => prev.filter((log) => log.id !== id));
     } catch {
       alert("Failed to delete log.");
@@ -64,14 +64,18 @@ export default function ObLogList() {
           <tbody>
             {logs.map((log) => (
               <tr key={log.id} className="border-t">
-                <td className="p-2">{log.title}</td>
-                <td className="p-2">{log.content}</td>
-                <td className="p-2">{log.createdBy}</td>
+                <td className="p-2">{log.message}</td> // ✅ from Prisma
+                <td className="p-2">{log.source}</td> // ✅ from Prisma
+                <td className="p-2">{log.guard?.name ?? "—"}</td> // optional,
+                if guard exists
                 <td className="p-2">
-                  {log.createdAt ? new Date(log.createdAt).toLocaleString() : "—"}
+                  {log.logTime ? new Date(log.logTime).toLocaleString() : "—"}
                 </td>
                 <td className="p-2 space-x-2">
-                  <Link to={`/oblogs/${log.id}/edit`} className="text-blue-600 hover:underline">
+                  <Link
+                    to={`/oblogs/${log.id}/edit`}
+                    className="text-blue-600 hover:underline"
+                  >
                     Edit
                   </Link>
                   <button

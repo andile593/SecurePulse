@@ -10,18 +10,24 @@ type SiteFormProps = {
 const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [description, setDescription] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   useEffect(() => {
-    if (initialData) {
-      setName(initialData.name ?? '');
-      setAddress(initialData.address ?? '');
-    }
+    setName(initialData.name ?? '');
+    setAddress(initialData.address ?? '');
+    setLatitude(initialData.latitude?.toString() ?? '');
+    setLongitude(initialData.longitude?.toString() ?? '');
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, address });
+    onSubmit({
+      name,
+      address,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+    });
   };
 
   return (
@@ -47,11 +53,26 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Description</label>
-        <textarea
+        <label className="block text-sm font-medium mb-1">Latitude</label>
+        <input
+          type="number"
+          step="any"
           className="w-full border p-2 rounded"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={latitude}
+          onChange={(e) => setLatitude(e.target.value)}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Longitude</label>
+        <input
+          type="number"
+          step="any"
+          className="w-full border p-2 rounded"
+          value={longitude}
+          onChange={(e) => setLongitude(e.target.value)}
+          required
         />
       </div>
 

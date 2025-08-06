@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { User } from "@/types";
+import type { User } from "@/types";
 import { getUsers, deleteUser } from "@/lib/api/users";
 
 export default function UserList() {
@@ -10,8 +10,8 @@ export default function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const data = await getUsers();
-      setUsers(data);
+      const response = await getUsers();
+      setUsers(response.data);
     } catch {
       setError("Failed to fetch users.");
     } finally {
@@ -26,7 +26,7 @@ export default function UserList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
-      await deleteUser(id);
+      await deleteUser({id});
       setUsers((prev) => prev.filter((user) => user.id !== id));
     } catch {
       alert("Failed to delete user.");
@@ -57,7 +57,6 @@ export default function UserList() {
               <th className="p-2">Username</th>
               <th className="p-2">Email</th>
               <th className="p-2">Role</th>
-              <th className="p-2">Status</th>
               <th className="p-2">Created At</th>
               <th className="p-2">Actions</th>
             </tr>
@@ -65,10 +64,9 @@ export default function UserList() {
           <tbody>
             {users.map((user) => (
               <tr key={user.id} className="border-t">
-                <td className="p-2">{user.username}</td>
+                <td className="p-2">{user.name}</td>
                 <td className="p-2">{user.email}</td>
-                <td className="p-2 capitalize">{user.role}</td>
-                <td className="p-2 capitalize">{user.status}</td>
+                <td className="p-2 capitalize">{user.role?.name ?? "—"}</td>
                 <td className="p-2">
                   {user.createdAt
                     ? new Date(user.createdAt).toLocaleDateString()

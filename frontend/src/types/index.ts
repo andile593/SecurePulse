@@ -6,6 +6,6 @@ export * from './obLog';
 export * from './aiCall';
 export * from './dispatch';
 export * from './user';
-// export * from './userRole';
+export * from './role';
 export * from './vehicle';
 export * from './guard';

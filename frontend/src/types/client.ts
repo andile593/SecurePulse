@@ -3,8 +3,9 @@ import type { Site } from '@/types';
 export interface Client {
   id?: string;
   name: string;
-  email: string;
+  contactEmail: string;
   phone: string;
-  createdAt?: string;
-  sites?: Site[]; // Related
+  createdAt: string;
+  sites?: Site[];
 }
+
