@@ -4,7 +4,7 @@ import type { Role } from '@/types'
 export interface User {
   id?: string;
   email: string;
-  passwordHash?: string; // used only server-side
+  password?: string; 
   name: string;
   createdAt?: string;
   lastLogin?: string;

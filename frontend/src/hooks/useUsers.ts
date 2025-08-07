@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  getUser,
   getUsers,
   createUser,
   updateUser,
@@ -17,6 +18,17 @@ export function useUsers() {
       const res = await getUsers();
       return res.data
     }
+  });
+}
+
+export function useUser(id: string) {
+  return useQuery<User>({
+    queryKey: ['user', id],
+    queryFn: async () => {
+      const res = await getUser(id);
+      return res.data; 
+    },
+    enabled: !!id,
   });
 }
 

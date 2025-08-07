@@ -1,4 +1,4 @@
-content://com.android.externalstorage.documents/tree/primary%3ADownload%2FSecurePulse::primary:Download/SecurePulse/backend/prisma/schema.prismagenerator client {
+generator client {
   provider = "prisma-client-js"
 }
 
@@ -24,9 +24,8 @@ model Site {
   longitude Float
   clientId  String
   client    Client  @relation(fields: [clientId], references: [id])
-  company   Company?  @relation(fields: [companyId], references: [id])
   alarms    Alarm[]
- }
+}
 
 model Alarm {
   id          String    @id @default(uuid())
@@ -39,7 +38,7 @@ model Alarm {
   obLogs      ObLog[]
   aiCall      AiCall?
   dispatch    Dispatch?
-}"
+}
 
 model ObLog {
   id      String   @id @default(uuid())
@@ -81,33 +80,22 @@ model Dispatch {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  name        String
-  role        Role     @default(CONTROLLER)
-  companyId   String?
-  company     Company? @relation(fields: [companyId], references: [id])
-  createdAt   DateTime @default(now())
-  resetToken       String? 
-  resetTokenExpiry DateTime?
+  id           String    @id @default(uuid())
+  email        String    @unique
+  password     String
+  name         String
+  createdAt    DateTime  @default(now())
+  lastLogin    DateTime?
 
+  roleId         String
+  role         UserRole @relation(fields: [roleId], references: [id])
 }
 
-
 model UserRole {
-  id    String @id @default(uuid())
+  id    String @id
   name  String @unique 
   users User[]
 }
-
-model Company {
-  id      String  @id @default(uuid())
-  name    String
-  users   User[]
-  sites   Site[]
-}
-
 
 model Vehicle {
   id         String   @id @default(uuid())
@@ -132,12 +120,4 @@ model Guard {
 
   dispatches Dispatch[]
   obLogs     ObLog[] 
-}
-
-enum Role {
-  SUPER_ADMIN
-  ADMIN
-  CONTROLLER
-  CLIENT
-  GUARD
 }

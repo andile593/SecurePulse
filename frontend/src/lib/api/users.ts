@@ -2,6 +2,9 @@ import api from './axios';
 import type { User } from '@/types/user';
 
 export const getUsers = () => api.get<User[]>('/users');
+
+export const getUser = (id: string) => api.get<User>(`/users/${id}`);
+
 export const getUserById = (id: string) => api.get<User>(`/users/${id}`);
 export const createUser = (user: User) => api.post<User>('/users', user);
 

@@ -45,6 +45,7 @@ import AiCallDetail from "../pages/AiCalls/AiCallDetail";
 // Users
 import Users from "../pages/Users/Users";
 import UserDetail from "../pages/Users/UserDetail";
+import NewUser from "../pages/Users/newUser";
 
 // Dispatches
 import Dispatches from "../pages/Dispatches/Dispatches";
@@ -210,6 +211,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+      <Route path="/users/new" element={<NewUser />} />
 
       <Route
         path="/dispatches"

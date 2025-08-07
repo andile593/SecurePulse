@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import type { User } from '@/types/user';
-
+import { useState } from "react";
+import type { User } from "@/types/user";
 
 type Role = {
   id: string;
@@ -12,26 +11,32 @@ type Props = {
   roles: Role[];
   onSubmit: (data: Partial<User>) => void;
   onClose: () => void;
+  disabled?: boolean;
 };
 
 const UserForm = ({ initialData = {}, roles, onSubmit, onClose }: Props) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [roleId, setRoleId] = useState('');
+  const [name, setName] = useState(initialData.name ?? "");
+  const [email, setEmail] = useState(initialData.email ?? "");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    setName(initialData.name ?? '');
-    setEmail(initialData.email ?? '');
-    setRoleId(initialData.roleId ?? (roles.length > 0 ? roles[0].id : ''));
-  }, [initialData, roles]);
+  const [roleId, setRoleId] = useState(() => {
+    return initialData.roleId ?? roles[0]?.id ?? "";
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, email, roleId });
+    const dataToSubmit: Partial<User> = { name, email, roleId };
+    if (password.trim() !== "") {
+      dataToSubmit.password = password;
+    }
+    onSubmit(dataToSubmit);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white shadow p-4 rounded max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white shadow p-4 rounded max-w-md"
+    >
       <div>
         <label className="block text-sm font-medium mb-1">Name</label>
         <input
@@ -54,6 +59,19 @@ const UserForm = ({ initialData = {}, roles, onSubmit, onClose }: Props) => {
       </div>
 
       <div>
+        <label className="block text-sm font-medium mb-1">Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder={
+            initialData?.name ? "(Leave blank to keep current password)" : ""
+          }
+          required={!initialData?.name}
+        />
+      </div>
+
+      <div>
         <label className="block text-sm font-medium mb-1">Role</label>
         <select
           className="w-full border p-2 rounded"
@@ -61,15 +79,29 @@ const UserForm = ({ initialData = {}, roles, onSubmit, onClose }: Props) => {
           onChange={(e) => setRoleId(e.target.value)}
           required
         >
-          {roles.map(role => (
-            <option key={role.id} value={role.id}>{role.name}</option>
+          <option value="">Select a role</option>
+          {roles.map((role) => (
+            <option key={role.id} value={role.id}>
+              {role.name}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">Cancel</button>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-600 hover:underline"
+        >
+          Cancel
+        </button>
       </div>
     </form>
   );

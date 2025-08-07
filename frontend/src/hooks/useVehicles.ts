@@ -4,6 +4,7 @@ import {
   createVehicle,
   updateVehicle,
   deleteVehicle,
+  getVehicleById 
 } from '@/lib/api/vehicles';
 import type { Vehicle } from '@/types/vehicle';
 
@@ -19,6 +20,13 @@ export function useVehicles() {
     },
   });
 }
+export const useVehicleById = (id: string) => {
+  return useQuery({
+    queryKey: ['vehicle', id],
+    queryFn: () => getVehicleById(id),
+    enabled: !!id,
+  });
+};
 
 export function useCreateVehicle() {
   const queryClient = useQueryClient();
