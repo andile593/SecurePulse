@@ -49,7 +49,7 @@ const Users = () => {
             <div className="flex gap-4 mt-2">
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // prevent triggering the li click
+                  e.stopPropagation();
                   handleDelete(user.id);
                 }}
                 className="text-red-600 hover:underline"

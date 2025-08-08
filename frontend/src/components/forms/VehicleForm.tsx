@@ -8,21 +8,11 @@ type VehicleFormProps = {
 };
 
 const VehicleForm = ({ initialData = {}, onSubmit, onClose }: VehicleFormProps) => {
-  const [name, setName] = useState('');
-  const [model, setModel] = useState('');
-  const [plate, setPlate] = useState('');
-  const [status, setStatus] = useState('');
-  const [description, setDescription] = useState('');
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name ?? '');
-      setModel(initialData.model ?? '');
-      setPlate(initialData.plate ?? '');
-      setStatus(initialData.status ?? '');
-      setDescription(initialData.description ?? '');
-    }
-  }, [initialData]);
+  const [name, setName] = useState(initialData.name ?? '');
+  const [model, setModel] = useState(initialData.model ?? '');
+  const [plate, setPlate] = useState(initialData.plate ?? '');
+  const [status, setStatus] = useState(initialData.status ?? '');
+  const [description, setDescription] = useState(initialData.description ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

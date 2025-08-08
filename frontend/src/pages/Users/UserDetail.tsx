@@ -8,7 +8,6 @@ const UserDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Early return if no id
   if (!id) return <div className="p-4">User ID not found</div>;
 
   // Fetch user and roles
