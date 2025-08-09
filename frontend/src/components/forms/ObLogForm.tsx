@@ -1,29 +1,23 @@
 import { useState, useEffect } from "react";
-import type { ObLog } from "@/types/obLog";
+import type { OBLog } from "@/types/OBLog";
 
-type ObLogFormProps = {
+type OBLogFormProps = {
   initialData?: Partial<ObLog>;
   onSubmit: (data: Partial<ObLog>) => void;
   onClose: () => void;
 };
 
-const ObLogForm = ({ initialData = {}, onSubmit, onClose }: ObLogFormProps) => {
-  const [source, setSource] = useState("");
-  const [logTime, setLogTime] = useState("");
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    setSource(initialData.source ?? "");
-    setLogTime(initialData.logTime ?? "");
-    setMessage(initialData.message ?? "");
-  }, [initialData]);
+const OBLogForm = ({ initialData = {}, onSubmit, onClose }: OBLogFormProps) => {
+  const [source, setSource] = useState(initialData.source ?? "");
+  const [logTime, setLogTime] = useState(initialData.logTime ?? "");
+  const [message, setMessage] = useState(initialData.message ?? "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ source, message, logTime });
   };
 
-  return (
+  return 
     <form
       onSubmit={handleSubmit}
       className="space-y-4 bg-white shadow p-4 rounded max-w-md"
@@ -76,4 +70,4 @@ const ObLogForm = ({ initialData = {}, onSubmit, onClose }: ObLogFormProps) => {
   );
 };
 
-export default ObLogForm;
+export default OBLogForm;

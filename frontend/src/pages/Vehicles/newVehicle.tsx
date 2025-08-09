@@ -13,7 +13,7 @@ const handleSubmit = (data: any) => {
       navigate("/vehicles");
     },
     onError: (error) => {
-      console.error("Failed to create user:", error);
+      console.error("Failed to create vehicle:", error);
     }
   });
 };

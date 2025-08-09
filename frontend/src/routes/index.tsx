@@ -17,30 +17,37 @@ import NotFound from "../pages/Common/NotFound";
 // Clients
 import Clients from "../pages/Clients/Clients";
 import ClientDetail from "../pages/Clients/ClientDetail";
+import NewClient from "../pages/Clients/newClient";
 
 // Alarms
 import Alarms from "../pages/Alarm/Alarms";
 import AlarmDetail from "../pages/Alarm/AlarmDetail";
+import NewAlarm from "../pages/Alarm/newAlarm";
 
 // OB Logs
-import ObLogs from "../pages/OBLogs/ObLogs";
-import ObLogDetail from "../pages/OBLogs/ObLogDetail";
+import OBLogs from "../pages/OBLogs/OBLogs";
+import OBLogDetail from "../pages/OBLogs/OBLogDetail";
+import NewOBLog from "../pages/OBLogs/newOBLog";
 
 // Sites
 import Sites from "../pages/Sites/Sites";
 import SiteDetail from "../pages/Sites/SiteDetail";
+import NewSite from "../pages/Sites/newSite";
 
 // Guards
 import Guards from "../pages/Guards/Guards";
 import GuardDetail from "../pages/Guards/GuardDetail";
+import NewGuard from "../pages/Guards/newGuard";
 
 // Vehicles
 import Vehicles from "../pages/Vehicles/Vehicles";
 import VehicleDetail from "../pages/Vehicles/VehicleDetail";
+import NewVehicle from "../pages/Vehicles/newVehicle";
 
 // AI Calls
 import AiCalls from "../pages/AiCalls/AiCalls";
 import AiCallDetail from "../pages/AiCalls/AiCallDetail";
+import NewAiCall from "../pages/AiCalls/newAiCall";
 
 // Users
 import Users from "../pages/Users/Users";
@@ -50,6 +57,7 @@ import NewUser from "../pages/Users/newUser";
 // Dispatches
 import Dispatches from "../pages/Dispatches/Dispatches";
 import DispatchDetail from "../pages/Dispatches/DispatchDetail";
+import NewDispatch from "../pages/Dispatches/newDispatch";
 
 export default function AppRoutes() {
   return (
@@ -92,6 +100,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/clients/new" element={<NewClient />} />
 
       <Route
         path="/alarms"
@@ -110,22 +119,25 @@ export default function AppRoutes() {
         }
       />
 
+       <Route path="/alarms/new" element={<NewAlarm />} />
+       
       <Route
-        path="/ob-logs"
+        path="/OBlogs"
         element={
           <AppLayout>
-            <ObLogs />
+            <OBLogs />
           </AppLayout>
         }
       />
       <Route
-        path="/ob-logs/:id"
+        path="/OBlogs/:id"
         element={
           <AppLayout>
-            <ObLogDetail />
+            <OBLogDetail />
           </AppLayout>
         }
       />
+       <Route path="/OBlogs/new" element={<NewOBLog />} />
 
       <Route
         path="/sites"
@@ -143,6 +155,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/sites/new" element={<NewSite />} />
 
       <Route
         path="/guards"
@@ -160,6 +173,8 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/guards/new" element={<NewGuard />} />
+
 
       <Route
         path="/vehicles"
@@ -177,6 +192,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/vehicles/new" element={<NewVehicle />} />
 
       <Route
         path="/ai-calls"
@@ -194,6 +210,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/ai-calls/new" element={<NewAiCall />} />
 
       <Route
         path="/users"
@@ -229,6 +246,7 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
+       <Route path="/dispatches/new" element={<NewDispatch />} />
     </Routes>
   );
 }

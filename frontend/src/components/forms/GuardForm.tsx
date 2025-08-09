@@ -9,21 +9,12 @@ type GuardFormProps = {
 };
 
 const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
-  const [name, setName] = useState('');
-  const [status, setStatus] = useState('');
-  const [phone, setPhone] = useState('');
-  const [assignedVehicleId, setAssignedVehicleId] = useState('');
+  const [name, setName] = useState(initialData.name ?? '');
+  const [status, setStatus] = useState(initialData.status ?? '');
+  const [phone, setPhone] = useState(initialData.phone ?? '');
+  const [assignedVehicleId, setAssignedVehicleId] = useState(initialData.assignedVehicleId ?? '');
 
-  const { data: vehicles = [] } = useVehicles(); // Hook to fetch vehicles
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name ?? '');
-      setStatus(initialData.status ?? '');
-      setPhone(initialData.phone ?? '');
-      setAssignedVehicleId(initialData.assignedVehicleId ?? '');
-    }
-  }, [initialData]);
+  const { data: vehicles = [] } = useVehicles(); 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

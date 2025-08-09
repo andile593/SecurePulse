@@ -1,36 +1,14 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import type { ObLog } from "@/types";
-import { getObLogs, deleteObLog } from "@/lib/api/obLogs";
+import { useNavigate } from "react-router-dom";
+import { useOBLogs, useDeleteOBLog } from "@/hooks/useOBLogs
+import type { OBLog } from "@/types";
 
-export default function ObLogList() {
-  const [logs, setLogs] = useState<ObLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchLogs = async () => {
-    try {
-      const response = await getObLogs();
-      setLogs(response.data);
-    } catch {
-      setError("Failed to fetch OB logs.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLogs();
-  }, []);
-
-  const handleDelete = async (id: string) => {
+export default function OBLogList() {
+  const { data: logs = [], isLoading, error } = useOBLogs();
+  const { mutate: deleteOBLog } = useDeleteOBLog();
+  
+  const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this log?")) return;
-    try {
-      await deleteObLog({ id });
-      setLogs((prev) => prev.filter((log) => log.id !== id));
-    } catch {
-      alert("Failed to delete log.");
-    }
+    deleteOBLog({ id });
   };
 
   if (loading) return <div className="p-4">Loading logs...</div>;
@@ -40,12 +18,12 @@ export default function ObLogList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">OB Logs</h1>
-        <Link
-          to="/oblogs/new"
+        <button
+          onClick={() => navigate("/oblogs/new"}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Log
-        </Link>
+        </button>
       </div>
 
       {logs.length === 0 ? (
@@ -62,24 +40,20 @@ export default function ObLogList() {
             </tr>
           </thead>
           <tbody>
-            {logs.map((log) => (
-              <tr key={log.id} className="border-t">
-                <td className="p-2">{log.message}</td> // ✅ from Prisma
-                <td className="p-2">{log.source}</td> // ✅ from Prisma
-                <td className="p-2">{log.guard?.name ?? "—"}</td> // optional,
-                if guard exists
+            {logs.map((log: OBLog) => (
+              <tr key={log.id} className="border-t" onClick={() => navigate(`/OBlogs/${log.id}`)}>
+                <td className="p-2">{log.message}</td>
+                <td className="p-2">{log.source}</td> 
+                <td className="p-2">{log.guard?.name ?? "—"}</td>
                 <td className="p-2">
                   {log.logTime ? new Date(log.logTime).toLocaleString() : "—"}
                 </td>
                 <td className="p-2 space-x-2">
-                  <Link
-                    to={`/oblogs/${log.id}/edit`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Edit
-                  </Link>
                   <button
-                    onClick={() => handleDelete(log.id!)}
+                    onClick={(e) => 
+                    e.stopPropagation();
+                    handleDelete(log.id)
+                    }
                     className="text-red-600 hover:underline"
                   >
                     Delete
@@ -88,7 +62,7 @@ export default function ObLogList() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table>!
       )}
     </div>
   );

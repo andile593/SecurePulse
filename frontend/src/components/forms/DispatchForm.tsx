@@ -8,23 +8,13 @@ type DispatchFormProps = {
 };
 
 const DispatchForm = ({ initialData = {}, onSubmit, onClose }: DispatchFormProps) => {
-  const [dispatchedAt, setDispatchedAt] = useState('');
-  const [arrivalTime, setArrivalTime] = useState('');
-  const [resolvedAt, setResolvedAt] = useState('');
-  const [responseNotes, setResponseNotes] = useState('');
-  const [alarmId, setAlarmId] = useState('');
-  const [guardId, setGuardId] = useState('');
-  const [vehicleId, setVehicleId] = useState('');
-
-  useEffect(() => {
-    setDispatchedAt(initialData.dispatchedAt ?? '');
-    setArrivalTime(initialData.arrivalTime ?? '');
-    setResolvedAt(initialData.resolvedAt ?? '');
-    setResponseNotes(initialData.responseNotes ?? '');
-    setAlarmId(initialData.alarmId ?? '');
-    setGuardId(initialData.guardId ?? '');
-    setVehicleId(initialData.vehicleId ?? '');
-  }, [initialData]);
+  const [dispatchedAt, setDispatchedAt] = useState(initialData.dispatchedAt ?? '');
+  const [arrivalTime, setArrivalTime] = useState(initialData.arrivalTime ?? '');
+  const [resolvedAt, setResolvedAt] = useState(initialData.resolvedAt ?? '');
+  const [responseNotes, setResponseNotes] = useState(initialData.responseNotes ?? '');
+  const [alarmId, setAlarmId] = useState(initialData.alarmId ?? '');
+  const [guardId, setGuardId] = useState(initialData.guardId ?? '');
+  const [vehicleId, setVehicleId] = useState(initialData.vehicleId ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

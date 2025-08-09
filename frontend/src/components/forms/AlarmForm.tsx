@@ -8,21 +8,11 @@ type AlarmFormProps = {
 };
 
 const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
-  const [alarmType, setAlarmType] = useState('');
-  const [status, setStatus] = useState('');
-  const [triggeredAt, setTriggeredAt] = useState('');
-  const [priority, setPriority] = useState(1);
-  const [siteId, setSiteId] = useState('');
-
-  useEffect(() => {
-    if (initialData) {
-      setAlarmType(initialData.alarmType ?? '');
-      setStatus(initialData.status ?? '');
-      setTriggeredAt(initialData.triggeredAt?.slice(0, 16) ?? '');
-      setPriority(initialData.priority ?? 1);
-      setSiteId(initialData.siteId ?? '');
-    }
-  }, [initialData]);
+  const [alarmType, setAlarmType] = useState(initialData.alarmType ?? '');
+  const [status, setStatus] = useState(initialData.status ?? '');
+  const [triggeredAt, setTriggeredAt] = useState(initialData.triggeredAt?.slice(0, 16) ?? '');
+  const [priority, setPriority] = useState(initialData.priority ?? 1);
+  const [siteId, setSiteId] = useState(initialData.siteId ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

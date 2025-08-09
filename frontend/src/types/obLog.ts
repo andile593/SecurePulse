@@ -1,7 +1,7 @@
 import type { Guard } from '@/types';
 import type { Alarm } from '@/types';
 
-export interface ObLog {
+export interface OBLog {
   id?: string;
   logTime: string;
   message: string;

@@ -8,17 +8,10 @@ type SiteFormProps = {
 };
 
 const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-
-  useEffect(() => {
-    setName(initialData.name ?? '');
-    setAddress(initialData.address ?? '');
-    setLatitude(initialData.latitude?.toString() ?? '');
-    setLongitude(initialData.longitude?.toString() ?? '');
-  }, [initialData]);
+  const [name, setName] = useState(initialData.name ?? '');
+  const [address, setAddress] = useState(initialData.address ?? '');
+  const [latitude, setLatitude] = useState(initialData.latitude?.toString() ?? '');
+  const [longitude, setLongitude] = useState(initialData.longitude?.toString() ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

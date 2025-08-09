@@ -8,19 +8,11 @@ type AiCallFormProps = {
 };
 
 const AiCallForm = ({ initialData = {}, onSubmit, onClose }: AiCallFormProps) => {
-  const [aiDecision, setAiDecision] = useState('');
-  const [confidenceScore, setConfidenceScore] = useState(0.5);
-  const [evaluatedAt, setEvaluatedAt] = useState('');
-  const [notes, setNotes] = useState('');
-  const [alarmId, setAlarmId] = useState('');
-
-  useEffect(() => {
-    setAiDecision(initialData.aiDecision ?? '');
-    setConfidenceScore(initialData.confidenceScore ?? 0.5);
-    setEvaluatedAt(initialData.evaluatedAt ?? new Date().toISOString().slice(0, 16));
-    setNotes(initialData.notes ?? '');
-    setAlarmId(initialData.alarmId ?? '');
-  }, [initialData]);
+  const [aiDecision, setAiDecision] = useState(initialData.aiDecision ?? '');
+  const [confidenceScore, setConfidenceScore] = useState(initialData.confidenceScore ?? 0.5);
+  const [evaluatedAt, setEvaluatedAt] = useState(initialData.evaluatedAt ?? new Date().toISOString().slice(0, 16));
+  const [notes, setNotes] = useState(initialData.notes ?? '');
+  const [alarmId, setAlarmId] = useState(initialData.alarmId ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

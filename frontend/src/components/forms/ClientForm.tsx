@@ -8,17 +8,9 @@ type ClientFormProps = {
 };
 
 const ClientForm = ({ initialData = {}, onSubmit, onClose }: ClientFormProps) => {
-  const [name, setName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [phone, setPhone] = useState('');
-
-  useEffect(() => {
-    if (initialData) {
-      setName(initialData.name ?? '');
-      setContactEmail(initialData.contactEmail ?? '');
-      setPhone(initialData.phone ?? '');
-    }
-  }, [initialData]);
+  const [name, setName] = useState(initialData.name ?? '');
+  const [contactEmail, setContactEmail] = useState(initialData.contactEmail ?? '');
+  const [phone, setPhone] = useState(initialData.phone ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

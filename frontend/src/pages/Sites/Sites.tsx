@@ -1,36 +1,16 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useSites, useDeleteSite } from "@/hooks/useSites
 import type { Site } from "@/types";
-import { getSites, deleteSite } from "@/lib/api/sites";
+
 
 export default function SiteList() {
-  const [sites, setSites] = useState<Site[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: sites = [], isLoading, error } = useSites();
+  const { mutate: deleteSite } = useDeleteSite();
 
-  const fetchSites = async () => {
-    try {
-      const response = await getSites();
-      setSites(response.data);
-    } catch {
-      setError("Failed to load sites.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSites();
-  }, []);
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this site?")) return;
-    try {
-      await deleteSite({id});
-      setSites((prev) => prev.filter((site) => site.id !== id));
-    } catch {
-      alert("Failed to delete site.");
-    }
+  const handleDelete = (id?: string) => {
+    if (!id || !confirm("Are you sure you want to delete this site?"))
+      return;
+    deleteSite({ id });
   };
 
   if (loading) return <div className="p-4">Loading sites...</div>;
@@ -40,12 +20,12 @@ export default function SiteList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Sites</h1>
-        <Link
-          to="/sites/new"
+       <button
+          onClick={() => navigate("/sites/new")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Site
-        </Link>
+        </button>
       </div>
 
       {sites.length === 0 ? (
@@ -62,20 +42,18 @@ export default function SiteList() {
             </tr>
           </thead>
           <tbody>
-            {sites.map((site) => (
-              <tr key={site.id} className="border-t">
+            {sites.map((site: Site) => (
+              <tr key={site.id} className="border-t" onClick={() => navigate(`/sites/${site.id}`)}>
                 <td className="p-2">{site.name}</td>
                 <td className="p-2">{site.clientId || "—"}</td>
+                <td className="p_2">{site.address}</td>
                 <td className="p-2 space-x-2">
-                  <Link
-                    to={`/sites/${site.id}/edit`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Edit
-                  </Link>
                   <button
-                    onClick={() => handleDelete(site.id!)}
                     className="text-red-600 hover:underline"
+                    onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(site.id)
+                    }}
                   >
                     Delete
                   </button>

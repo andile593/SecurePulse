@@ -1,5 +1,5 @@
 import type { Site } from '@/types';
-import type { ObLog } from '@/types';
+import type { OBLog } from '@/types';
 import type { Dispatch } from '@/types';
 import type { AiCall } from '@/types';
 
@@ -11,7 +11,7 @@ export interface Alarm {
   status: string;
   siteId: string;
   site?: Site;
-  obLogs?: ObLog[];
+  OBLogs?: OBLog[];
   aiCall?: AiCall;
   dispatch?: Dispatch;
 }

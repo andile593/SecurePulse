@@ -1,42 +1,42 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  getObLogs,
-  createObLog,
-  updateObLog,
-  deleteObLog,
-} from '@/lib/api/obLogs';
-import type { ObLog } from '@/types/obLog';
+  getOBLogs,
+  createOBLog,
+  updateOBLog,
+  deleteOBLog,
+} from '@/lib/api/OBLogs';
+import type { OBLog } from '@/types/OBLog';
 
-export function useObLogs() {
-  return useQuery<ObLog[]>({
-    queryKey: ['obLogs'],
+export function useOBLogs() {
+  return useQuery<OBLog[]>({
+    queryKey: ['OBLogs'],
     queryFn: async ( )=> {
-      const res = await getObLogs();
+      const res = await getOBLogs();
       return res.data
     } 
   });
 }
 
-export function useCreateObLog() {
+export function useCreateOBLog() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createObLog,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['obLogs'] }),
+    mutationFn: createOBLog,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['OBLogs'] }),
   });
 }
 
-export function useUpdateObLog() {
+export function useUpdateOBLog() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: updateObLog,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['obLogs'] }),
+    mutationFn: updateOBLog,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['OBLogs'] }),
   });
 }
 
-export function useDeleteObLog() {
+export function useDeleteOBLog() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteObLog,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['obLogs'] }),
+    mutationFn: deleteOBLog,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['OBLogs'] }),
   });
 }
