@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState,  } from "react";
 import type { OBLog } from "@/types/OBLog";
 
 type OBLogFormProps = {
-  initialData?: Partial<ObLog>;
-  onSubmit: (data: Partial<ObLog>) => void;
+  initialData?: Partial<OBLog>;
+  onSubmit: (data: Partial<OBLog>) => void;
   onClose: () => void;
 };
 
@@ -17,7 +17,7 @@ const OBLogForm = ({ initialData = {}, onSubmit, onClose }: OBLogFormProps) => {
     onSubmit({ source, message, logTime });
   };
 
-  return 
+  return (
     <form
       onSubmit={handleSubmit}
       className="space-y-4 bg-white shadow p-4 rounded max-w-md"

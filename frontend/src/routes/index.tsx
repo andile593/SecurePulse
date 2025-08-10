@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from './ProtectedRoute';
 
@@ -25,8 +25,8 @@ import AlarmDetail from "../pages/Alarm/AlarmDetail";
 import NewAlarm from "../pages/Alarm/newAlarm";
 
 // OB Logs
-import OBLogs from "../pages/OBLogs/OBLogs";
-import OBLogDetail from "../pages/OBLogs/OBLogDetail";
+import OBLogs from "../pages/OBLogs/ObLogs";
+import OBLogDetail from "../pages/OBLogs/ObLogDetail";
 import NewOBLog from "../pages/OBLogs/newOBLog";
 
 // Sites
@@ -37,7 +37,7 @@ import NewSite from "../pages/Sites/newSite";
 // Guards
 import Guards from "../pages/Guards/Guards";
 import GuardDetail from "../pages/Guards/GuardDetail";
-import NewGuard from "../pages/Guards/newGuard";
+import NewGuard from "../pages/Guards/Guards";
 
 // Vehicles
 import Vehicles from "../pages/Vehicles/Vehicles";
@@ -57,7 +57,7 @@ import NewUser from "../pages/Users/newUser";
 // Dispatches
 import Dispatches from "../pages/Dispatches/Dispatches";
 import DispatchDetail from "../pages/Dispatches/DispatchDetail";
-import NewDispatch from "../pages/Dispatches/newDispatch";
+import NewDispatch from "../pages/Dispatches/DispatchDetail";
 
 export default function AppRoutes() {
   return (
@@ -100,7 +100,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/clients/new" element={<NewClient />} />
+       <Route path="/clients/new" element={
+        <AppLayout>
+          <NewClient />
+        </AppLayout>
+       } />
 
       <Route
         path="/alarms"
@@ -119,7 +123,11 @@ export default function AppRoutes() {
         }
       />
 
-       <Route path="/alarms/new" element={<NewAlarm />} />
+       <Route path="/alarms/new" element={
+        <AppLayout>
+          <NewAlarm />
+        </AppLayout>
+       } />
        
       <Route
         path="/OBlogs"
@@ -137,7 +145,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/OBlogs/new" element={<NewOBLog />} />
+       <Route path="/OBlogs/new" element={
+        <AppLayout>
+          <NewOBLog />
+        </AppLayout>
+       } />
 
       <Route
         path="/sites"
@@ -155,7 +167,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/sites/new" element={<NewSite />} />
+       <Route path="/sites/new" element={
+        <AppLayout>
+          <NewSite />
+        </AppLayout>
+       } />
 
       <Route
         path="/guards"
@@ -173,7 +189,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/guards/new" element={<NewGuard />} />
+       <Route path="/guards/new" element={
+        <AppLayout>
+          <NewGuard />
+        </AppLayout>
+       } />
 
 
       <Route
@@ -192,7 +212,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/vehicles/new" element={<NewVehicle />} />
+       <Route path="/vehicles/new" element={
+        <AppLayout>
+          <NewVehicle />
+        </AppLayout>
+       } />
 
       <Route
         path="/ai-calls"
@@ -210,7 +234,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/ai-calls/new" element={<NewAiCall />} />
+       <Route path="/ai-calls/new" element={
+        <AppLayout>
+          <NewAiCall />
+        </AppLayout>
+       } />
 
       <Route
         path="/users"
@@ -228,7 +256,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-      <Route path="/users/new" element={<NewUser />} />
+      <Route path="/users/new" element={
+        <AppLayout>
+          <NewUser />
+        </AppLayout>
+      } />
 
       <Route
         path="/dispatches"
@@ -246,7 +278,11 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-       <Route path="/dispatches/new" element={<NewDispatch />} />
+       <Route path="/dispatches/new" element={
+        <AppLayout>
+          <NewDispatch />
+        </AppLayout>
+       } />
     </Routes>
   );
 }

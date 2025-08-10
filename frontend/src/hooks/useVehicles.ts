@@ -20,13 +20,17 @@ export function useVehicles() {
     },
   });
 }
-export const useVehicleById = (id: string) => {
-  return useQuery({
+export const useVehicle = (id: string) => {
+  return useQuery<Vehicle>({
     queryKey: ['vehicle', id],
-    queryFn: () => getVehicleById(id),
+    queryFn: async () => {
+      const res = await getVehicleById(id);
+      return res.data; 
+    },
     enabled: !!id,
   });
 };
+
 
 export function useCreateVehicle() {
   const queryClient = useQueryClient();

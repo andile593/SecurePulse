@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getAlarms,
+  getAlarmById,
   createAlarm,
   updateAlarm,
   deleteAlarm,
@@ -19,6 +20,16 @@ export function useAlarms() {
     },
   });
 }
+export const useAlarm = (id: string) => {
+  return useQuery<Alarm>({
+    queryKey: ['alarm', id],
+    queryFn: async () => {
+      const res = await getAlarmById(id);  
+      return res.data;
+    },
+    enabled: !!id,
+  });
+};
 
 export function useCreateAlarm() {
   const queryClient = useQueryClient();

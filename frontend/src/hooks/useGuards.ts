@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getGuards,
+  getGuardById,
   createGuard,
   updateGuard,
   deleteGuard,
@@ -31,6 +32,17 @@ export function useCreateGuard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guards'] });
     },
+  });
+}
+
+export function useGuard(id: string) {
+  return useQuery<Guard>({
+    queryKey: ['guard', id],
+    queryFn: async () => {
+      const res = await getGuardById(id);
+      return res.data;
+    },
+    enabled: !!id, // only run if id is truthy
   });
 }
 

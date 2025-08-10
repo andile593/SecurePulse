@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { Alarm } from "@/types";
 import { getAlarms, deleteAlarm } from "@/lib/api/alarms";
 
 export default function AlarmList() {
+  const navigate = useNavigate();
   const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,10 +27,10 @@ export default function AlarmList() {
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this alarm?")) return;
     try {
-      await deleteAlarm({id});
-      setAlarms((prev) => prev.filter((alarm) => alarm.id !== id));
+      await deleteAlarm({ id });
+      setAlarms((prev) => prev.filter((a) => a.id !== id));
     } catch {
-      alert("Error deleting alarm.");
+      alert("Delete failed.");
     }
   };
 
@@ -40,51 +41,48 @@ export default function AlarmList() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Alarms</h1>
-        <Link
-          to="/alarms/new"
+        <button
+          onClick={() => navigate("/alarms/new")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Alarm
-        </Link>
+        </button>
       </div>
 
       {alarms.length === 0 ? (
-        <div>No alarms found.</div>
+        <div className="p-4 text-gray-500">No alarms found.</div>
       ) : (
-        <table className="w-full border text-sm">
-          <thead className="bg-gray-100 text-left">
-            <tr>
-              <th className="p-2">Type</th>
-              <th className="p-2">Priority</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Triggered At</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {alarms.map((alarm) => (
-              <tr key={alarm.id} className="border-t">
-                <td className="p-2">{alarm.alarmType}</td>
-                <td className="p-2">{alarm.priority}</td>
-                <td className="p-2">{alarm.status}</td>
-                <td className="p-2">
-                  {alarm.triggeredAt ? new Date(alarm.triggeredAt).toLocaleString() : "—"}
-                </td>
-                <td className="p-2 space-x-2">
-                  <Link to={`/alarms/${alarm.id}/edit`} className="text-blue-600 hover:underline">
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(alarm.id!)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="space-y-4 mt-6">
+          {alarms.map((alarm) => (
+            <li
+              key={alarm.id}
+              className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
+              onClick={() => navigate(`/alarms/${alarm.id}`)}
+            >
+              <p className="text-sm text-gray-600">
+                Site: {alarm.site?.name || alarm.siteId || "—"}
+              </p>
+              <p className="text-sm text-gray-600">
+                Status: <span className="font-medium">{alarm.status}</span>
+              </p>
+              <p className="text-sm text-gray-600">
+                Priority: {alarm.priority}
+              </p>
+
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(alarm.id!);
+                  }}
+                  className="text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

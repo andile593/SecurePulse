@@ -3,18 +3,17 @@ import type { Vehicle } from "@/types/vehicle";
 import { useNavigate } from "react-router-dom";
 
 const Vehicles = () => {
+  const navigate = useNavigate();
   const { data: vehicles = [], isLoading, error } = useVehicles();
   const { mutate: deleteVehicle } = useDeleteVehicle();
 
-  const handleDelete = (id?: string) => {
-    if (!id || !confirm("Are you sure you want to delete this vehicle?"))
-      return;
+  const handleDelete = (id: string) => {
+    if (!confirm("Are you sure you want to delete this vehicle?")) return;
     deleteVehicle({ id });
   };
 
   if (isLoading) return <div className="p-4">Loading vehicles...</div>;
-  if (error)
-    return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
 
   return (
     <div className="p-6">
@@ -28,27 +27,41 @@ const Vehicles = () => {
         </button>
       </div>
 
-      <ul className="space-y-4 mt-6">
-        {vehicles.map((vehicle: Vehicle) => (
-          <li key={vehicle.id} className="bg-white shadow-md p-4 rounded-md" onClick={() => navigate(`/vehicles/${user.id}`)}>
-            <p className="font-bold text-blue-600 hover:underline">{vehicle.name} ({vehicle.model})</p>
-            <p className="text-sm text-gray-600">Plate #: {vehicle.plate}</p>
-            <p className="text-sm text-gray-600">Status: {vehicle.status}</p>
-            <p className="text-sm text-gray-600">Description: {vehicle.description}</p>
-            <div className="flex gap-4 mt-2">
-              <button
-                className="text-red-600 hover:underline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(vehicle.id);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {vehicles.length === 0 ? (
+        <div className="p-4 text-gray-500">No vehicles found.</div>
+      ) : (
+        <ul className="space-y-4 mt-6">
+          {vehicles.map((vehicle: Vehicle) => (
+            <li
+              key={vehicle.id}
+              className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
+              onClick={() => navigate(`/vehicles/${vehicle.id}`)}
+            >
+              <p className="font-bold">
+                {vehicle.name} {vehicle.model ? `(${vehicle.model})` : ""}
+              </p>
+              <p className="text-sm text-gray-600">Plate #: {vehicle.plate || "—"}</p>
+              <p className="text-sm text-gray-600 capitalize">
+                Status: {vehicle.status || "—"}
+              </p>
+              {vehicle.description && (
+                <p className="text-sm text-gray-600">Description: {vehicle.description}</p>
+              )}
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(vehicle.id!);
+                  }}
+                  className="text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

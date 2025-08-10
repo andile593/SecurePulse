@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getDispatches,
+  getDispatchById,
   createDispatch,
   updateDispatch,
   deleteDispatch,
@@ -25,6 +26,16 @@ export function useCreateDispatch() {
   });
 }
 
+export function useDispatch(id: string) {
+  return useQuery<Dispatch>({
+    queryKey: ['dispatch', id],
+    queryFn: async () => {
+      const res = await getDispatchById(id);
+      return res.data;
+    },
+    enabled: !!id,
+  });
+}
 export function useUpdateDispatch() {
   const queryClient = useQueryClient();
   return useMutation({

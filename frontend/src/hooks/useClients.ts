@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getClients,
+  getClientById,
   createClient,
   updateClient,
   deleteClient,
@@ -30,7 +31,17 @@ export function useClients() {
   });
 }
 
-// Create a new client
+export const useClient = (id: string) => {
+  return useQuery<Client>({
+    queryKey: ['client', id],
+    queryFn: async () => {
+      const res = await getClientById(id);  
+      return res.data;
+    },
+    enabled: !!id,
+  });
+};
+
 export function useCreateClient() {
   const queryClient = useQueryClient();
   return useMutation({

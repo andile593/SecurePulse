@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Vehicle } from '@/types/vehicle';
 
 type VehicleFormProps = {

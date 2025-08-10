@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
@@ -11,7 +11,7 @@ const navLinks = [
   { name: "Vehicles", path: "/vehicles" },
   { name: "AI Calls", path: "/ai-calls" },
   { name: "Users", path: "/users" },
-  { name: "OB Logs", path: "/ob-logs" },
+  { name: "OB Logs", path: "/OBlogs" },
 ];
 
 const Sidebar = () => {

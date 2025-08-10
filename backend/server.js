@@ -13,7 +13,7 @@ const prisma = new PrismaClient();
 
 app.use('/clients', require('./routes/clients'));
 app.use('/alarms', require('./routes/alarms'));
-app.use('/ob-logs', require('./routes/obLogs'));
+app.use('/OBlogs', require('./routes/obLogs'));
 app.use('/sites', require('./routes/sites'));
 app.use('/guards',  require('./routes/guards'));
 app.use('/vehicles', require('./routes/vehicle'));

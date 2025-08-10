@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getSites,
+  getSiteById,
   createSite,
   updateSite,
   deleteSite,
@@ -25,6 +26,16 @@ export function useCreateSite() {
   return useMutation({
     mutationFn: createSite,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sites'] }),
+  });
+}
+export function useSite(id: string) {
+  return useQuery<Site>({
+    queryKey: ['site', id],
+    queryFn: async () => {
+      const res = await getSiteById(id);
+      return res.data;
+    },
+    enabled: !!id, // only run if id is truthy
   });
 }
 

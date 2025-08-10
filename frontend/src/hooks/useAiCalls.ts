@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getAiCalls,
+  getAiCallById,
   createAiCall,
   updateAiCall,
   deleteAiCall,
@@ -16,6 +17,17 @@ export function useAiCalls() {
     }
   });
 }
+
+export const useAiCall = (id: string) => {
+  return useQuery<AiCall>({
+    queryKey: ['aiCall', id],
+    queryFn: async () => {
+      const res = await getAiCallById(id);  
+      return res.data;
+    },
+    enabled: !!id,
+  });
+};
 
 export function useCreateAiCall() {
   const queryClient = useQueryClient();

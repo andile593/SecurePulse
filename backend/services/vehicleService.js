@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function createVehicle(data) {
@@ -18,18 +18,26 @@ async function getVehicleById(id) {
       include: { guards: true },
     });
   } catch (error) {
-    console.error('Error in getVehicleById:', error);
+    console.error("Error in getVehicleById:", error);
     throw error;
   }
 }
 
 async function updateVehicle(id, data) {
+  
+  const { guards, ...safeData } = data;
+
   try {
-    return await prisma.vehicle.update({ where: { id }, data });
-  } catch {
+    return await prisma.vehicle.update({
+      where: { id },
+      data: safeData, 
+    });
+  } catch (error) {
+    console.error("Prisma updateVehicle error:", error);
     return null;
   }
 }
+
 
 async function deleteVehicle(id) {
   try {
