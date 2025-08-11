@@ -28,16 +28,19 @@ model Site {
 }
 
 model Alarm {
-  id          String    @id @default(uuid())
-  triggeredAt DateTime
-  alarmType   String
-  priority    Int
-  status      String
-  siteId      String
-  site        Site      @relation(fields: [siteId], references: [id])
-  obLogs      ObLog[]
-  aiCall      AiCall?
-  dispatch    Dispatch?
+  id                  String    @id @default(uuid())
+  triggeredAt         DateTime
+  eventType           String
+  priority            Int
+  status              String
+  transmitterId       String?
+  clientId            String
+  client              Client   @relation(fields: [clientId], references: [id])
+  siteId              String
+  site                Site     @relation(fields: [siteId], references: [id])
+  obLogs              ObLog[]
+  aiCall              AiCall?
+  dispatch            Dispatch?
 }
 
 model ObLog {
