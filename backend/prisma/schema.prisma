@@ -9,7 +9,8 @@ datasource db {
 
 model Client {
   id           String @id @default(uuid())
-  name         String
+  Surname      String
+  Firstname    String
   email        String
   phone        String
   sites        Site[]

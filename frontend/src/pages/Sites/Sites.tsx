@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useSites, useDeleteSite } from "@/hooks/useSites";
 import type { Site } from "@/types";
 
-export default function SiteList() {
+const Sites = () => {
   const navigate = useNavigate();
   const { data: sites = [], isLoading, error } = useSites();
   const { mutate: deleteSite } = useDeleteSite();
@@ -60,3 +60,5 @@ export default function SiteList() {
     </div>
   );
 }
+
+export default Sites
