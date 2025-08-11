@@ -1,6 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useOBLogs, useUpdateOBLog, useDeleteOBLog } from "@/hooks/useOBLogs";
+import { useOBLog, useUpdateOBLog, useDeleteOBLog } from "@/hooks/useOBLogs";
 import OBLogForm from "@/components/forms/OBLogForm";
+import { useState, useEffect} from "react";
+import type { OBLog } from "@/types/OBLog";
 
 const OBLogDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -8,16 +10,17 @@ const OBLogDetail = () => {
   
   if (!id) return <div className="p-4">OB ID not found</div>;
   
-  const { data: log, isLoading, error, refetch } = useOBLogs(id);
+  const { data: log, isLoading, error, refetch } = useOBLog(id);
   const { mutate: updateOBLog } = useUpdateOBLog();
   const { mutate: deleteOBLog } = useDeleteOBLog();
   
   const [editing, setEditing] = useState(false);
   
-  const handleSubmit = (data: Partial<typeof log>) => {
+  const handleSubmit = (data: Partial<OBlog>) => {
     if (!log) return;
 
     const updateOBLog = { ...log, ...data };
+    const { id, ...OBlogData } = updateOBLog;
     updateOBLog(
       { id: log.id!, log: updateOBLog },
       {
@@ -34,7 +37,7 @@ const OBLogDetail = () => {
 
     if (confirm("Are you sure you want to delete this log?")) {
       deleteOBLog(
-        { id: site.id! },
+        { id: log.id! },
         {
           onSuccess: () => navigate("/OBlogs"),
         }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getOBLogs,
+  getOBLogById
   createOBLog,
   updateOBLog,
   deleteOBLog,
@@ -16,6 +17,19 @@ export function useOBLogs() {
     } 
   });
 }
+
+export const useOBLog = (id: string) => {
+  return useQuery<OBLog>({
+    queryKey: ['OBLog', id],
+    queryFn: async () => {
+      const res = await getOBLogById(id);
+      return res.data; 
+    },
+    enabled: !!id,
+  });
+};
+
+
 
 export function useCreateOBLog() {
   const queryClient = useQueryClient();

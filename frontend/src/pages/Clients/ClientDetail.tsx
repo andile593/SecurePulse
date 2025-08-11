@@ -20,6 +20,7 @@ const ClientDetail = () => {
     if (!client) return;
 
     const updatedClient = { ...client, ...data };
+    const { id, ...clientData } = updatedClient; 
     updateClient(
       { id: client.id!, client: updatedClient },
       {

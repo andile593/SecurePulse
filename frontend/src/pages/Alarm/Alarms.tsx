@@ -1,41 +1,19 @@
-import { useEffect, useState } from "react";
+import { useAlarms, useDeleteAlarm } from "@/hooks/useAlarms";
 import { useNavigate } from "react-router-dom";
 import type { Alarm } from "@/types";
-import { getAlarms, deleteAlarm } from "@/lib/api/alarms";
 
 export default function AlarmList() {
   const navigate = useNavigate();
-  const [alarms, setAlarms] = useState<Alarm[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: alarms = [], isLoading, error } = useAlarms();
+  const { mutate: deleteAlarm } = useDeleteAlarm();
 
-  const fetchAlarms = async () => {
-    try {
-      const response = await getAlarms();
-      setAlarms(response.data);
-    } catch {
-      setError("Failed to load alarms.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAlarms();
-  }, []);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this alarm?")) return;
-    try {
-      await deleteAlarm({ id });
-      setAlarms((prev) => prev.filter((a) => a.id !== id));
-    } catch {
-      alert("Delete failed.");
-    }
+    deleteAlarm({ id });
   };
 
-  if (loading) return <div className="p-4">Loading alarms...</div>;
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (isLoading) return <div className="p-4">Loading alarms...</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
 
   return (
     <div className="p-6">

@@ -25,8 +25,8 @@ import AlarmDetail from "../pages/Alarm/AlarmDetail";
 import NewAlarm from "../pages/Alarm/newAlarm";
 
 // OB Logs
-import OBLogs from "../pages/OBLogs/ObLogs";
-import OBLogDetail from "../pages/OBLogs/ObLogDetail";
+import OBLogs from "../pages/OBLogs/OBLogs";
+import OBLogDetail from "../pages/OBLogs/OBLogDetail";
 import NewOBLog from "../pages/OBLogs/newOBLog";
 
 // Sites

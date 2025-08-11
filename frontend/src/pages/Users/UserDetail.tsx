@@ -28,6 +28,7 @@ const UserDetail = () => {
     if (!user) return;
 
     const updatedUser = { ...user, ...data };
+     const { id, ...userData } = updatedUser;
     updateUser(
       { id: user.id!, user: updatedUser },
       {

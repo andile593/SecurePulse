@@ -15,10 +15,11 @@ const AlarmDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<typeof alarm>) => {
+  const handleSubmit = (data: Partial<Alarm>) => {
     if (!alarm) return;
 
     const updatedAlarm = { ...alarm, ...data };
+    const { id, ...alarmData } = updatedAlarm; 
     updateAlarm(
       { id: alarm.id!, alarm: updatedAlarm },
       {

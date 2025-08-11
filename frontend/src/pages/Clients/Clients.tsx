@@ -1,41 +1,19 @@
-import { useEffect, useState } from "react";
+import { useClients, useDeleteClient } from "@/hooks/useClients";
 import { useNavigate } from "react-router-dom";
 import type { Client } from "@/types";
-import { getClients, deleteClient } from "@/lib/api/clients";
 
 export default function ClientList() {
   const navigate = useNavigate();
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: clients = [], isLoading, error } = useClients();
+  const { mutate: deleteClient } = useDeleteClient();
 
-  const fetchClients = async () => {
-    try {
-      const response = await getClients();
-      setClients(response.data);
-    } catch {
-      setError("Failed to load clients.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this client?")) return;
-    try {
-      await deleteClient({ id });
-      setClients((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      alert("Delete failed.");
-    }
+    deleteClient({ id });
   };
 
-  if (loading) return <div className="p-4">Loading clients...</div>;
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (isLoading) return <div className="p-4">Loading clients...</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
 
   return (
     <div className="p-6">

@@ -3,7 +3,6 @@ import { useVehicle, useUpdateVehicle, useDeleteVehicle } from "@/hooks/useVehic
 import VehicleForm from "@/components/forms/VehicleForm";
 import { useState, useEffect} from "react";
 import type { Vehicle } from "@/types/vehicle";
-import { getVehicleById } from "@/lib/api/vehicles";
 
 const VehicleDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,9 +30,6 @@ const VehicleDetail = () => {
       },
     }
   );
-
-  console.log("Updating vehicle ID:", vehicle.id);
-  console.log("Update payload:", vehicleData);
 };
 
   
@@ -50,8 +46,7 @@ const VehicleDetail = () => {
 
   if (isLoading) return <div className="p-4">Loading vehicle details...</div>;
   if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
-  if (!vehicle) return <div className="p-4">Vehicle not found.</div>;
-console.log("Updating vehicle ID:", vehicle.id);
+  if (!vehicle) return <div className="p-4">Vehicle not found.</div>
 
   return (
     <div className="p-6">

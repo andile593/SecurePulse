@@ -35,7 +35,7 @@ export function useSite(id: string) {
       const res = await getSiteById(id);
       return res.data;
     },
-    enabled: !!id, // only run if id is truthy
+    enabled: !!id, 
   });
 }
 

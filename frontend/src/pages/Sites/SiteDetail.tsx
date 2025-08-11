@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useSite, useUpdateSite, useDeleteSite } from "@/hooks/useSites"; 
+import { useState, useEffect} from "react";
 import SiteForm from "@/components/forms/SiteForm";
-import { useState } from "react";
+import type { Site } from "@/types/site";
 
 const SiteDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -9,19 +10,17 @@ const SiteDetail = () => {
 
   if (!id) return <div className="p-4">Site ID not found</div>;
 
-  // Use hook to fetch a single site by id
   const { data: site, isLoading, error, refetch } = useSite(id);
   const { mutate: updateSite } = useUpdateSite();
   const { mutate: deleteSite } = useDeleteSite();
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<typeof site>) => {
+  const handleSubmit = (data: Partial<Site>) => {
     if (!site) return;
-
     
     const updatedSite = { ...site, ...data };
-
+    const { id, ...siteData } = updatedSite;
     updateSite(
       { id: site.id!, site: updatedSite },
       {
@@ -35,7 +34,6 @@ const SiteDetail = () => {
 
   const handleDelete = () => {
     if (!site) return;
-
     if (confirm("Are you sure you want to delete this site?")) {
       deleteSite(
         { id: site.id! },

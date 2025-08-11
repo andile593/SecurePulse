@@ -2,6 +2,7 @@ import  { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useUpdateDispatch, useDeleteDispatch } from "@/hooks/useDispatches";
 import DispatchForm from "@/components/forms/DispatchForm";
+import type { Dispatch } = "@/types/dispatch"
 
 const DispatchDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,10 +16,11 @@ const DispatchDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<typeof dispatch>) => {
+  const handleSubmit = (data: Partial<Dispatch>) => {
     if (!dispatch) return;
 
     const updatedDispatch = { ...dispatch, ...data };
+    const { id, ...dispatchData } = updatedDispatch;
     updateDispatch(
       { id: dispatch.id!, dispatch: updatedDispatch },
       {

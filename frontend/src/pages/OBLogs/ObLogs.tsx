@@ -20,7 +20,7 @@ export default function OBLogList() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">OB Logs</h1>
         <button
-          onClick={() => navigate("/oblogs/new")}
+          onClick={() => navigate("/OBlogs/new")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Log
@@ -35,7 +35,7 @@ export default function OBLogList() {
             <li
               key={log.id}
               className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
-              onClick={() => navigate(`/oblogs/${log.id}`)}
+              onClick={() => navigate(`/OBlogs/${log.id}`)}
             >
               <p className="font-bold">{log.message || "Untitled Log"}</p>
               <p className="text-sm text-gray-600">Source: {log.source || "—"}</p>

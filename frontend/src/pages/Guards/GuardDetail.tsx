@@ -15,10 +15,11 @@ const GuardDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<typeof guard>) => {
+  const handleSubmit = (data: Partial<Guard>) => {
     if (!guard) return;
 
     const updatedGuard = { ...guard, ...data };
+    const { id, ...guardData } = updatedGuard;
     updateGuard(
       { id: guard.id!, guard: updatedGuard },
       {

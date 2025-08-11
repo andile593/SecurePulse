@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAiCall, useUpdateAiCall, useDeleteAiCall } from "@/hooks/useAiCalls";
 import AiCallForm from "@/components/forms/AiCallForm";
 import { useState } from "react";
+import type { AiCall } from '@/types';
 
 const AiCallDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +16,7 @@ const AiCallDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<typeof aiCall>) => {
+  const handleSubmit = (data: Partial<AiCall>) => {
     if (!aiCall) return;
 
     const updatedAiCall = { ...aiCall, ...data };

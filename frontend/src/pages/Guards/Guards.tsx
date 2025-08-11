@@ -1,37 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Guard } from "@/types";
-import { getGuards, deleteGuard } from "@/lib/api/guards";
+import { useGuards, useDeleteGuard } from "@/hooks/useGuards";
 
 export default function GuardList() {
   const navigate = useNavigate();
-  const [guards, setGuards] = useState<Guard[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: guards = [], isLoading, error } = useGuards();
+  const { mutate: deleteGuard } = useDeleteGuard();
 
-  const fetchGuards = async () => {
-    try {
-      const response = await getGuards();
-      setGuards(response.data);
-    } catch {
-      setError("Failed to load guards.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchGuards();
-  }, []);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this guard?")) return;
-    try {
-      await deleteGuard({ id });
-      setGuards((prev) => prev.filter((g) => g.id !== id));
-    } catch {
-      alert("Delete failed.");
-    }
+    deleteGuard({ id });
   };
 
   if (loading) return <div className="p-4">Loading guards...</div>;

@@ -1,51 +1,30 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { AiCall } from "@/types";
-import { getAiCalls, deleteAiCall } from "@/lib/api/aiCalls";
+import { useAiCalls, useDeleteAiCall } from "@/hooks/useAiCalls";
 
 export default function AiCallList() {
-  const [aiCalls, setAiCalls] = useState<AiCall[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: aiCalls = [], isLoading, error } = useAiCalls();
+  const { mutate: deleteAiCall } = useDeleteAiCall();
 
-  const fetchAiCalls = async () => {
-    try {
-      const response = await getAiCalls();
-      setAiCalls(response.data);
-    } catch (err) {
-      setError("Failed to load AI calls.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAiCalls();
-  }, []);
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this AI call?")) return;
-    try {
-      await deleteAiCall({id});
-      setAiCalls((prev) => prev.filter((c) => c.id !== id));
-    } catch {
-      alert("Delete failed.");
-    }
+    deleteAiCall({id});
   };
 
-  if (loading) return <div className="p-4">Loading AI calls...</div>;
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (isLoading) return <div className="p-4">Loading AI calls...</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">AI Calls</h1>
-        <Link
-          to="/ai-calls/new"
+        <button
+          onClick={() => navigate("/ai-calls/new")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New AI Call
-        </Link>
+        </button>
       </div>
 
       {aiCalls.length === 0 ? (
