@@ -1,4 +1,4 @@
-import AiCallForm from "@/components/forms/AiCallForm";
+-import AiCallForm from "@/components/forms/AiCallForm";
 import { useCreateAiCall } from "@/hooks/useAiCalls";
 import { useNavigate } from "react-router-dom";
 

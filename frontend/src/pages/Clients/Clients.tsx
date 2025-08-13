@@ -1,6 +1,5 @@
 import { useClients, useDeleteClient } from "@/hooks/useClients";
 import { useNavigate } from "react-router-dom";
-import type { Client } from "@/types";
 
 export default function ClientList() {
   const navigate = useNavigate();
@@ -37,7 +36,7 @@ export default function ClientList() {
               className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
               onClick={() => navigate(`/clients/${client.id}`)}
             >
-              <p className="font-bold">{client.name}</p>
+              <p className="font-bold">{client.name} {client.surname}</p>
               <p className="text-sm text-gray-600">
                 Email: {client.email || "—"}
               </p>

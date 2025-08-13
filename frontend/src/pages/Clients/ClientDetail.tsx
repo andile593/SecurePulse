@@ -1,8 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
+import {
+  useClient,
+  useUpdateClient,
+  useDeleteClient,
+} from "@/hooks/useClients";
 import ClientForm from "@/components/forms/ClientForm";
 import { useState } from "react";
-import type { Client } from '@/types';
+import type { Client } from "@/types";
 
 const ClientDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,21 +20,31 @@ const ClientDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<Client>) => {
-    if (!client) return;
+  const handleSubmit = (
+  data: Partial<Client>, 
+  deletedSiteIds: string[] = []
+) => {
+  if (!client) return;
 
-    const updatedClient = { ...client, ...data };
-    const { id, ...clientData } = updatedClient; 
-    updateClient(
-      { id: client.id!, client: updatedClient },
-      {
-        onSuccess: () => {
-          refetch();
-          setEditing(false);
-        },
-      }
-    );
-  };
+  // Merge existing client with updated fields
+  const updatedClient = { ...client, ...data };
+  
+  // Call your update mutation passing client data and deletedSiteIds
+  updateClient(
+    { 
+      id: client.id!, 
+      client: updatedClient, 
+      deletedSiteIds 
+    },
+    {
+      onSuccess: () => {
+        refetch();
+        setEditing(false);
+      },
+    }
+  );
+};
+
 
   const handleDelete = () => {
     if (!client) return;
@@ -46,7 +60,8 @@ const ClientDetail = () => {
   };
 
   if (isLoading) return <div className="p-4">Loading client details...</div>;
-  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+  if (error)
+    return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!client) return <div className="p-4">Client not found.</div>;
 
   return (
@@ -61,9 +76,26 @@ const ClientDetail = () => {
         />
       ) : (
         <>
-          <p><strong>Name:</strong> {client.name}</p>
-          <p><strong>Email:</strong> {client.email ?? "—"}</p>
-          <p><strong>Phone:</strong> {client.phone ?? "—"}</p>
+          <p>
+            <strong>Name:</strong> {client.name}
+          </p>
+          <p>
+            <strong>Surname:</strong> {client.surname}
+          </p>
+          <p>
+            <strong>Email:</strong> {client.email ?? "—"}
+          </p>
+          <p>
+            <strong>Phone:</strong> {client.phone ?? "—"}
+          </p>
+          <p>
+            <strong>Sites:</strong>{" "}
+            {Array.isArray(client.sites)
+              ? client.sites.length > 0
+                ? client.sites.map((site) => site.name).join(", ")
+                : "No sites linked"
+              : client.sites || "No sites linked"}
+          </p>
 
           <div className="flex gap-4 mt-6">
             <button

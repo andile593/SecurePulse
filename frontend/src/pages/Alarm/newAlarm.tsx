@@ -1,5 +1,6 @@
 import AlarmForm from "@/components/forms/AlarmForm";
 import { useCreateAlarm } from "@/hooks/useAlarms";
+import type { Alarm } from "@/types/alarm";
 import { useNavigate } from "react-router-dom";
 
 const NewAlarm = () => {
@@ -17,13 +18,21 @@ const NewAlarm = () => {
     });
   };
   
-  const emptyAlarmData = {
-    triggeredAt: '',
-    alarmType: '',
-    priority: '',
-    status: '',
-    siteId: '',
-  };
+const emptyAlarmData: Partial<Alarm> = {
+  triggeredAt: '',
+  eventType: '',
+  priority: 1,
+  status: '',
+  source: '',
+  transmitterId: '',
+  siteId: '',
+  clientId: '',
+  resolutionNotes: '',
+  resolvedBy: '',
+  resolvedAt: '',
+  lastAICheckAt: '',
+  aiDecision: '',
+};
 
   return (
     <div className="p-6 max-w-xl mx-auto">

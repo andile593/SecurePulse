@@ -2,6 +2,7 @@ import type { Site } from '@/types';
 
 export interface Client {
   id?: string;
+  surname: string;
   name: string;
   email: string;
   phone: string;
@@ -9,3 +10,17 @@ export interface Client {
   sites?: Site[];
 }
 
+export type SiteCreateInput = {
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type CreateClientInput = {
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  sites: SiteCreateInput[];
+};

@@ -4,10 +4,25 @@ const express = require("express");
 const { PrismaClient } = require('@prisma/client');
 const app = express();
 const cors = require('cors');
+const errorHandler = require('./middlewares/errorMiddleware');
 
 
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
+app.use(errorHandler);
+app.use((err, req, res, next) => {
+  console.error(err); // log the error for debugging
+
+  if (err.name === 'PrismaClientValidationError') {
+    return res.status(400).json({ error: err.message });
+  }
+
+  if (err.name === 'PrismaClientKnownRequestError') {
+    return res.status(400).json({ error: err.message });
+  }
+
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 const prisma = new PrismaClient();
 

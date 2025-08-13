@@ -7,13 +7,16 @@ import {
   deleteGuard,
 } from '@/lib/api/guards';
 import type { Guard } from '@/types/guard';
+import type { AxiosResponse } from 'axios';
 
 type UpdateGuardInput = {
   id: string;
   guard: Partial<Guard>;
 };
 
-type DeleteGuardInput = { id: string };
+type DeleteGuardInput = { 
+  id: string 
+};
 
 export function useGuards() {
   return useQuery<Guard[]>({
@@ -35,7 +38,6 @@ export function useCreateGuard() {
   });
 }
 
-
 export function useGuard(id: string) {
   return useQuery<Guard>({
     queryKey: ['guard', id],
@@ -49,12 +51,11 @@ export function useGuard(id: string) {
 
 export function useUpdateGuard() {
   const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: updateGuard,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['guards'] });
-    },
-  });
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['guards'] }),
+    });
 }
 
 export function useDeleteGuard() {

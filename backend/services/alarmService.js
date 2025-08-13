@@ -6,25 +6,13 @@ async function createAlarm(data) {
 }
 
 async function getAllAlarms() {
-  return prisma.alarm.findMany({
-    include: {
-      site: true,
-      obLogs: true,
-      aiCall: true,
-      dispatch: true
-    }
-  });
+  return prisma.alarm.findMany();
 }
+
 
 async function getAlarmById(id) {
   return prisma.alarm.findUnique({
-    where: { id },
-    include: {
-      site: true,
-      obLogs: true,
-      aiCall: true,
-      dispatch: true
-    }
+    where: { id }
   });
 }
 

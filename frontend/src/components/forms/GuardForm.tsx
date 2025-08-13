@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import type { Guard } from '@/types/guard';
-import { useVehicles } from '@/hooks/useVehicles'; // <-- Assuming this hook exists
+import { useState, useEffect } from "react";
+import type { Guard } from "@/types/guard";
+import { useVehicles } from "@/hooks/useVehicles";
+import { useGuards } from "@/hooks/useGuards";
 
 type GuardFormProps = {
   initialData?: Partial<Guard>;
@@ -9,12 +10,23 @@ type GuardFormProps = {
 };
 
 const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
-  const [name, setName] = useState(initialData.name ?? '');
-  const [status, setStatus] = useState(initialData.status ?? '');
-  const [phone, setPhone] = useState(initialData.phone ?? '');
-  const [assignedVehicleId, setAssignedVehicleId] = useState(initialData.assignedVehicleId ?? '');
+  const [name, setName] = useState(initialData.name ?? "");
+  const [status, setStatus] = useState(initialData.status ?? "");
+  const [phone, setPhone] = useState(initialData.phone ?? "");
+  const [assignedVehicleId, setAssignedVehicleId] = useState(
+    initialData.assignedVehicleId ?? ""
+  );
 
-  const { data: vehicles = [] } = useVehicles(); 
+  const { data: vehicles = [] } = useVehicles();
+  const { data: guards = [] } = useGuards();
+
+  const assignedVehicleIds = new Set(
+    guards.map((g) => g.assignedVehicleId).filter(Boolean) // remove null/undefined
+  );
+
+  const availableVehicles = vehicles.filter(
+    (v) => !assignedVehicleIds.has(v.id)
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +34,10 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded shadow-md max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 p-4 bg-white rounded shadow-md max-w-md"
+    >
       <div>
         <label className="block text-sm font-medium mb-1">Name</label>
         <input
@@ -56,14 +71,16 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Assigned Vehicle</label>
+        <label className="block text-sm font-medium mb-1">
+          Assigned Vehicle
+        </label>
         <select
           className="w-full border p-2 rounded"
           value={assignedVehicleId}
           onChange={(e) => setAssignedVehicleId(e.target.value)}
         >
           <option value="">None</option>
-          {vehicles.map((vehicle) => (
+          {availableVehicles.map((vehicle) => (
             <option key={vehicle.id} value={vehicle.id}>
               {vehicle.plate ?? vehicle.name ?? vehicle.id}
             </option>
@@ -72,10 +89,17 @@ const GuardForm = ({ initialData = {}, onSubmit, onClose }: GuardFormProps) => {
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Save
         </button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline px-4 py-2 rounded">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-600 hover:underline px-4 py-2 rounded"
+        >
           Cancel
         </button>
       </div>

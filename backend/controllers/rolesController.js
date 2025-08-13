@@ -1,11 +1,11 @@
 const roleService = require('../services/roleService');
 
-async function getRoles(req, res) {
+async function getRoles(req, res, next) {
   try {
     const roles = await roleService.getAllRoles();
     res.json(roles);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 }
 module.exports = {

@@ -37,7 +37,7 @@ import NewSite from "../pages/Sites/newSite";
 // Guards
 import Guards from "../pages/Guards/Guards";
 import GuardDetail from "../pages/Guards/GuardDetail";
-import NewGuard from "../pages/Guards/Guards";
+import NewGuard from "../pages/Guards/newGuard";
 
 // Vehicles
 import Vehicles from "../pages/Vehicles/Vehicles";

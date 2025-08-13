@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function getAllObLogs() {
-  return prisma.obLog.findMany({ include: { alarm: true, guard: true } });
+  return prisma.obLog.findMany();
 }
 
 async function getObLogById(id) {

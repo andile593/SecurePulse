@@ -1,17 +1,23 @@
 import api from './axios';
-import type { Client } from '@/types/client';
+import type { CreateClientInput, Client } from '@/types/client';
 
 export const getClients = () => api.get<Client[]>('/clients');
 export const getClientById = (id: string) => api.get<Client>(`/clients/${id}`);
 
-export const createClient = (client: Client) => api.post<Client>('/clients', client);
+export async function createClient(data: CreateClientInput): Promise<Client> {
+  const response = await api.post<Client>('/clients', data);
+  return response.data;
+}
 
 export type UpdateClientInput = {
   id: string;
   client: Partial<Client>;
+  deletedSiteIds?: string[];
 };
-export const updateClient = ({ id, client }: UpdateClientInput) => 
-  api.put(`/clients/${id}`, client);
+
+export function updateClient({ id, client, deletedSiteIds }: UpdateClientInput) {
+  return api.put(`/clients/${id}`, { ...client, deletedSiteIds });
+}
 
 export type DeleteClientInput = { id: string };
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getOBLogs,
-  getOBLogById
+  getOBLogById,
   createOBLog,
   updateOBLog,
   deleteOBLog,

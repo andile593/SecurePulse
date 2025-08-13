@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { Guard } from "@/types";
 import { useGuards, useDeleteGuard } from "@/hooks/useGuards";
 
 export default function GuardList() {
@@ -13,8 +11,8 @@ export default function GuardList() {
     deleteGuard({ id });
   };
 
-  if (loading) return <div className="p-4">Loading guards...</div>;
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (isLoading) return <div className="p-4">Loading guards...</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
 
   return (
     <div className="p-6">

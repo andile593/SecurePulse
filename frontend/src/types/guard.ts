@@ -7,7 +7,7 @@ export interface Guard {
   name: string;
   phone: string;
   status: string;
-  assignedVehicleId?: string;
+  assignedVehicleId?: string | null;
   assignedVehicle?: Vehicle;
   dispatches?: Dispatch[];
   OBLogs?: OBLog[];

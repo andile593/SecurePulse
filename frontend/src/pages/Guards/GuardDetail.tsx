@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useGuard, useUpdateGuard, useDeleteGuard } from "@/hooks/useGuards";
 import GuardForm from "@/components/forms/GuardForm";
+import type { Guard } from "@/types/guard";
 
 const GuardDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,33 +11,38 @@ const GuardDetail = () => {
   if (!id) return <div className="p-4">Guard ID not found</div>;
 
   const { data: guard, isLoading, error, refetch } = useGuard(id);
-  const { mutate: updateGuard } = useUpdateGuard();
+  const { mutate: updateGuard  } = useUpdateGuard();
   const { mutate: deleteGuard } = useDeleteGuard();
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<Guard>) => {
-    if (!guard) return;
+  const handleSubmit = (formData: Partial<Guard>) => {
+  if (!guard) return;
 
-    const updatedGuard = { ...guard, ...data };
-    const { id, ...guardData } = updatedGuard;
-    updateGuard(
-      { id: guard.id!, guard: updatedGuard },
-      {
-        onSuccess: () => {
-          refetch();
-          setEditing(false);
-        },
-      }
-    );
-  };
+  updateGuard(
+    { 
+      id: guard.id!, 
+      guard: {
+        ...formData,
+        assignedVehicleId: formData.assignedVehicleId || null
+      } 
+    },
+    {
+      onSuccess: () => {
+        refetch();
+        setEditing(false);
+      },
+    }
+  );
+};
+
 
   const handleDelete = () => {
     if (!guard) return;
 
     if (confirm("Are you sure you want to delete this guard?")) {
       deleteGuard(
-        { id: guard.id! },
+        { id: guard.id! }, // Pass as DeleteGuardInput object
         {
           onSuccess: () => navigate("/guards"),
         }

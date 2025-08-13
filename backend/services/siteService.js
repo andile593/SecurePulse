@@ -14,14 +14,30 @@ async function getAllSites() {
 async function getSiteById(id) {
   return prisma.site.findUnique({
     where: { id },
-    include: { client: true, alarms: true }
+    include: { client: true }
   });
 }
 
 async function updateSite(id, data) {
   try {
-    return await prisma.site.update({ where: { id }, data });
-  } catch {
+    
+    const { clientId, ...siteData } = data;
+
+    const updatePayload = { ...siteData };
+
+    if (clientId) {
+      updatePayload.client = { connect: { id: clientId } };
+    }
+
+    const updatedSite = await prisma.site.update({
+      where: { id },
+      data: updatePayload,
+      include: { client: true, alarms: true }, 
+    });
+
+    return updatedSite;
+  } catch (error) {
+    console.error("Failed to update site:", error);
     return null;
   }
 }

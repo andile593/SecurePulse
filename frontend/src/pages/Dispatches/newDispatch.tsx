@@ -1,6 +1,7 @@
 import DispatchForm from "@/components/forms/VehicleForm";
-import { useCreateDispatch } from "@/hooks/useDispatch";
+import { useCreateDispatch } from "@/hooks/useDispatches";
 import { useNavigate } from "react-router-dom";
+import type { Dispatch } from "@/types";
 
 const NewDispatch = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const NewDispatch = () => {
   const handleSubmit = (data: any) => {
     createDispatch(data, {
       onSuccess: () => {
-        navigate("/dispatch");
+        navigate("/dispatches");
       },
       onError: (error) => {
         console.error("Failed to create dispatch:", error);
@@ -17,7 +18,7 @@ const NewDispatch = () => {
     });
   };
   
-  const emptyDispatchData = {
+  const emptyDispatchData: Partial<Dispatch> = {
     dispatchedAt: '',
     alarmId: '',
     arrivalTime: '',

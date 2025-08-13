@@ -6,7 +6,9 @@ import {
   updateClient,
   deleteClient,
 } from '@/lib/api/clients';
-import type { Client } from '@/types/client';
+import type { CreateClientInput, Client } from '@/types/client';
+
+
 
 type UpdateClientInput = {
   id: string;
@@ -48,10 +50,10 @@ export function useCreateClient() {
     mutationFn: createClient,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients'] });
+
     },
   });
-
-}
+} 
 
 export function useUpdateClient() {
   const queryClient = useQueryClient();

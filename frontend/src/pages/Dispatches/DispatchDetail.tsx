@@ -1,8 +1,12 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useDispatch, useUpdateDispatch, useDeleteDispatch } from "@/hooks/useDispatches";
+import {
+  useDispatch,
+  useUpdateDispatch,
+  useDeleteDispatch,
+} from "@/hooks/useDispatches";
 import DispatchForm from "@/components/forms/DispatchForm";
-import type { Dispatch } = "@/types/dispatch"
+import type { Dispatch } from "@/types/dispatch";
 
 const DispatchDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +24,6 @@ const DispatchDetail = () => {
     if (!dispatch) return;
 
     const updatedDispatch = { ...dispatch, ...data };
-    const { id, ...dispatchData } = updatedDispatch;
     updateDispatch(
       { id: dispatch.id!, dispatch: updatedDispatch },
       {
@@ -46,7 +49,8 @@ const DispatchDetail = () => {
   };
 
   if (isLoading) return <div className="p-4">Loading dispatch details...</div>;
-  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+  if (error)
+    return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!dispatch) return <div className="p-4">Dispatch not found.</div>;
 
   return (
@@ -60,16 +64,39 @@ const DispatchDetail = () => {
           onClose={() => setEditing(false)}
         />
       ) : (
-        <><>
-  <p><strong>Dispatch ID:</strong> {dispatch.id}</p>
-  <p><strong>Dispatched At:</strong> {new Date(dispatch.dispatchedAt).toLocaleString()}</p>
-  <p><strong>Arrival Time:</strong> {dispatch.arrivalTime ? new Date(dispatch.arrivalTime).toLocaleString() : "—"}</p>
-  <p><strong>Resolved At:</strong> {dispatch.resolvedAt ? new Date(dispatch.resolvedAt).toLocaleString() : "—"}</p>
-  <p><strong>Response Notes:</strong> {dispatch.responseNotes ?? "—"}</p>
-  <p><strong>Guard:</strong> {dispatch.guard ? dispatch.guard.name : "—"}</p>
-  <p><strong>Vehicle:</strong> {dispatch.vehicle ? dispatch.vehicle.name : "—"}</p>
-</>
-
+        <>
+          <>
+            <p>
+              <strong>Dispatch ID:</strong> {dispatch.id}
+            </p>
+            <p>
+              <strong>Dispatched At:</strong>{" "}
+              {new Date(dispatch.dispatchedAt).toLocaleString()}
+            </p>
+            <p>
+              <strong>Arrival Time:</strong>{" "}
+              {dispatch.arrivalTime
+                ? new Date(dispatch.arrivalTime).toLocaleString()
+                : "—"}
+            </p>
+            <p>
+              <strong>Resolved At:</strong>{" "}
+              {dispatch.resolvedAt
+                ? new Date(dispatch.resolvedAt).toLocaleString()
+                : "—"}
+            </p>
+            <p>
+              <strong>Response Notes:</strong> {dispatch.responseNotes ?? "—"}
+            </p>
+            <p>
+              <strong>Guard:</strong>{" "}
+              {dispatch.guard ? dispatch.guard.name : "—"}
+            </p>
+            <p>
+              <strong>Vehicle:</strong>{" "}
+              {dispatch.vehicle ? dispatch.vehicle.name : "—"}
+            </p>
+          </>
 
           <div className="flex gap-4 mt-6">
             <button

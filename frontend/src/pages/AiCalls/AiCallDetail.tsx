@@ -38,7 +38,7 @@ const AiCallDetail = () => {
       deleteAiCall(
         { id: aiCall.id! },
         {
-          onSuccess: () => navigate("/aicalls"),
+          onSuccess: () => navigate("/ai-calls"),
         }
       );
     }
@@ -82,7 +82,7 @@ const AiCallDetail = () => {
 
             <button
               className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              onClick={() => navigate("/aicalls")}
+              onClick={() => navigate("/ai-calls")}
             >
               Back to AI Calls
             </button>

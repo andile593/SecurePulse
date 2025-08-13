@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Site } from '@/types/site';
 
 type SiteFormProps = {
@@ -12,6 +12,7 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
   const [address, setAddress] = useState(initialData.address ?? '');
   const [latitude, setLatitude] = useState(initialData.latitude?.toString() ?? '');
   const [longitude, setLongitude] = useState(initialData.longitude?.toString() ?? '');
+  const [clientId, setClientId] = useState(initialData.clientId ?? '');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +21,7 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
       address,
       latitude: parseFloat(latitude),
       longitude: parseFloat(longitude),
+      clientId,
     });
   };
 
@@ -68,7 +70,15 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
           required
         />
       </div>
-
+      <div>
+        <label className="block text-sm font-medium mb-1">Client ID</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={clientId}
+          onChange={(e) => setClientId(e.target.value)}
+          required
+        />
+      </div>
       <div className="flex gap-2">
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
         <button type="button" className="text-gray-600 hover:underline px-4 py-2" onClick={onClose}>Cancel</button>

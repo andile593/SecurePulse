@@ -8,13 +8,14 @@ datasource db {
 }
 
 model Client {
-  id           String @id @default(uuid())
-  Surname      String
-  Firstname    String
-  email        String
-  phone        String
-  sites        Site[]
-  createdAt    DateTime @default(now())
+  id        String   @id @default(uuid())
+  surname   String
+  name      String
+  email     String
+  phone     String
+  sites     Site[]
+  alarms    Alarm[]      // <-- add this
+  createdAt DateTime @default(now())
 }
 
 model Site {
@@ -28,12 +29,13 @@ model Site {
   alarms    Alarm[]
 }
 
+
 model Alarm {
   id              String    @id @default(uuid())
   triggeredAt     DateTime
-  eventType       EventType
+  eventType       String
   priority        Int
-  status          AlarmStatus
+  status          String
   source          String
   transmitterId   String?
 
@@ -60,8 +62,6 @@ model ObLog {
   logTime DateTime
   message String
   source  String
-  alarmId String?
-  alarm   Alarm?    @relation(fields: [alarmId], references: [id])
   guardId String?
   guard   Guard?   @relation(fields: [guardId], references: [id])
 }

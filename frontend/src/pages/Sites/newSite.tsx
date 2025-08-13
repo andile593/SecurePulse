@@ -1,6 +1,7 @@
 import SiteForm from "@/components/forms/SiteForm";
 import { useCreateSite } from "@/hooks/useSites";
 import { useNavigate } from "react-router-dom";
+import type { Site } from '@/types/site'
 
 const NewSite = () => {
   const navigate = useNavigate();
@@ -17,11 +18,11 @@ const handleSubmit = (data: any) => {
   });
 };
 
-const emptySiteData = {
+const emptySiteData: Partial<Site> = {
     name: '',
     address: '',
-    latitude: '',
-    longitude: '',
+    latitude: 0,
+    longitude: 0,
     clientId: '',
   };
 

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useSite, useUpdateSite, useDeleteSite } from "@/hooks/useSites"; 
-import { useState, useEffect} from "react";
+import { useState } from "react";
 import SiteForm from "@/components/forms/SiteForm";
 import type { Site } from "@/types/site";
 
@@ -20,7 +20,6 @@ const SiteDetail = () => {
     if (!site) return;
     
     const updatedSite = { ...site, ...data };
-    const { id, ...siteData } = updatedSite;
     updateSite(
       { id: site.id!, site: updatedSite },
       {

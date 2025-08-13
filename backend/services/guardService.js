@@ -2,7 +2,20 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function createGuard(data) {
-  return prisma.guard.create({ data });
+  // Normalize assignedVehicleId: convert empty string to null
+  const assignedVehicleId =
+    data.assignedVehicleId && data.assignedVehicleId.trim() !== ""
+      ? data.assignedVehicleId
+      : null;
+
+  return prisma.guard.create({
+    data: {
+      name: data.name,
+      phone: data.phone,
+      status: data.status,
+      assignedVehicleId,
+    },
+  });
 }
 
 async function getAllGuards() {
@@ -20,8 +33,23 @@ async function getGuardById(id) {
 
 async function updateGuard(id, data) {
   try {
-    return await prisma.guard.update({ where: { id }, data });
-  } catch {
+    const assignedVehicleId =
+      data.assignedVehicleId && data.assignedVehicleId.trim() !== ""
+        ? data.assignedVehicleId
+        : null;
+
+
+    return await prisma.guard.update({
+      where: { id },
+      data: {
+        name: data.name ?? undefined,
+        phone: data.phone ?? undefined,
+        status: data.status ?? undefined,
+        assignedVehicleId: data.assignedVehicleId || null,
+      },
+    });
+  } catch (err) {
+    console.error(err);
     return null;
   }
 }

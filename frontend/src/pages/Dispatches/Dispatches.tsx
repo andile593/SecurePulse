@@ -38,7 +38,7 @@ export default function DispatchList() {
               onClick={() => navigate(`/dispatches/${dispatch.id}`)}
             >
               <p className="font-bold">
-                Alarm: {dispatch.alarm?.description || "—"}
+                Alarm: {dispatch.alarm?.eventType || "—"}
               </p>
               <p className="text-sm text-gray-600">
                 Guard: {dispatch.guard?.name || "—"}

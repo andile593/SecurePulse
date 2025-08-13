@@ -1,192 +1,171 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+function randomPhone() {
+  return `555-${Math.floor(1000 + Math.random() * 9000)}`;
+}
+
+function randomStatus() {
+  const statuses = ["active", "inactive", "maintenance"];
+  return statuses[Math.floor(Math.random() * statuses.length)];
+}
+
+function randomPriority() {
+  return Math.floor(1 + Math.random() * 5);
+}
+
+function randomEventType() {
+  const events = ["Intrusion", "Fire", "Medical", "System Alert"];
+  return events[Math.floor(Math.random() * events.length)];
+}
+
+function randomAiDecision() {
+  const decisions = ["Safe", "False Alarm", "Requires Response"];
+  return decisions[Math.floor(Math.random() * decisions.length)];
+}
+
 async function main() {
-  // Roles
-  const adminRole = await prisma.userRole.create({ data: { name: 'Admin' } });
-  const guardRole = await prisma.userRole.create({ data: { name: 'Guard' } });
+  console.log("🌱 Starting seed...");
 
-  // Users
-  await prisma.user.createMany({
-    data: [
-      {
-        email: 'admin@example.com',
-        passwordHash: 'hashed-password-1',
-        name: 'Admin User',
-        roleId: adminRole.id,
-      },
-      {
-        email: 'guard@example.com',
-        passwordHash: 'hashed-password-2',
-        name: 'Guard User',
-        roleId: guardRole.id,
+  // 1. Seed Clients
+  const clientNames = [
+    { name: "Acme", surname: "Security Corp" },
+    { name: "Global", surname: "Protect Ltd" },
+    { name: "Prime", surname: "Safe Inc" },
+    { name: "Secure", surname: "Solutions" }
+  ];
+
+  const clients = [];
+  for (const c of clientNames) {
+    const emailBase = `${c.name.toLowerCase()}${c.surname.toLowerCase().replace(/\s+/g, '')}`;
+    const client = await prisma.client.create({
+      data: {
+        name: c.name,
+        surname: c.surname,
+        email: `${emailBase}@example.com`,
+        phone: randomPhone()
       }
-    ]
-  });
+    });
+    clients.push(client);
+  }
 
-  // Clients
-  const client1 = await prisma.client.create({
-    data: {
-      name: 'SecureCorp',
-      contactEmail: 'contact@securecorp.com',
-      phone: '1234567890'
+  // 2. Seed Sites
+  const sites = [];
+  for (const client of clients) {
+    for (let i = 1; i <= 2; i++) { // 2 sites per client
+      const site = await prisma.site.create({
+        data: {
+          name: `${client.name} Site ${i}`,
+          address: `123${i} Main St, City ${i}`,
+          latitude: 40 + Math.random(),
+          longitude: -74 + Math.random(),
+          clientId: client.id
+        }
+      });
+      sites.push(site);
     }
-  });
+  }
 
-  const client2 = await prisma.client.create({
-    data: {
-      name: 'SafeZone Ltd',
-      contactEmail: 'info@safezone.com',
-      phone: '0987654321'
-    }
-  });
-
-  // Sites
-  const site1 = await prisma.site.create({
-    data: {
-      name: 'Downtown HQ',
-      address: '123 City Center',
-      latitude: 40.7128,
-      longitude: -74.0060,
-      clientId: client1.id
-    }
-  });
-
-  const site2 = await prisma.site.create({
-    data: {
-      name: 'Uptown Facility',
-      address: '789 Uptown Blvd',
-      latitude: 34.0522,
-      longitude: -118.2437,
-      clientId: client2.id
-    }
-  });
-
-  // Vehicles
-  const vehicle1 = await prisma.vehicle.create({
-    data: {
-      plateNumber: 'ABC-1234',
-      model: 'Ford Ranger',
-      status: 'active'
-    }
-  });
-
-  const vehicle2 = await prisma.vehicle.create({
-    data: {
-      plateNumber: 'XYZ-5678',
-      model: 'Toyota Hilux',
-      status: 'maintenance'
-    }
-  });
-
-  // Guards
-  const guard1 = await prisma.guard.create({
-    data: {
-      name: 'John Doe',
-      phone: '555-1234',
-      status: 'on-duty',
-      assignedVehicleId: vehicle1.id
-    }
-  });
-
-  const guard2 = await prisma.guard.create({
-    data: {
-      name: 'Jane Smith',
-      phone: '555-5678',
-      status: 'off-duty',
-      assignedVehicleId: vehicle2.id
-    }
-  });
-
-  // Alarms
-  const alarm1 = await prisma.alarm.create({
-    data: {
-      triggeredAt: new Date(),
-      alarmType: 'Intrusion',
-      priority: 1,
-      status: 'pending',
-      siteId: site1.id
-    }
-  });
-
-  const alarm2 = await prisma.alarm.create({
-    data: {
-      triggeredAt: new Date(),
-      alarmType: 'Fire',
-      priority: 2,
-      status: 'resolved',
-      siteId: site2.id
-    }
-  });
-
-  // OB Logs
-  await prisma.obLog.createMany({
-    data: [
-      {
-        logTime: new Date(),
-        message: 'Routine perimeter check.',
-        source: 'guard',
-        guardId: guard1.id,
-        alarmId: alarm1.id
-      },
-      {
-        logTime: new Date(),
-        message: 'Fire alarm test log.',
-        source: 'system',
-        guardId: guard2.id,
-        alarmId: alarm2.id
+  // 3. Seed Vehicles
+  const vehicleModels = ["Ford Transit", "Toyota Hilux", "Chevrolet Silverado"];
+  const vehicles = [];
+  for (let i = 1; i <= 5; i++) {
+    const vehicle = await prisma.vehicle.create({
+      data: {
+        name: `Vehicle ${i}`,
+        plate: `ABC-${100 + i}`,
+        model: vehicleModels[Math.floor(Math.random() * vehicleModels.length)],
+        status: randomStatus(),
+        description: `Vehicle ${i} for patrol`
       }
-    ]
-  });
+    });
+    vehicles.push(vehicle);
+  }
 
-  // AI Calls
-  await prisma.aiCall.createMany({
-    data: [
-      {
-        aiDecision: 'False Alarm',
-        confidenceScore: 0.92,
-        evaluatedAt: new Date(),
-        alarmId: alarm1.id
-      },
-      {
-        aiDecision: 'Real Threat',
-        confidenceScore: 0.85,
-        evaluatedAt: new Date(),
-        alarmId: alarm2.id
+  // 4. Seed Guards
+  const guards = [];
+  for (let i = 1; i <= 5; i++) {
+    const guard = await prisma.guard.create({
+      data: {
+        name: `Guard ${i}`,
+        phone: randomPhone(),
+        status: randomStatus(),
+        assignedVehicleId: vehicles[Math.floor(Math.random() * vehicles.length)].id
       }
-    ]
-  });
+    });
+    guards.push(guard);
+  }
 
-  // Dispatches
-  await prisma.dispatch.createMany({
-    data: [
-      {
+  // 5. Seed Alarms
+  const alarms = [];
+  for (const site of sites) {
+    for (let i = 1; i <= 3; i++) { // 3 alarms per site
+      const client = clients.find(c => c.id === site.clientId);
+      const alarm = await prisma.alarm.create({
+        data: {
+          triggeredAt: new Date(),
+          eventType: randomEventType(),
+          priority: randomPriority(),
+          status: "triggered",
+          source: "Sensor",
+          siteId: site.id,
+          clientId: client.id
+        }
+      });
+      alarms.push(alarm);
+    }
+  }
+
+  // 6. Seed Dispatches
+  const dispatches = [];
+  for (const alarm of alarms) {
+    const dispatch = await prisma.dispatch.create({
+      data: {
         dispatchedAt: new Date(),
-        arrivalTime: new Date(),
-        resolvedAt: new Date(),
-        responseNotes: 'No threat found.',
-        alarmId: alarm1.id,
-        guardId: guard1.id,
-        vehicleId: vehicle1.id
-      },
-      {
-        dispatchedAt: new Date(),
-        arrivalTime: new Date(),
-        resolvedAt: new Date(),
-        responseNotes: 'Fire controlled quickly.',
-        alarmId: alarm2.id,
-        guardId: guard2.id,
-        vehicleId: vehicle2.id
+        alarmId: alarm.id,
+        guardId: guards[Math.floor(Math.random() * guards.length)].id,
+        vehicleId: vehicles[Math.floor(Math.random() * vehicles.length)].id,
+        responseNotes: "Responded quickly."
       }
-    ]
-  });
+    });
+    dispatches.push(dispatch);
+  }
 
-  console.log('✅ Seed completed');
+  // 7. Seed ObLogs
+  for (const guard of guards) {
+    for (let i = 0; i < 2; i++) {
+      await prisma.obLog.create({
+        data: {
+          logTime: new Date(),
+          message: `Patrol log entry ${i + 1}`,
+          source: "Mobile App",
+          guardId: guard.id
+        }
+      });
+    }
+  }
+
+  // 8. Seed AiCalls
+  for (const alarm of alarms) {
+    await prisma.aiCall.create({
+      data: {
+        aiDecision: randomAiDecision(),
+        confidenceScore: parseFloat((Math.random() * 100).toFixed(2)),
+        evaluatedAt: new Date(),
+        alarmId: alarm.id,
+        notes: "AI analysis completed."
+      }
+    });
+  }
+
+  console.log("✅ Seed finished!");
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
