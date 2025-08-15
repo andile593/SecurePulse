@@ -18,9 +18,24 @@ async function getAiCallById(id) {
 
 async function updateAiCall(id, data) {
   try {
-    return await prisma.aiCall.update({ where: { id }, data });
-  } catch {
-    return null;
+    const updatedAiCall = await prisma.aiCall.update({
+      where: { id }, // the AiCall ID to update
+      data: {
+        aiDecision: data.aiDecision,
+        confidenceScore: data.confidenceScore,
+        evaluatedAt: new Date(data.evaluatedAt),
+        notes: data.notes,
+        // Link the existing Alarm by its ID
+        alarm: {
+          connect: { id: data.alarmId },
+        },
+      },
+    });
+
+    return updatedAiCall;
+  } catch (error) {
+    console.error("Error updating AiCall:", error);
+    throw error;
   }
 }
 

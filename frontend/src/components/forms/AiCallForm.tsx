@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { AiCall } from '@/types/aiCall';
+import { useState } from "react";
+import type { AiCall } from "@/types/aiCall";
 
 type AiCallFormProps = {
   initialData?: Partial<AiCall>;
@@ -7,20 +7,33 @@ type AiCallFormProps = {
   onClose: () => void;
 };
 
-const AiCallForm = ({ initialData = {}, onSubmit, onClose }: AiCallFormProps) => {
-  const [aiDecision, setAiDecision] = useState(initialData.aiDecision ?? '');
-  const [confidenceScore, setConfidenceScore] = useState(initialData.confidenceScore ?? 0.5);
-  const [evaluatedAt, setEvaluatedAt] = useState(initialData.evaluatedAt ?? new Date().toISOString().slice(0, 16));
-  const [notes, setNotes] = useState(initialData.notes ?? '');
-  const [alarmId, setAlarmId] = useState(initialData.alarmId ?? '');
+const AiCallForm = ({
+  initialData = {},
+  onSubmit,
+  onClose,
+}: AiCallFormProps) => {
+  const [aiDecision, setAiDecision] = useState(initialData.aiDecision ?? "");
+  const [confidenceScore, setConfidenceScore] = useState(
+    initialData.confidenceScore ?? 0.5
+  );
+  const [evaluatedAt, setEvaluatedAt] = useState(
+    initialData.evaluatedAt ?? new Date().toISOString().slice(0, 16)
+  );
+  const [notes, setNotes] = useState(initialData.notes ?? "");
+  const [alarmId, setAlarmId] = useState(initialData.alarmId ?? "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ aiDecision, confidenceScore, evaluatedAt, notes, alarmId });
+
+    const evaluatedAtIso = new Date(evaluatedAt).toISOString();
+    onSubmit({ aiDecision, confidenceScore, evaluatedAt: evaluatedAtIso, notes, alarmId });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white shadow p-4 rounded max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white shadow p-4 rounded max-w-md"
+    >
       <div>
         <label className="block text-sm font-medium mb-1">AI Decision</label>
         <select
@@ -37,7 +50,9 @@ const AiCallForm = ({ initialData = {}, onSubmit, onClose }: AiCallFormProps) =>
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Confidence Score</label>
+        <label className="block text-sm font-medium mb-1">
+          Confidence Score
+        </label>
         <input
           type="number"
           step="0.01"
@@ -79,12 +94,20 @@ const AiCallForm = ({ initialData = {}, onSubmit, onClose }: AiCallFormProps) =>
           required
         />
       </div>
+      
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Save
         </button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-600 hover:underline"
+        >
           Cancel
         </button>
       </div>

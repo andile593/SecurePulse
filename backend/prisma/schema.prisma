@@ -14,7 +14,7 @@ model Client {
   email     String
   phone     String
   sites     Site[]
-  alarms    Alarm[]      // <-- add this
+  alarms    Alarm[] // <-- add this
   createdAt DateTime @default(now())
 }
 
@@ -29,33 +29,31 @@ model Site {
   alarms    Alarm[]
 }
 
-
 model Alarm {
-  id              String    @id @default(uuid())
-  triggeredAt     DateTime
-  eventType       String
-  priority        Int
-  status          String
-  source          String
-  transmitterId   String?
+  id            String   @id @default(uuid())
+  triggeredAt   DateTime
+  eventType     String
+  priority      Int
+  status        String
+  source        String
+  transmitterId String?
 
-  siteId          String
-  site            Site @relation(fields: [siteId], references: [id])
-  
-  clientId        String
-  client          Client   @relation(fields: [clientId], references: [id])
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id])
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
 
   resolutionNotes String?
   resolvedBy      String?
   resolvedAt      DateTime?
 
-  lastAICheckAt   DateTime?
-  aiDecision      String?
+  lastAICheckAt DateTime?
+  aiDecision    String?
 
-  aiCall          AiCall?
-  dispatch        Dispatch?
+  aiCalls   AiCall[]
+  dispatch Dispatch?
 }
-
 
 model ObLog {
   id      String   @id @default(uuid())
@@ -73,7 +71,7 @@ model AiCall {
   evaluatedAt     DateTime
   notes           String?
 
-  alarmId String @unique
+  alarmId String 
   alarm   Alarm  @relation(fields: [alarmId], references: [id])
 }
 
@@ -95,29 +93,29 @@ model Dispatch {
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  password     String
-  name         String
-  createdAt    DateTime  @default(now())
-  lastLogin    DateTime?
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String
+  createdAt DateTime  @default(now())
+  lastLogin DateTime?
 
-  roleId         String
-  role         UserRole @relation(fields: [roleId], references: [id])
+  roleId String
+  role   UserRole @relation(fields: [roleId], references: [id])
 }
 
 model UserRole {
   id    String @id
-  name  String @unique 
+  name  String @unique
   users User[]
 }
 
 model Vehicle {
-  id         String   @id @default(uuid())
-  name       String
-  plate      String  @unique
-  model      String
-  status     String
+  id          String  @id @default(uuid())
+  name        String
+  plate       String  @unique
+  model       String
+  status      String
   description String?
 
   dispatches Dispatch[]
@@ -134,5 +132,5 @@ model Guard {
   assignedVehicle   Vehicle? @relation(fields: [assignedVehicleId], references: [id])
 
   dispatches Dispatch[]
-  obLogs     ObLog[] 
+  obLogs     ObLog[]
 }

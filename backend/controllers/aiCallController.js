@@ -20,6 +20,7 @@ async function getAiCalls(req, res, next) {
 
 async function getAiCallById(req, res, next) {
   try {
+    
     const aiCall = await aiCallService.getAiCallById(req.params.id);
     if (!aiCall) return res.status(404).json({ error: 'AI Call not found' });
     res.json(aiCall);

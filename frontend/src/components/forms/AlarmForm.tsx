@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Alarm } from '@/types/alarm';
+import { useState } from "react";
+import type { Alarm } from "@/types/alarm";
 
 type AlarmFormProps = {
   initialData?: Partial<Alarm>;
@@ -8,26 +8,36 @@ type AlarmFormProps = {
 };
 
 const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
-  const [eventType, setEventType] = useState(initialData.eventType ?? '');
-  const [status, setStatus] = useState(initialData.status ?? '');
-  const [triggeredAt, setTriggeredAt] = useState(initialData.triggeredAt?.slice(0, 16) ?? '');
+  const [eventType, setEventType] = useState(initialData.eventType ?? "");
+  const [status, setStatus] = useState(initialData.status ?? "");
+  const [triggeredAt, setTriggeredAt] = useState(
+    initialData.triggeredAt?.slice(0, 16) ?? ""
+  );
   const [priority, setPriority] = useState(initialData.priority ?? 1);
-  const [source, setSource] = useState(initialData.source ?? '');
-  const [transmitterId, setTransmitterId] = useState(initialData.transmitterId ?? '');
-  const [siteId, setSiteId] = useState(initialData.siteId ?? '');
-  const [clientId, setClientId] = useState(initialData.clientId ?? '');
-  const [resolutionNotes, setResolutionNotes] = useState(initialData.resolutionNotes ?? '');
-  const [resolvedBy, setResolvedBy] = useState(initialData.resolvedBy ?? '');
-  const [resolvedAt, setResolvedAt] = useState(initialData.resolvedAt?.slice(0, 16) ?? '');
-  const [lastAICheckAt, setLastAICheckAt] = useState(initialData.lastAICheckAt?.slice(0, 16) ?? '');
-  const [aiDecision, setAiDecision] = useState(initialData.aiDecision ?? '');
+  const [source, setSource] = useState(initialData.source ?? "");
+  const [transmitterId, setTransmitterId] = useState(
+    initialData.transmitterId ?? ""
+  );
+  const [siteId, setSiteId] = useState(initialData.siteId ?? "");
+  const [clientId, setClientId] = useState(initialData.clientId ?? "");
+  const [resolutionNotes, setResolutionNotes] = useState(
+    initialData.resolutionNotes ?? ""
+  );
+  const [resolvedBy, setResolvedBy] = useState(initialData.resolvedBy ?? "");
+  const [resolvedAt, setResolvedAt] = useState(
+    initialData.resolvedAt?.slice(0, 16) ?? ""
+  );
+  const [lastAICheckAt, setLastAICheckAt] = useState(
+    initialData.lastAICheckAt?.slice(0, 16) ?? ""
+  );
+  const [aiDecision, setAiDecision] = useState(initialData.aiDecision ?? "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       eventType,
       status,
-      triggeredAt: new Date(triggeredAt).toISOString(), 
+      triggeredAt: new Date(triggeredAt).toISOString(),
       priority,
       source,
       transmitterId: transmitterId || undefined,
@@ -36,13 +46,18 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
       resolutionNotes: resolutionNotes || undefined,
       resolvedBy: resolvedBy || undefined,
       resolvedAt: resolvedAt ? new Date(resolvedAt).toISOString() : undefined,
-      lastAICheckAt: lastAICheckAt ? new Date(lastAICheckAt).toISOString() : undefined,
+      lastAICheckAt: lastAICheckAt
+        ? new Date(lastAICheckAt).toISOString()
+        : undefined,
       aiDecision: aiDecision || undefined,
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 p-4 bg-white rounded shadow-md"
+    >
       <div>
         <label className="block text-sm font-medium">Event Type</label>
         <input
@@ -162,10 +177,17 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Save
         </button>
-        <button type="button" onClick={onClose} className="text-gray-600 hover:underline">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-gray-600 hover:underline"
+        >
           Cancel
         </button>
       </div>
