@@ -11,7 +11,6 @@ export interface Alarm {
   priority: number;
   status: string;
   source: string;
-  transmitterId?: string;
   siteId: string;
   clientId: string;
   resolutionNotes?: string;

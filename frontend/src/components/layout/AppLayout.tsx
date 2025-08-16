@@ -18,7 +18,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Scrollable content */}
-        <main className="flex-1 overflow-auto p-4 bg-gray-100">
+        <main className="flex-1 overflow-auto p-4 bg-white-100">
           {children}
         </main>
       </div>

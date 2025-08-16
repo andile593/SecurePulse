@@ -85,11 +85,6 @@ const AlarmDetail = () => {
               <dd>{alarm.source || "—"}</dd>
             </div>
             <div>
-              <dt className="font-medium text-gray-700">Transmitter ID</dt>
-              <dd>{alarm.transmitterId || "—"}</dd>
-            </div>
-
-            <div>
               <dt className="font-medium text-gray-700">Site</dt>
               <dd>{alarm.site?.name || alarm.siteId || "—"}</dd>
             </div>

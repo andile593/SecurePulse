@@ -15,9 +15,6 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
   );
   const [priority, setPriority] = useState(initialData.priority ?? 1);
   const [source, setSource] = useState(initialData.source ?? "");
-  const [transmitterId, setTransmitterId] = useState(
-    initialData.transmitterId ?? ""
-  );
   const [siteId, setSiteId] = useState(initialData.siteId ?? "");
   const [clientId, setClientId] = useState(initialData.clientId ?? "");
   const [resolutionNotes, setResolutionNotes] = useState(
@@ -40,7 +37,6 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
       triggeredAt: new Date(triggeredAt).toISOString(),
       priority,
       source,
-      transmitterId: transmitterId || undefined,
       siteId,
       clientId,
       resolutionNotes: resolutionNotes || undefined,
@@ -105,14 +101,6 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
           value={source}
           onChange={(e) => setSource(e.target.value)}
           required
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Transmitter ID</label>
-        <input
-          className="w-full border p-2 rounded"
-          value={transmitterId}
-          onChange={(e) => setTransmitterId(e.target.value)}
         />
       </div>
       <div>
