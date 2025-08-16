@@ -2,13 +2,14 @@ import type { Site } from '@/types';
 
 export interface Client {
   id?: string;
-  surname: string;
+  shortId?: number;   
   name: string;
   email: string;
   phone: string;
   createdAt: string;
   sites?: Site[];
 }
+
 
 export type SiteCreateInput = {
   name: string;

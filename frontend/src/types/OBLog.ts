@@ -3,6 +3,7 @@ import type { Alarm } from '@/types';
 
 export interface OBLog {
   id?: string;
+  shortId?: number; 
   logTime: string;
   message: string;
   source: string;

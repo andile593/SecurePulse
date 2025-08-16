@@ -3,6 +3,7 @@ import type { Client } from '@/types';
 
 export interface Site {
   id?: string;
+  shortId?: number;   
   name: string;
   address: string;      
   location?: string;    

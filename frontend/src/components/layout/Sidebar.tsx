@@ -1,32 +1,33 @@
-
 import { Link, useLocation } from "react-router-dom";
+import emblem from "@/assets/Emblem.png";
 
 const navLinks = [
   { name: "Dashboard", path: "/dashboard" },
-  { name: "Clients", path: "/clients" },
-  { name: "Alarms", path: "/alarms" },
-  { name: "Guards", path: "/guards" },
-  { name: "Sites", path: "/sites" },
-  { name: "Dispatches", path: "/dispatches" },
-  { name: "Vehicles", path: "/vehicles" },
-  { name: "AI Calls", path: "/ai-calls" },
-  { name: "Users", path: "/users" },
-  { name: "OB Logs", path: "/OBlogs" },
+  { name: "Call Activity", path: "/ai-calls" },
+  { name: "OB Feed", path: "/OBlogs" },
+  { name: "Dispatch Manager", path: "/dispatches" },
 ];
 
 const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-64 bg-white shadow-lg min-h-screen">
-      <div className="p-4 font-bold text-lg border-b">SecurePulse</div>
+    <aside className="w-64 bg-primary shadow-lg min-h-screen">
+      <div className="w-64 h-27 flex justify-center items-center">
+        <img
+          className="object-cover"
+          src={emblem}
+          alt="Logo"
+        />
+      </div>
+
       <nav className="flex flex-col p-4 space-y-2">
         {navLinks.map((link) => (
           <Link
             key={link.path}
             to={link.path}
-            className={`p-2 rounded hover:bg-gray-100 ${
-              location.pathname.startsWith(link.path) ? "bg-gray-200" : ""
+            className={`p-2 rounded text-text_light ${
+              location.pathname.startsWith(link.path) ? "bg-primary-200" : ""
             }`}
           >
             {link.name}

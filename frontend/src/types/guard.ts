@@ -4,6 +4,7 @@ import type { Dispatch } from '@/types';
 
 export interface Guard {
   id?: string;
+  shortId?: number;  
   name: string;
   phone: string;
   status: string;

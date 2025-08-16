@@ -15,7 +15,7 @@ function randomPriority() {
 }
 
 function randomEventType() {
-  const events = ["Intrusion", "Fire", "Medical", "System Alert"];
+  const events = ["Intrusion Alarm", "Fire Alarm", "Open Alarm",  "Panic Alarm"];
   return events[Math.floor(Math.random() * events.length)];
 }
 

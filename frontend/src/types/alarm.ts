@@ -5,6 +5,7 @@ import type { AiCall } from '@/types';
 
 export interface Alarm {
   id?: string;
+  shortId?: number;
   triggeredAt: string;
   eventType: string;
   priority: number;

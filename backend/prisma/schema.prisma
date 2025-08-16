@@ -9,6 +9,7 @@ datasource db {
 
 model Client {
   id        String   @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   surname   String
   name      String
   email     String
@@ -20,6 +21,7 @@ model Client {
 
 model Site {
   id        String  @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   name      String
   address   String
   latitude  Float
@@ -31,6 +33,7 @@ model Site {
 
 model Alarm {
   id            String   @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   triggeredAt   DateTime
   eventType     String
   priority      Int
@@ -57,6 +60,7 @@ model Alarm {
 
 model ObLog {
   id      String   @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   logTime DateTime
   message String
   source  String
@@ -66,6 +70,7 @@ model ObLog {
 
 model AiCall {
   id              String   @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   aiDecision      String
   confidenceScore Float
   evaluatedAt     DateTime
@@ -77,6 +82,7 @@ model AiCall {
 
 model Dispatch {
   id            String    @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   dispatchedAt  DateTime
   arrivalTime   DateTime?
   resolvedAt    DateTime?
@@ -94,6 +100,7 @@ model Dispatch {
 
 model User {
   id        String    @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   email     String    @unique
   password  String
   name      String
@@ -112,6 +119,7 @@ model UserRole {
 
 model Vehicle {
   id          String  @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   name        String
   plate       String  @unique
   model       String
@@ -124,6 +132,7 @@ model Vehicle {
 
 model Guard {
   id     String @id @default(uuid())
+  shortId   Int      @default(autoincrement()) @unique
   name   String
   phone  String
   status String

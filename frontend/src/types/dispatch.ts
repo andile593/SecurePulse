@@ -4,6 +4,7 @@ import type { Vehicle } from '@/types';
 
 export interface Dispatch {
   id?: string;
+  shortId?: number;   
   dispatchedAt: string;
   arrivalTime?: string;
   resolvedAt?: string;

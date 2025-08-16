@@ -3,6 +3,7 @@ import type { Role } from '@/types'
 
 export interface User {
   id?: string;
+  shortId?: number; 
   email: string;
   password?: string; 
   name: string;
