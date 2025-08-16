@@ -4,6 +4,8 @@ import { useSites } from "@/hooks/useSites";
 import { useNavigate } from "react-router-dom";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import type { Site } from "@/types/site";
+import type { Alarm } from "@/types/alarm";
+import type { AiCall } from "@/types/aiCall";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -42,6 +44,30 @@ export default function Dashboard() {
     "Intrusion Alarm": "bg-purple",
     "Open Alarm": "bg-blue",
   };
+
+  function getCallStatus(alarm: Alarm, aiCalls: AiCall[]) {
+    // Find AI call related to this alarm
+    const call = aiCalls.find((c: AiCall) => c.alarmId === alarm.id);
+
+    const eventType = alarm.eventType.toLowerCase();
+
+    if (
+      eventType === "panic alarm" ||
+      eventType === "fire alarm" ||
+      eventType === "open alarm"
+    ) {
+      return "No call";
+    }
+
+    if (eventType === "intrusion alarm") {
+      if (!call) return "No answer";
+      // Assume code is mentioned in notes
+      if (call.notes?.toLowerCase().includes("code")) return "Code confirmed";
+      return "No answer";
+    }
+
+    return "-";
+  }
 
   return (
     <div className="p-6 space-y-8">
@@ -98,14 +124,13 @@ export default function Dashboard() {
         ) : (
           <div className="w-full text-sm">
             {/* Header */}
-            <div className="flex border-b font-semibold text-gray-700 gap-2" >
+            <div className="flex border-b font-semibold text-gray-700 gap-2">
               <div className="w-[8%] text-center py-2">Event</div>
               <div className="w-[6%] text-center py-2">ID</div>
               <div className="w-[10%] text-center py-2">Date & Time</div>
               <div className="w-[30%] py-2">Site</div>
-              <div className="w-[20%] py-2">Call Status</div>
+              <div className="w-[20%] text-center py-2">Call Status</div>
               <div className="w-[10%] py-2">Results</div>
-            
             </div>
 
             {/* Rows */}
@@ -143,15 +168,14 @@ export default function Dashboard() {
                 <div className="w-[30%] py-2 flex items-center">
                   {alarm.siteId ? siteMap[alarm.siteId] : "—"}
                 </div>
-               
-               <div className="w-[20%] py-2 flex items-center">
-                  {alarm.status}
+
+                <div className="w-[20%] py-2 flex items-center justify-center">
+                  <CallStatusBadge status={getCallStatus(alarm, aiCalls)} />
                 </div>
 
                 <div className="w-[10%] py-2 flex items-center justify-center font-bold">
                   {alarm.resolutionNotes}
                 </div>
-
               </div>
             ))}
           </div>
@@ -197,6 +221,59 @@ function SummaryCard({
           {Math.abs(percentageChange).toFixed(1)}% from past day
         </p>
       )}
+    </div>
+  );
+}
+
+function CallStatusBadge({ status }: { status: string }) {
+  const styles: Record<
+    string,
+    { textColor: string; bgColor: string; width: number; height: number }
+  > = {
+    "No call": {
+      textColor: "#FCB050",
+      bgColor: "#FFE7B4",
+      width: 105,
+      height: 30,
+    },
+    "Code confirmed": {
+      textColor: "#2BFF00",
+      bgColor: "#C7FFBB",
+      width: 150,
+      height: 30,
+    },
+    "No answer": {
+      textColor: "#FF0000",
+      bgColor: "#FFB4B4",
+      width: 105,
+      height: 30,
+    },
+  };
+
+  const style = styles[status] || {
+    textColor: "#000",
+    bgColor: "#EEE",
+    width: 100,
+    height: 30,
+  };
+
+  return (
+    <div
+      style={{
+        color: style.textColor,
+        backgroundColor: style.bgColor,
+        width: style.width,
+        height: style.height,
+        opacity: 0.5,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 6,
+        fontWeight: 600,
+        fontSize: 12,
+      }}
+    >
+      {status}
     </div>
   );
 }

@@ -29,12 +29,29 @@ async function updateAlarm(id, data) {
 
 async function deleteAlarm(id) {
   try {
-    await prisma.alarm.delete({ where: { id } });
-    return true;
-  } catch {
-    return false;
+    // Delete related dispatches
+    await prisma.dispatch.deleteMany({
+      where: { alarmId: id },
+    });
+
+    // Delete related AI calls
+    await prisma.aiCall.deleteMany({
+      where: { alarmId: id },
+    });
+
+    // Now delete the alarm
+    return await prisma.alarm.delete({
+      where: { id },
+    });
+  } catch (err) {
+    if (err.code === 'P2025') {
+      throw new Error('Alarm not found');
+    }
+    throw err;
   }
 }
+
+
 
 module.exports = {
   createAlarm,
