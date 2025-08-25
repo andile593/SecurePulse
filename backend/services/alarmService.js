@@ -2,18 +2,32 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function createAlarm(data) {
-  return prisma.alarm.create({ data });
+  try {
+    return await prisma.alarm.create({ data });
+  } catch (error) {
+    console.error("Failed to create alarm:", error.message);
+    return null; // fallback
+  }
 }
 
 async function getAllAlarms() {
-  return prisma.alarm.findMany();
+  try {
+    return await prisma.alarm.findMany();
+  } catch (error) {
+    console.error("Failed to fetch alarms:", error.message);
+    return []; // fallback
+  }
 }
 
-
 async function getAlarmById(id) {
-  return prisma.alarm.findUnique({
-    where: { id }
-  });
+  try {
+    return await prisma.alarm.findUnique({
+      where: { id }
+    });
+  } catch (error) {
+    console.error(`Failed to fetch alarm ${id}:`, error.message);
+    return null; // fallback
+  }
 }
 
 async function updateAlarm(id, data) {
@@ -22,8 +36,9 @@ async function updateAlarm(id, data) {
       where: { id },
       data
     });
-  } catch {
-    return null;
+  } catch (error) {
+    console.error(`Failed to update alarm ${id}:`, error.message);
+    return null; // fallback
   }
 }
 
@@ -45,13 +60,13 @@ async function deleteAlarm(id) {
     });
   } catch (err) {
     if (err.code === 'P2025') {
-      throw new Error('Alarm not found');
+      console.warn(`Alarm ${id} not found`);
+      return null; // fallback for non-existing alarm
     }
-    throw err;
+    console.error(`Failed to delete alarm ${id}:`, err.message);
+    return null; // fallback for other errors
   }
 }
-
-
 
 module.exports = {
   createAlarm,

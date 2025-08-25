@@ -1,4 +1,4 @@
-const { PrismaClient  } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const { sendCredentialsEmail } = require('../utils/mailer');
 
@@ -11,16 +11,13 @@ async function createUser(data) {
     throw new Error("Missing required fields");
   }
 
-  // Check for existing user with the same email
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new Error("Email already in use");
-  }
-
   try {
+    // Check for existing user with the same email
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new Error("Email already in use");
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -32,52 +29,56 @@ async function createUser(data) {
       },
     });
 
-    await sendCredentialsEmail(email, name, password); 
+    // Send credentials via email (optional)
+    await sendCredentialsEmail(email, name, password);
 
     return user;
   } catch (error) {
-    if (error.code) {
-      console.error("Prisma error code:", error.code);
-      console.error("Prisma meta:", error.meta);
-      console.error("Prisma error message:", error.message);
-    } else {
-      console.error("Unexpected error:", error);
-    }
-
-    throw new Error("Failed to create user");
+    console.error("Failed to create user:", error.message);
+    return null;
   }
 }
 
-
-
 async function getAllUsers() {
-  return prisma.user.findMany({
-    include: { role: true }, 
-  });
+  try {
+    return await prisma.user.findMany({ include: { role: true } });
+  } catch (error) {
+    console.error("Failed to fetch users:", error.message);
+    return [];
+  }
 }
 
 async function getUserById(id) {
-  return prisma.user.findUnique({
-    where: { id },
-    include: { role: true }, 
-  });
+  try {
+    return await prisma.user.findUnique({ 
+      where: { id }, 
+      include: { role: true } 
+    });
+  } catch (error) {
+    console.error(`Failed to fetch user ${id}:`, error.message);
+    return null;
+  }
 }
 
-
 async function updateUser(id, data) {
-  const { name, email, roleId } = data;
-
-  return prisma.user.update({
-    where: { id },
-    data: { name, email, roleId }
-  });
+  try {
+    const { name, email, roleId } = data;
+    return await prisma.user.update({
+      where: { id },
+      data: { name, email, roleId }
+    });
+  } catch (error) {
+    console.error(`Failed to update user ${id}:`, error.message);
+    return null;
+  }
 }
 
 async function deleteUser(id) {
   try {
     await prisma.user.delete({ where: { id } });
     return true;
-  } catch {
+  } catch (error) {
+    console.error(`Failed to delete user ${id}:`, error.message);
     return false;
   }
 }

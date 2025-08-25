@@ -2,38 +2,51 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function createClient(data) {
-  // Validate latitude and longitude or set defaults (e.g., 0) to avoid Prisma errors
-  const sitesData = (data.sites || []).map((site) => ({
-    name: site.name,
-    address: site.address,
-    latitude: site.latitude ?? 0,  // provide default if missing
-    longitude: site.longitude ?? 0, // provide default if missing
-  }));
+  try {
+    const sitesData = (data.sites || []).map((site) => ({
+      name: site.name,
+      address: site.address,
+      latitude: site.latitude ?? 0,
+      longitude: site.longitude ?? 0,
+    }));
 
-  return prisma.client.create({
-    data: {
-      name: data.name,
-      surname: data.surname,
-      email: data.email,
-      phone: data.phone,
-      sites: {
-        create: sitesData,
+    return await prisma.client.create({
+      data: {
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        sites: {
+          create: sitesData,
+        },
       },
-    },
-  });
+      include: { sites: true },
+    });
+  } catch (error) {
+    console.error("Failed to create client:", error.message);
+    return null;
+  }
 }
 
 async function getAllClients() {
-  return prisma.client.findMany({
-    include: { sites: true },
-  });
+  try {
+    return await prisma.client.findMany({ include: { sites: true } });
+  } catch (error) {
+    console.error("Failed to fetch clients:", error.message);
+    return [];
+  }
 }
 
 async function getClientById(id) {
-  return prisma.client.findUnique({
-    where: { id },
-    include: { sites: true },
-  });
+  try {
+    return await prisma.client.findUnique({
+      where: { id },
+      include: { sites: true },
+    });
+  } catch (error) {
+    console.error(`Failed to fetch client ${id}:`, error.message);
+    return null;
+  }
 }
 
 async function updateClient(id, data) {
@@ -75,31 +88,25 @@ async function updateClient(id, data) {
       include: { sites: true },
     });
   } catch (error) {
-    console.error("Update Client error:", error);
+    console.error(`Failed to update client ${id}:`, error.message);
     return null;
   }
 }
 
-
-
 async function deleteClient(id) {
   try {
-    // Delete all sites related to the client
-    await prisma.site.deleteMany({
-      where: { clientId: id },
-    });
-
-    // Now delete the client
-    await prisma.client.delete({
-      where: { id },
-    });
-
+    await prisma.site.deleteMany({ where: { clientId: id } });
+    await prisma.client.delete({ where: { id } });
     return { message: "Client and related sites deleted successfully" };
   } catch (error) {
-    throw error;
+    if (error.code === 'P2025') {
+      console.warn(`Client ${id} not found`);
+      return null;
+    }
+    console.error(`Failed to delete client ${id}:`, error.message);
+    return null;
   }
 }
-
 
 module.exports = {
   createClient,

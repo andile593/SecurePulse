@@ -24,7 +24,6 @@ const emptyAlarmData: Partial<Alarm> = {
   priority: 1,
   status: '',
   source: '',
-  transmitterId: '',
   siteId: '',
   clientId: '',
   resolutionNotes: '',

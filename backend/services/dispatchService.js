@@ -2,23 +2,37 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function createDispatch(data) {
-  return prisma.dispatch.create({ data });
+  try {
+    return await prisma.dispatch.create({ data });
+  } catch (error) {
+    console.error("Failed to create dispatch:", error.message);
+    return null;
+  }
 }
 
 async function getAllDispatches() {
-  return prisma.dispatch.findMany({ include: { alarm: true } });
+  try {
+    return await prisma.dispatch.findMany({ include: { alarm: true } });
+  } catch (error) {
+    console.error("Failed to fetch dispatches:", error.message);
+    return [];
+  }
 }
 
 async function getDispatchById(id) {
-  return prisma.dispatch.findUnique({
-    where: { id },
-    include: { alarm: true },
-  });
+  try {
+    return await prisma.dispatch.findUnique({
+      where: { id },
+      include: { alarm: true },
+    });
+  } catch (error) {
+    console.error(`Failed to fetch dispatch ${id}:`, error.message);
+    return null;
+  }
 }
 
 async function updateDispatch(id, data) {
   try {
-    // Only allow direct fields or nested relation updates
     return await prisma.dispatch.update({
       where: { id },
       data: {
@@ -28,41 +42,34 @@ async function updateDispatch(id, data) {
         responseNotes: data.responseNotes,
         guardId: data.guardId,
         vehicleId: data.vehicleId,
-        alarmId: data.alarmId,      
+        alarmId: data.alarmId,
       },
     });
   } catch (error) {
-    console.error("Failed to update dispatch:", error);
+    console.error(`Failed to update dispatch ${id}:`, error.message);
     return null;
   }
 }
 
-
 async function deleteDispatch(id) {
   try {
-
     const dispatch = await prisma.dispatch.findUnique({
       where: { id },
-      include: {
-        alarm: true,  
-      },
+      include: { alarm: true },
     });
 
     if (!dispatch) {
-      console.error(`Dispatch with ID ${id} not found.`);
-      return null; // Nothing to delete
+      console.warn(`Dispatch with ID ${id} not found.`);
+      return null;
     }
 
-    const deleted = await prisma.dispatch.delete({
-      where: { id },
-    });
-
+    const deleted = await prisma.dispatch.delete({ where: { id } });
     console.log(`Dispatch with ID ${id} deleted successfully.`);
     return deleted;
 
   } catch (error) {
-    console.error("Failed to delete dispatch:", error);
-    return null; // Indicates failure
+    console.error(`Failed to delete dispatch ${id}:`, error.message);
+    return null;
   }
 }
 

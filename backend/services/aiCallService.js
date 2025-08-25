@@ -2,40 +2,50 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function createAiCall(data) {
-  return prisma.aiCall.create({ data });
+  try {
+    return await prisma.aiCall.create({ data });
+  } catch (error) {
+    console.error("Failed to create AI call:", error.message);
+    return null; // fallback
+  }
 }
 
 async function getAllAiCalls() {
-  return prisma.aiCall.findMany({ include: { alarm: true } });
+  try {
+    return await prisma.aiCall.findMany({ include: { alarm: true } });
+  } catch (error) {
+    console.error("Failed to fetch AI calls:", error.message);
+    return []; // fallback
+  }
 }
 
 async function getAiCallById(id) {
-  return prisma.aiCall.findUnique({
-    where: { id },
-    include: { alarm: true },
-  });
+  try {
+    return await prisma.aiCall.findUnique({
+      where: { id },
+      include: { alarm: true },
+    });
+  } catch (error) {
+    console.error(`Failed to fetch AI call ${id}:`, error.message);
+    return null; // fallback
+  }
 }
 
 async function updateAiCall(id, data) {
   try {
-    const updatedAiCall = await prisma.aiCall.update({
-      where: { id }, // the AiCall ID to update
+    return await prisma.aiCall.update({
+      where: { id },
       data: {
         aiDecision: data.aiDecision,
         confidenceScore: data.confidenceScore,
-        evaluatedAt: new Date(data.evaluatedAt),
+        evaluatedAt: data.evaluatedAt ? new Date(data.evaluatedAt) : undefined,
         notes: data.notes,
-        // Link the existing Alarm by its ID
-        alarm: {
-          connect: { id: data.alarmId },
-        },
+        alarm: data.alarmId ? { connect: { id: data.alarmId } } : undefined,
       },
     });
-
-    return updatedAiCall;
   } catch (error) {
-    console.error("Error updating AiCall:", error);
-    throw error;
+    console.error(`Error updating AI call ${id}:`, error.message);
+    return null; // fallback
   }
 }
 
@@ -43,7 +53,8 @@ async function deleteAiCall(id) {
   try {
     await prisma.aiCall.delete({ where: { id } });
     return true;
-  } catch {
+  } catch (error) {
+    console.error(`Failed to delete AI call ${id}:`, error.message);
     return false;
   }
 }

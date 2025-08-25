@@ -2,13 +2,23 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function createVehicle(data) {
-  return prisma.vehicle.create({ data });
+  try {
+    return await prisma.vehicle.create({ data });
+  } catch (error) {
+    console.error("Failed to create vehicle:", error.message);
+    return null;
+  }
 }
 
 async function getAllVehicles() {
-  return prisma.vehicle.findMany({
-    include: { guards: true },
-  });
+  try {
+    return await prisma.vehicle.findMany({
+      include: { guards: true },
+    });
+  } catch (error) {
+    console.error("Failed to fetch vehicles:", error.message);
+    return [];
+  }
 }
 
 async function getVehicleById(id) {
@@ -18,32 +28,30 @@ async function getVehicleById(id) {
       include: { guards: true },
     });
   } catch (error) {
-    console.error("Error in getVehicleById:", error);
-    throw error;
-  }
-}
-
-async function updateVehicle(id, data) {
-  
-  const { guards, ...safeData } = data;
-
-  try {
-    return await prisma.vehicle.update({
-      where: { id },
-      data: safeData, 
-    });
-  } catch (error) {
-    console.error("Prisma updateVehicle error:", error);
+    console.error(`Failed to fetch vehicle ${id}:`, error.message);
     return null;
   }
 }
 
+async function updateVehicle(id, data) {
+  try {
+    const { guards, ...safeData } = data; // ignore nested guards updates here
+    return await prisma.vehicle.update({
+      where: { id },
+      data: safeData,
+    });
+  } catch (error) {
+    console.error(`Failed to update vehicle ${id}:`, error.message);
+    return null;
+  }
+}
 
 async function deleteVehicle(id) {
   try {
     await prisma.vehicle.delete({ where: { id } });
     return true;
-  } catch {
+  } catch (error) {
+    console.error(`Failed to delete vehicle ${id}:`, error.message);
     return false;
   }
 }

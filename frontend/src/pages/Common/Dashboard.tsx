@@ -104,7 +104,7 @@ export default function Dashboard() {
               <div className="w-[15%] text-center py-2">Results</div>
             </div>
 
-            {alarms.slice(1).map((alarm) => (
+            {alarms.map((alarm) => (
               <AlarmRow
                 key={alarm.id}
                 alarm={alarm}
