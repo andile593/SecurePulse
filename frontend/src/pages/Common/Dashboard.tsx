@@ -21,20 +21,24 @@ export default function Dashboard() {
     return <div className="p-6 text-red-600">Something went wrong</div>;
 
   const totalAlarms = alarms.length;
+
   const unansweredCalls = aiCalls.filter(
-    (a) => a.aiDecision === "escalated"
+    (a) => a.aiDecision === "Inconclusive"
   ).length;
-  const cancelled = aiCalls.filter((a) => a.aiDecision === "cancelled").length;
-  const escalatedAlarms = aiCalls.filter(
-    (a) => a.aiDecision === "Requires Response"
+
+  const cancelled = aiCalls.filter((a) => a.aiDecision === "Cancelled").length;
+
+  const escalatedAlarms = alarms.filter(
+    (a) => a.aiDecision?.toLowerCase() === "dispatched"
   ).length;
+
 
   const siteMap = sites.reduce((acc, site) => {
     if (site.id) acc[site.id] = site.name;
     return acc;
   }, {} as Record<string, string>);
-  
-  const prevTotalAlarms = 20; 
+
+  const prevTotalAlarms = 20;
   const prevCancelled = 5;
   const prevUnansweredCalls = 3;
   const prevEscalatedAlarms = 10;
@@ -98,7 +102,7 @@ export default function Dashboard() {
               <div className="w-[8%] text-center py-2">Event</div>
               <div className="w-[6%] text-center py-2">ID</div>
               <div className="w-[10%] text-center py-2">Date & Time</div>
-              <div className="w-[25%] py-2">Site</div>
+              <div className="w-[25%] py-2">Site Address</div>
               <div className="w-[20%] text-center py-2">Call Status</div>
               <div className="w-[15%] text-center py-2">Source Code</div>
               <div className="w-[15%] text-center py-2">Results</div>

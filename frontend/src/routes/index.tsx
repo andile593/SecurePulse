@@ -9,7 +9,6 @@ import ProtectedRoute from './ProtectedRoute';
   />
 
 
-import Home from "@/pages/Common/Home";
 import Login from "../pages/Common/Login";
 import Dashboard from "../pages/Common/Dashboard";
 import NotFound from "../pages/Common/NotFound";
@@ -66,7 +65,6 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
 
-      {/* Protected with Layout */}
       <Route
         path="/"
         element={
@@ -75,15 +73,6 @@ export default function AppRoutes() {
           </AppLayout>
         }
       />
-      <Route
-        path="/dashboard"
-        element={
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
-        }
-      />
-
       <Route
         path="/clients"
         element={

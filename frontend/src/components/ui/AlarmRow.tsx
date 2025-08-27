@@ -20,6 +20,8 @@ export function AlarmRow({
   siteMap: Record<string, string>;
   navigate: any;
 }) {
+
+
   function getCallStatus() {
     const call = aiCalls.find((c) => c.alarmId === alarm.id);
     const type = alarm.eventType.toLowerCase();

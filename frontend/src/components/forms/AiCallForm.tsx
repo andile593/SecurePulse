@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { AiCall } from "@/types/aiCall";
+import { useAlarms } from "@/hooks/useAlarms";
+import { useSites } from "@/hooks/useSites";
 
 type AiCallFormProps = {
   initialData?: Partial<AiCall>;
@@ -22,6 +24,14 @@ const AiCallForm = ({
   const [notes, setNotes] = useState(initialData.notes ?? "");
   const [alarmId, setAlarmId] = useState(initialData.alarmId ?? "");
 
+  const { data: alarms = [] } = useAlarms();
+  const { data: sites = [] } = useSites();
+
+  const siteMap = sites.reduce((acc, site) => {
+    if (site.id) acc[site.id] = site.name;
+    return acc;
+  }, {} as Record<string, string>);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -43,9 +53,9 @@ const AiCallForm = ({
           required
         >
           <option value="">Select Decision</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="escalated">Escalated</option>
-          <option value="inconclusive">Inconclusive</option>
+          <option value="Cancelled">Cancelled</option>
+          <option value="Escalated">Escalated</option>
+          <option value="Inconclusive">Inconclusive</option>
         </select>
       </div>
 
@@ -86,15 +96,23 @@ const AiCallForm = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Alarm ID</label>
-        <input
+        <label className="block text-sm font-medium mb-1">Alarm</label>
+        <select
           className="w-full border p-2 rounded"
           value={alarmId}
           onChange={(e) => setAlarmId(e.target.value)}
           required
-        />
+        >
+          <option value="">Select a Alarm</option>
+          {alarms.map((alarm) => (
+            <option key={alarm.id} value={alarm.id}>
+              {alarm.eventType} - {siteMap[alarm.siteId] ?? "Unknown Site"}
+            </option>
+          ))}
+
+        </select>
       </div>
-      
+
 
       <div className="flex gap-2">
         <button

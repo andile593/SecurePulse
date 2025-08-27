@@ -30,11 +30,11 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
   const { data: sites = [] } = useSites();
   const { data: users = [] } = useUsers(); 
 
-  // Filter sites based on selected client
+
   const filteredSites = clientId ? sites.filter(site => site.clientId === clientId) : [];
 
   useEffect(() => {
-    // Reset site selection if client changes
+    
     if (!filteredSites.find(site => site.id === siteId)) {
       setSiteId("");
     }
