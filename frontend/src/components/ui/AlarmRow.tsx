@@ -3,10 +3,10 @@ import type { Alarm } from "@/types/alarm";
 import type { AiCall } from "@/types/aiCall";
 
 const eventTypeColors: Record<string, string> = {
-  "Panic Alarm": "bg-red",
-  "Fire Alarm": "bg-red",
-  "Intrusion Alarm": "bg-purple",
-  "Open Alarm": "bg-blue",
+  "Panic": "bg-red",
+  "Fire": "bg-red",
+  "Intrusion": "bg-purple",
+  "Open": "bg-blue",
 };
 
 export function AlarmRow({

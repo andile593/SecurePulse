@@ -59,12 +59,13 @@ CREATE TABLE "public"."ObLog" (
 -- CreateTable
 CREATE TABLE "public"."AiCall" (
     "id" TEXT NOT NULL,
-    "shortId" SERIAL NOT NULL,
-    "aiDecision" TEXT NOT NULL,
-    "confidenceScore" DOUBLE PRECISION NOT NULL,
-    "evaluatedAt" TIMESTAMP(3) NOT NULL,
-    "notes" TEXT,
     "alarmId" TEXT NOT NULL,
+    "calledAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "callDuration" TEXT,
+    "notes" TEXT,
+    "aiDecision" TEXT,
+    "confidenceScore" DOUBLE PRECISION,
+    "evaluatedAt" TIMESTAMP(3),
 
     CONSTRAINT "AiCall_pkey" PRIMARY KEY ("id")
 );
@@ -142,9 +143,6 @@ CREATE UNIQUE INDEX "Alarm_shortId_key" ON "public"."Alarm"("shortId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ObLog_shortId_key" ON "public"."ObLog"("shortId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "AiCall_shortId_key" ON "public"."AiCall"("shortId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Dispatch_shortId_key" ON "public"."Dispatch"("shortId");

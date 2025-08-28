@@ -1,15 +1,14 @@
-// AiCall.ts
-import type { Alarm } from '@/types';
+import type { Alarm } from './alarm';
 
 export interface AiCall {
   id?: string;
-  shortId?: number; 
-  aiDecision: string;
-  confidenceScore: number;
-  calledAt: string;
-  callDuration: string;
-  evaluatedAt: string;
-  notes?: string;
+  shortId?: number;
   alarmId: string;
+  calledAt: string;
+  callDuration?: string;
+  notes?: string;
+  aiDecision?: string;
+  confidenceScore?: number;
+  evaluatedAt?: string;
   alarm?: Alarm;
 }

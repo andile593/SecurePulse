@@ -23,6 +23,10 @@ const AiCallForm = ({
   );
   const [notes, setNotes] = useState(initialData.notes ?? "");
   const [alarmId, setAlarmId] = useState(initialData.alarmId ?? "");
+  const [calledAt, setCalledAt] = useState(
+    initialData.calledAt ?? new Date().toISOString().slice(0, 16)
+  );
+  const [callDuration, setCallDuration] = useState(initialData.callDuration ?? "");
 
   const { data: alarms = [] } = useAlarms();
   const { data: sites = [] } = useSites();
@@ -36,7 +40,10 @@ const AiCallForm = ({
     e.preventDefault();
 
     const evaluatedAtIso = new Date(evaluatedAt).toISOString();
-    onSubmit({ aiDecision, confidenceScore, evaluatedAt: evaluatedAtIso, notes, alarmId });
+    onSubmit({
+      aiDecision, confidenceScore, evaluatedAt: evaluatedAtIso, notes, alarmId, calledAt: new Date(calledAt).toISOString(),
+      callDuration,
+    });
   };
 
   return (
@@ -72,6 +79,27 @@ const AiCallForm = ({
           onChange={(e) => setConfidenceScore(parseFloat(e.target.value))}
           className="w-full border p-2 rounded"
           required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Call Started At</label>
+        <input
+          type="datetime-local"
+          value={calledAt}
+          onChange={(e) => setCalledAt(e.target.value)}
+          className="w-full border p-2 rounded"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Call Duration</label>
+        <input
+          type="text"
+          placeholder="e.g. 00:03:25"
+          value={callDuration}
+          onChange={(e) => setCallDuration(e.target.value)}
+          className="w-full border p-2 rounded"
         />
       </div>
 

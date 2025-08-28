@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
 }
 
 datasource db {
@@ -11,19 +10,19 @@ datasource db {
 
 model Client {
   id        String   @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId   Int      @unique @default(autoincrement())
   surname   String
   name      String
   email     String
   phone     String
   sites     Site[]
-  alarms    Alarm[] 
+  alarms    Alarm[]
   createdAt DateTime @default(now())
 }
 
 model Site {
   id        String  @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId   Int     @unique @default(autoincrement())
   name      String
   address   String
   latitude  Float
@@ -34,13 +33,13 @@ model Site {
 }
 
 model Alarm {
-  id            String   @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
-  triggeredAt   DateTime
-  eventType     String
-  priority      Int
-  status        String
-  source        String
+  id          String   @id @default(uuid())
+  shortId     Int      @unique @default(autoincrement())
+  triggeredAt DateTime
+  eventType   String
+  priority    Int
+  status      String
+  source      String
 
   siteId String
   site   Site   @relation(fields: [siteId], references: [id])
@@ -55,13 +54,13 @@ model Alarm {
   lastAICheckAt DateTime?
   aiDecision    String?
 
-  aiCalls   AiCall[]
+  aiCalls  AiCall[]
   dispatch Dispatch?
 }
 
 model ObLog {
   id      String   @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId Int      @unique @default(autoincrement())
   logTime DateTime
   message String
   source  String
@@ -70,22 +69,21 @@ model ObLog {
 }
 
 model AiCall {
-  id              String   @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
-  aiDecision      String
-  confidenceScore Float
-  calledAt  DateTime @default(now())
-  callDuration String
-  evaluatedAt     DateTime
+  id              String    @id @default(uuid())
+  shortId       Int       @unique @default(autoincrement())
+  alarmId         String
+  alarm           Alarm     @relation(fields: [alarmId], references: [id])
+  calledAt        DateTime  @default(now())
+  callDuration    String?
   notes           String?
-
-  alarmId String 
-  alarm   Alarm  @relation(fields: [alarmId], references: [id])
+  aiDecision      String?
+  confidenceScore Float?
+  evaluatedAt     DateTime?
 }
 
 model Dispatch {
   id            String    @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId       Int       @unique @default(autoincrement())
   dispatchedAt  DateTime
   arrivalTime   DateTime?
   resolvedAt    DateTime?
@@ -103,7 +101,7 @@ model Dispatch {
 
 model User {
   id        String    @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId   Int       @unique @default(autoincrement())
   email     String    @unique
   password  String
   name      String
@@ -122,7 +120,7 @@ model UserRole {
 
 model Vehicle {
   id          String  @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
+  shortId     Int     @unique @default(autoincrement())
   name        String
   plate       String  @unique
   model       String
@@ -134,11 +132,11 @@ model Vehicle {
 }
 
 model Guard {
-  id     String @id @default(uuid())
-  shortId   Int      @default(autoincrement()) @unique
-  name   String
-  phone  String
-  status String
+  id      String @id @default(uuid())
+  shortId Int    @unique @default(autoincrement())
+  name    String
+  phone   String
+  status  String
 
   assignedVehicleId String?
   assignedVehicle   Vehicle? @relation(fields: [assignedVehicleId], references: [id])

@@ -15,7 +15,7 @@ export function AiCallRow({
   return (
     <div
       className="flex gap-3 mb-3 rounded-sm bg-light_gray hover:bg-gray-50 cursor-pointer"
-      onClick={() => navigate(`/alarms/${alarm?.id || aiCall.id}`)}
+      onClick={() => navigate(`/ai-calls/${aiCall.id}`)}
     >
       {/* Call ID */}
       <div className="w-[8%] flex justify-center items-center">

@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import emblem from "@/assets/Emblem.png";
 
 const navLinks = [
-  { name: "Dashboard", path: "/dashboard" },
+  { name: "Dashboard", path: "/" },
   { name: "Call Activity", path: "/ai-calls" },
   { name: "OB Feed", path: "/OBlogs" },
   { name: "Dispatch Manager", path: "/dispatches" },
