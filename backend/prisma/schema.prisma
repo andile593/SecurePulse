@@ -74,6 +74,8 @@ model AiCall {
   shortId   Int      @default(autoincrement()) @unique
   aiDecision      String
   confidenceScore Float
+  calledAt  DateTime @default(now())
+  callDuration String
   evaluatedAt     DateTime
   notes           String?
 

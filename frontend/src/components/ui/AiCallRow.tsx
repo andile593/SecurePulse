@@ -29,6 +29,10 @@ export function AiCallRow({
 
       {/* Example alarm info */}
       <div className="w-[10%] text-center py-2">
+        {new Date(aiCall.calledAt).toLocaleTimeString() || "—"}
+      </div>
+
+      <div className="w-[10%] text-center py-2">
         {alarm?.eventType || "—"}
       </div>
     </div>

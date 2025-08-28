@@ -6,6 +6,8 @@ export interface AiCall {
   shortId?: number; 
   aiDecision: string;
   confidenceScore: number;
+  calledAt: string;
+  callDuration: string;
   evaluatedAt: string;
   notes?: string;
   alarmId: string;
