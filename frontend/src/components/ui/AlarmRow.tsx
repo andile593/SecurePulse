@@ -1,12 +1,13 @@
 import { StatusBadge } from "./StatusBadge";
 import type { Alarm } from "@/types/alarm";
 import type { AiCall } from "@/types/aiCall";
+import { format } from "date-fns";
 
 const eventTypeColors: Record<string, string> = {
-  "Panic": "bg-red",
-  "Fire": "bg-red",
-  "Intrusion": "bg-purple",
-  "Open": "bg-blue",
+  "Panic Alarm": "bg-red",
+  "Fire Alarm": "bg-red",
+  "Intrusion Alarm": "bg-purple",
+  "Open Alarm": "bg-blue",
 };
 
 export function AlarmRow({
@@ -26,14 +27,22 @@ export function AlarmRow({
     const call = aiCalls.find((c) => c.alarmId === alarm.id);
     const type = alarm.eventType.toLowerCase();
 
-    if (["panic", "fire", "open"].includes(type)) return "No call";
-    if (type === "intrusion") {
+    if (["panic alarm", "fire alarm", "open alarm"].includes(type)) return "No call";
+    if (type === "intrusion alarm") {
       if (!call) return "No answer";
       if (call.notes?.toLowerCase().includes("code")) return "Code confirmed";
       return "No answer";
     }
     return "-";
   }
+
+  const formattedDate = alarm.triggeredAt
+  ? `${format(new Date(alarm.triggeredAt), "HH:mm")}\n${format(
+      new Date(alarm.triggeredAt),
+      "dd MMM yyyy"
+    )}`
+  : "—";
+
 
   return (
     <div
@@ -42,16 +51,17 @@ export function AlarmRow({
     >
       <div className="w-[8%] py-2 flex items-center justify-center">
         <div
-          className={`w-[35px] h-[35px] flex items-center justify-center text-white text-xs font-bold rounded ${
-            eventTypeColors[alarm.eventType] || "bg-gray-400"
-          }`}
+          className={`w-[35px] h-[35px] flex items-center justify-center text-white text-xs font-bold rounded ${eventTypeColors[alarm.eventType] || "bg-gray-400"
+            }`}
         >
           {alarm.eventType?.split(" ").map((w) => w[0]).join("")}
         </div>
       </div>
 
-      <div className="w-[6%] flex justify-center items-center">#{alarm.shortId || "—"}</div>
-      <div className="w-[10%] px-2 py-2 text-center">{new Date(alarm.triggeredAt).toLocaleString()}</div>
+      <div className="w-[6%] flex justify-center items-center"># {alarm.shortId || "—"}</div>
+      <div className="w-[10%] px-2 py-2 text-center whitespace-pre">
+        {formattedDate}
+      </div>
       <div className="w-[25%] flex items-center py-2">{alarm.siteId ? siteMap[alarm.siteId] : "—"}</div>
 
       <div className="w-[20%] flex justify-center items-center">

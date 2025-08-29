@@ -33,26 +33,31 @@ async function getSiteById(id) {
   }
 }
 
+
 async function updateSite(id, data) {
-  try {
-    const { clientId, ...siteData } = data;
-    const updatePayload = { ...siteData };
+  
+  const { name, address, latitude, longitude, clientId } = data;
 
-    if (clientId) {
-      updatePayload.client = { connect: { id: clientId } };
-    }
+  const updatePayload = {
+    name,
+    address,
+    latitude,
+    longitude,
+  };
 
-    const updatedSite = await prisma.site.update({
-      where: { id },
-      data: updatePayload,
-      include: { client: true, alarms: true },
-    });
-
-    return updatedSite;
-  } catch (error) {
-    console.error(`Failed to update site ${id}:`, error.message);
-    return null;
+  
+  if (clientId) {
+    updatePayload.client = { connect: { id: clientId } };
   }
+
+  return prisma.site.update({
+    where: { id },
+    data: updatePayload,
+    include: {
+      client: true,
+      alarms: true,
+    },
+  });
 }
 
 async function deleteSite(id) {

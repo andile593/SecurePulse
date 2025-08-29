@@ -2,12 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from './ProtectedRoute';
 
-<Route path="/dashboard" element={
-<ProtectedRoute>
-  <Dashboard />
-  </ProtectedRoute>} 
-  />
-
 
 import Login from "../pages/Common/Login";
 import Dashboard from "../pages/Common/Dashboard";

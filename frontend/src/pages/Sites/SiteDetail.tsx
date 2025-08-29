@@ -18,8 +18,10 @@ const SiteDetail = () => {
 
   const handleSubmit = (data: Partial<Site>) => {
     if (!site) return;
-    
+    console.log("Data:", data)
+
     const updatedSite = { ...site, ...data };
+    console.log("UpdateSite",updatedSite)
     updateSite(
       { id: site.id!, site: updatedSite },
       {
