@@ -85,7 +85,7 @@ export default function AiCallList() {
       ) : (
 
         <div className="w-full text-sm">
-          <div className="flex mb-3 rounded-sm font-semibold bg-gray gap-2">
+          <div className="flex mb-3 rounded-sm font-medium bg-gray gap-2">
             <div className="w-[10%] text-center py-2">Call ID</div>
             <div className="w-[15%] py-2">Site Name</div>
             <div className="w-[10%] text-center py-2">Time</div>
@@ -105,8 +105,8 @@ export default function AiCallList() {
               <AiCallRow
                 key={aiCall.id}
                 aiCall={aiCall}
-                alarm={alarm}   // pass the alarm too if needed
-                siteName={siteName}  // pass the resolved site name
+                alarm={alarm}  
+                siteName={siteName}  
                 navigate={navigate}
               />
             );

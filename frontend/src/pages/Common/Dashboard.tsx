@@ -98,7 +98,7 @@ export default function Dashboard() {
           <p className="text-gray-500">No alarms available.</p>
         ) : (
           <div className="w-full text-sm">
-            <div className="flex mb-3 rounded-sm font-semibold bg-gray gap-2">
+            <div className="flex mb-3 rounded-sm font-medium bg-gray gap-2">
               <div className="w-[8%] text-center py-2">Event</div>
               <div className="w-[6%] text-center py-2">ID</div>
               <div className="w-[10%] text-center py-2">Date & Time</div>

@@ -46,7 +46,7 @@ export function AlarmRow({
 
   return (
     <div
-      className="flex gap-3 mb-3 rounded-sm bg-light_gray hover:bg-gray-50 cursor-pointer"
+      className="flex gap-3 mb-3 font-semibold rounded-sm bg-light_gray hover:bg-gray-50 cursor-pointer"
       onClick={() => navigate(`/alarms/${alarm.id}`)}
     >
       <div className="w-[8%] py-2 flex items-center justify-center">
@@ -58,7 +58,7 @@ export function AlarmRow({
         </div>
       </div>
 
-      <div className="w-[6%] flex justify-center items-center"># {alarm.shortId || "—"}</div>
+      <div className="w-[6%] flex justify-center items-center">#{alarm.shortId || "—"}</div>
       <div className="w-[10%] px-2 py-2 text-center whitespace-pre">
         {formattedDate}
       </div>

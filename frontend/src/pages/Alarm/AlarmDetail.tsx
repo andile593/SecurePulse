@@ -5,6 +5,8 @@ import AlarmForm from "@/components/forms/AlarmForm";
 import { useState } from "react";
 import type { Alarm } from "@/types/alarm";
 import { useClients } from "@/hooks/useClients"
+import CallIcon from '@mui/icons-material/Call';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 const AlarmDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -73,7 +75,7 @@ const AlarmDetail = () => {
             <p className="text-base pr-45 ">Source Code: {alarm.source}</p>
             <div className="w-full bg-gray h-px mb-4"></div>
           </div>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-5">
             <div className="grid grid-cols-2 col-start-1 col-end-3 gap-2">
               <p className="text-base">Alarm ID</p>
               <p className="text-base font-medium">#{alarm.shortId}</p>
@@ -100,16 +102,71 @@ const AlarmDetail = () => {
                 {alarm.resolutionNotes ?? "N/A"}
               </p>
             </div>
-            <div className="col-start-3 col-end-5 gap-2">
+            <div className="col-start-3 col-end-5  gap-2">
               <h3 className="text-lg font-semibold mb-4">Decision log</h3>
-              <div className="p-4 bg-primary rounded-xl text-base leading-7 text-light_gray">
+              <div className="p-7 bg-primary rounded-xl text-base leading-7 text-light_gray">
                 The client was reached within 1 ring. The cancellation code was
                 valid and matched the system. No signs of duress or distress
                 detected in tone. Alarm was cancelled based on standard
                 auto-handling protocol for intrusion alarm.
               </div>
             </div>
-            <div className="col-start-1 col-end-5"></div>
+            <div className="col-start-1 col-end-5">
+               <h2 className="text-gray-700 font-semibold flex items-center gap-2 mb-4">
+                  <CallIcon className="text-gray-600" />
+                  AI Call Transcript
+                </h2>
+              <div className="bg-light_gray rounded-lg border border-gray p-4">
+
+                {/* Transcript */}
+                <div className="space-y-3 text-sm leading-relaxed text-gray-800">
+                  <p>
+                    <span className="font-semibold text-gray-600">AI:</span> Hello, This is
+                    Sam Calling From SecureOps Security. We Have Received An Intrusion Alarm
+                    At Your Premises: Springs Fire Station – Main Entrance. Can You Please
+                    Confirm If Everything Is Okay?
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">Client:</span> Yes,
+                    Everything Is Okay. Sorry, It Was A False Alarm.
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">AI:</span> Thank You. For
+                    Security Verification, Can You Please Provide Your Cancellation Code?
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">Client:</span> Sure, It’s
+                    4912.
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">AI:</span> Thank You. Code
+                    4912 Has Been Verified. Your Alarm Has Been Cancelled And No Dispatch Will
+                    Occur. Have A Safe Evening.
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">Client:</span> Thanks.
+                    Appreciate The Call.
+                  </p>
+                  <p>
+                    <span className="font-semibold text-gray-600">AI:</span> You're Welcome.
+                    This Call Has Been Logged For Audit Purposes. Goodbye.
+                  </p>
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-4 border-t pt-3 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <PlayCircleOutlineIcon className=" text-gray-600"/>
+                    <span>Audio Playback</span>
+                  </div>
+                  <div className="flex gap-4">
+                    <span><strong>Duration:</strong> 0:46s</span>
+                    <span><strong>Time:</strong> 03:17 AM</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
 
           <div className="flex gap-4 mt-8 justify-end">
