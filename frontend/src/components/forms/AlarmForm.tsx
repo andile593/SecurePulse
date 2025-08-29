@@ -206,7 +206,7 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
       </div>
 
       <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button type="submit" className="bg-primary text-white px-4 py-2 rounded">
           Save
         </button>
         <button type="button" onClick={onClose} className="text-gray-600 hover:underline">

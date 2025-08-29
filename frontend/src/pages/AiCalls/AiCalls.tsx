@@ -38,13 +38,15 @@ export default function AiCallList() {
 
   return (
     <div className="p-6 space-y-8">
-      <h3 className="text-3xl font-bold mb-6">Call Activity</h3>
-      <button
-        onClick={() => navigate("/ai-calls/new")}
-        className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
-      >
-        + New AI Call
-      </button>
+      <div className="flex justify-between">
+        <h3 className="text-3xl font-bold mb-6">Call Activity</h3>
+        <button
+          onClick={() => navigate("/ai-calls/new")}
+          className="bg-primary text-white px-5 py-2 rounded "
+        >
+          + New AI Call
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <SummaryCard
           title="Total AI Calls"
@@ -84,10 +86,10 @@ export default function AiCallList() {
 
         <div className="w-full text-sm">
           <div className="flex mb-3 rounded-sm font-semibold bg-gray gap-2">
-            <div className="w-[8%] text-center py-2">Call ID</div>
+            <div className="w-[10%] text-center py-2">Call ID</div>
             <div className="w-[15%] py-2">Site Name</div>
-            <div className="w-[8%] text-center py-2">Time</div>
-            <div className="w-[10%] py-2">Call Duration</div>
+            <div className="w-[10%] text-center py-2">Time</div>
+            <div className="w-[10%] text-center py-2">Call Duration</div>
             <div className="w-[20%] text-center py-2">Outcome</div>
             <div className="w-[15%] text-center py-2">Code Provided</div>
             <div className="w-[15%] text-center py-2">Results</div>

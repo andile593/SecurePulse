@@ -4,6 +4,7 @@ import { useSites } from "@/hooks/useSites";
 import AlarmForm from "@/components/forms/AlarmForm";
 import { useState } from "react";
 import type { Alarm } from "@/types/alarm";
+import { useClients } from "@/hooks/useClients"
 
 const AlarmDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ const AlarmDetail = () => {
   const { mutate: updateAlarm } = useUpdateAlarm();
   const { mutate: deleteAlarm } = useDeleteAlarm();
   const { data: sites = [] } = useSites();
+  const { data: clients = [] } = useClients();
 
   const [editing, setEditing] = useState(false);
 
@@ -50,12 +52,13 @@ const AlarmDetail = () => {
   if (error)
     return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!alarm) return <div className="p-4">Alarm not found.</div>;
+  const client = clients.find((c) => c.id === alarm.clientId);
 
   const site = sites.find((s) => s.id === alarm.siteId);
 
   return (
     <div className="p-6 h-fit">
-      <h1 className="text-2xl font-semibold mb-6">Alarm Details</h1>
+
 
       {editing ? (
         <AlarmForm
@@ -65,6 +68,11 @@ const AlarmDetail = () => {
         />
       ) : (
         <>
+          <div className="flex justify-between items-center w-full flex-wrap">
+            <h2 className="text-3xl font-semibold mb-4">Event - {client?.name} {client?.surname}</h2>
+            <p className="text-base pr-45 ">Source Code: {alarm.source}</p>
+            <div className="w-full bg-gray h-px mb-4"></div>
+          </div>
           <div className="grid grid-cols-4 gap-4">
             <div className="grid grid-cols-2 col-start-1 col-end-3 gap-2">
               <p className="text-base">Alarm ID</p>
@@ -74,7 +82,7 @@ const AlarmDetail = () => {
               <p className="text-base font-medium">{alarm.eventType}</p>
 
               <p className="text-base">Site Number</p>
-              <p className="text-base ffont-medium">{site?.shortId ?? "N/A"}</p>
+              <p className="text-base ffont-medium">M-{site?.shortId ?? "N/A"}</p>
 
               <p className="text-base">Site Name</p>
               <p className="text-base font-medium">{site?.name ?? "Unknown"}</p>
@@ -93,7 +101,7 @@ const AlarmDetail = () => {
               </p>
             </div>
             <div className="col-start-3 col-end-5 gap-2">
-              <h3 className="text-lg">Decision log</h3>
+              <h3 className="text-lg font-semibold mb-4">Decision log</h3>
               <div className="p-4 bg-primary rounded-xl text-base leading-7 text-light_gray">
                 The client was reached within 1 ring. The cancellation code was
                 valid and matched the system. No signs of duress or distress
@@ -106,7 +114,7 @@ const AlarmDetail = () => {
 
           <div className="flex gap-4 mt-8 justify-end">
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700"
               onClick={() => setEditing(true)}
             >
               Edit

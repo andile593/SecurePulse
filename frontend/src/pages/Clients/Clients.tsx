@@ -20,7 +20,7 @@ export default function ClientList() {
         <h1 className="text-2xl font-semibold">Clients</h1>
         <button
           onClick={() => navigate("/clients/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Client
         </button>
