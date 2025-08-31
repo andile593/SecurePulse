@@ -1,5 +1,10 @@
-import { useEffect, useState } from 'react';
-import type { Dispatch } from '@/types/dispatch';
+import { useState } from 'react';
+import type { Dispatch } from '@/types';
+import { useAlarms } from '@/hooks/useAlarms';
+import { useVehicles } from '@/hooks/useVehicles';
+import { useGuards } from '@/hooks/useGuards';
+import { useSites } from "@/hooks/useSites";
+
 
 type DispatchFormProps = {
   initialData?: Partial<Dispatch>;
@@ -15,6 +20,13 @@ const DispatchForm = ({ initialData = {}, onSubmit, onClose }: DispatchFormProps
   const [alarmId, setAlarmId] = useState(initialData.alarmId ?? '');
   const [guardId, setGuardId] = useState(initialData.guardId ?? '');
   const [vehicleId, setVehicleId] = useState(initialData.vehicleId ?? '');
+
+    const { data: alarms = [] } = useAlarms();
+      const { data: sites = [] } = useSites();
+    const { data: guards = [] } = useGuards();
+    const { data: vehicles = [] } = useVehicles();
+
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,13 +84,20 @@ const DispatchForm = ({ initialData = {}, onSubmit, onClose }: DispatchFormProps
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Alarm ID</label>
-        <input
+        <label className="block text-sm font-medium mb-1">Alarm</label>
+        <select
           className="w-full border p-2 rounded"
           value={alarmId}
           onChange={(e) => setAlarmId(e.target.value)}
           required
-        />
+        >
+            <option value="">Select a Alarm</option>
+          {alarms.map((alarm) => (
+            <option key={alarm.id} value={alarm.id}>
+              {alarm.eventType} {alarm.site?.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

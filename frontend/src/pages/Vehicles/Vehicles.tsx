@@ -30,9 +30,9 @@ const Vehicles = () => {
       {vehicles.length === 0 ? (
         <div className="p-4 text-gray-500">No vehicles found.</div>
       ) : (
-        <ul className="space-y-4 mt-6">
+        <div className="grid grid-cols mt-6">
           {vehicles.map((vehicle: Vehicle) => (
-            <li
+            <div
               key={vehicle.id}
               className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
               onClick={() => navigate(`/vehicles/${vehicle.id}`)}
@@ -40,7 +40,7 @@ const Vehicles = () => {
               <p className="font-bold">
                 {vehicle.name} {vehicle.model ? `(${vehicle.model})` : ""}
               </p>
-              <p className="text-sm text-gray-600">Plate #: {vehicle.plate || "—"}</p>
+              <p className="text-sm text-gray-600">Registration: {vehicle.plate || "—"}</p>
               <p className="text-sm text-gray-600 capitalize">
                 Status: {vehicle.status || "—"}
               </p>
@@ -58,9 +58,9 @@ const Vehicles = () => {
                   Delete
                 </button>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

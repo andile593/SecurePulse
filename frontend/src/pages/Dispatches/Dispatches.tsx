@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatches, useDeleteDispatch } from "@/hooks/useDispatches";
-import type { Dispatch } from "@/types";
+import { useVehicles } from "@/hooks/useVehicles";
 
 export default function DispatchList() {
   const navigate = useNavigate();
   const { data: dispatches = [], isLoading, error } = useDispatches();
   const { mutate: deleteDispatch } = useDeleteDispatch();
+
+  const { data: vehicles = [] } = useVehicles();
+
 
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this dispatch?")) return;
@@ -30,60 +33,17 @@ export default function DispatchList() {
       {dispatches.length === 0 ? (
         <div className="p-4 text-gray-500">No dispatches found.</div>
       ) : (
-        <ul className="space-y-4 mt-6">
-          {dispatches.map((dispatch: Dispatch) => (
-            <li
-              key={dispatch.id}
-              className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
-              onClick={() => navigate(`/dispatches/${dispatch.id}`)}
-            >
-              <p className="font-bold">
-                Alarm: {dispatch.alarm?.eventType || "—"}
-              </p>
-              <p className="text-sm text-gray-600">
-                Guard: {dispatch.guard?.name || "—"}
-              </p>
-              <p className="text-sm text-gray-600">
-                Vehicle: {dispatch.vehicle?.plate || "—"}
-              </p>
-              <p className="text-sm text-gray-600">
-                Dispatched At:{" "}
-                {dispatch.dispatchedAt
-                  ? new Date(dispatch.dispatchedAt).toLocaleString()
-                  : "—"}
-              </p>
-              <p className="text-sm text-gray-600">
-                Arrival Time:{" "}
-                {dispatch.arrivalTime
-                  ? new Date(dispatch.arrivalTime).toLocaleString()
-                  : "—"}
-              </p>
-              <p className="text-sm text-gray-600">
-                Resolved At:{" "}
-                {dispatch.resolvedAt
-                  ? new Date(dispatch.resolvedAt).toLocaleString()
-                  : "—"}
-              </p>
-              {dispatch.responseNotes && (
-                <p className="text-sm text-gray-600">
-                  Notes: {dispatch.responseNotes}
-                </p>
-              )}
-
-              <div className="flex gap-4 mt-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(dispatch.id!);
-                  }}
-                  className="text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
+        <div className="grid grid-cols-4 gap-5">
+          <div className="flex flex-col col-start-1 col-end-2">
+            {vehicles.map((vehicle) => (
+              <div className="bg-primary">
+                <p>{vehicle.plate}</p>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+          <div className="col-start-2 col-end-5"></div>
+          <div className="col-start-1 col-end-5"></div>
+        </div>
       )}
     </div>
   );

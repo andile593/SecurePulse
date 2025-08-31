@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useSite, useUpdateSite, useDeleteSite } from "@/hooks/useSites"; 
+import { useSite, useUpdateSite, useDeleteSite } from "@/hooks/useSites";
 import { useState } from "react";
 import SiteForm from "@/components/forms/SiteForm";
 import type { Site } from "@/types/site";
+import { useClients } from "@/hooks/useClients";
 
 const SiteDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,15 +14,14 @@ const SiteDetail = () => {
   const { data: site, isLoading, error, refetch } = useSite(id);
   const { mutate: updateSite } = useUpdateSite();
   const { mutate: deleteSite } = useDeleteSite();
+  const { data: clients = [] } = useClients();
 
   const [editing, setEditing] = useState(false);
 
   const handleSubmit = (data: Partial<Site>) => {
     if (!site) return;
-    console.log("Data:", data)
 
     const updatedSite = { ...site, ...data };
-    console.log("UpdateSite",updatedSite)
     updateSite(
       { id: site.id!, site: updatedSite },
       {
@@ -49,6 +49,9 @@ const SiteDetail = () => {
   if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!site) return <div className="p-4">Site not found.</div>;
 
+  const client = clients.find((c) => c.id === site.clientId);
+
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-semibold">Site Details</h1>
@@ -67,7 +70,7 @@ const SiteDetail = () => {
             <strong>Address:</strong> {site.address}
           </p>
           <p>
-            <strong>Client ID:</strong> {site.clientId ?? "—"}
+            <strong>Client:</strong> {client?.name} {client?.surname}
           </p>
 
           <div className="flex gap-4 mt-6">

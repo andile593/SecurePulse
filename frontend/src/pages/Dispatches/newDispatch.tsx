@@ -1,4 +1,4 @@
-import DispatchForm from "@/components/forms/VehicleForm";
+import DispatchForm from "@/components/forms/DispatchForm";
 import { useCreateDispatch } from "@/hooks/useDispatches";
 import { useNavigate } from "react-router-dom";
 import type { Dispatch } from "@/types";
@@ -27,7 +27,7 @@ const NewDispatch = () => {
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Create New Vehicle</h1>
+      <h1 className="text-2xl font-semibold mb-4">Create New dispatch</h1>
       <DispatchForm
         initialData={emptyDispatchData}
         onSubmit={handleSubmit}

@@ -25,9 +25,29 @@ export function useCreateSite() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createSite,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sites'] }),
+    onMutate: async (newSite) => {
+      await queryClient.cancelQueries({ queryKey: ['sites'] });
+
+      const previousSites = queryClient.getQueryData<Site[]>(['sites']) || [];
+
+      queryClient.setQueryData<Site[]>(['sites'], (old = []) => [
+        ...old,
+        { ...newSite, id: `temp-${Date.now()}` }, 
+      ]);
+
+      return { previousSites };
+    },
+    onError: (_err, _newSite, context) => {
+      if (context?.previousSites) {
+        queryClient.setQueryData(['sites'], context.previousSites);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['sites'] });
+    },
   });
 }
+
 export function useSite(id: string) {
   return useQuery<Site>({
     queryKey: ['site', id],

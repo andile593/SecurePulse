@@ -50,7 +50,7 @@ import NewUser from "../pages/Users/newUser";
 // Dispatches
 import Dispatches from "../pages/Dispatches/Dispatches";
 import DispatchDetail from "../pages/Dispatches/DispatchDetail";
-import NewDispatch from "../pages/Dispatches/DispatchDetail";
+import NewDispatch from "../pages/Dispatches/newDispatch";
 
 export default function AppRoutes() {
   return (

@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useVehicle, useUpdateVehicle, useDeleteVehicle } from "@/hooks/useVehicles";
 import VehicleForm from "@/components/forms/VehicleForm";
-import { useState, useEffect} from "react";
+import { useState} from "react";
 import type { Vehicle } from "@/types/vehicle";
 
 const VehicleDetail = () => {
