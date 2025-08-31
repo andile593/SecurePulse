@@ -114,7 +114,6 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
         />
       </div>
 
-      {/* Client Dropdown */}
       <div>
         <label className="block text-sm font-medium">Client</label>
         <select
@@ -132,7 +131,6 @@ const AlarmForm = ({ initialData = {}, onSubmit, onClose }: AlarmFormProps) => {
         </select>
       </div>
 
-      {/* Site Dropdown */}
       <div>
         <label className="block text-sm font-medium">Site</label>
         <select

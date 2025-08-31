@@ -27,6 +27,7 @@ const AiCallForm = ({
     initialData.calledAt ?? new Date().toISOString().slice(0, 16)
   );
   const [callDuration, setCallDuration] = useState(initialData.callDuration ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: alarms = [] } = useAlarms();
   const { data: sites = [] } = useSites();
@@ -39,11 +40,20 @@ const AiCallForm = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const capitalize = (str: string) => {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+
     const evaluatedAtIso = new Date(evaluatedAt).toISOString();
     onSubmit({
       aiDecision, confidenceScore, evaluatedAt: evaluatedAtIso, notes, alarmId, calledAt: new Date(calledAt).toISOString(),
       callDuration,
     });
+    setTimeout(() => setIsSubmitting(false), 1000);
   };
 
   return (
@@ -145,9 +155,11 @@ const AiCallForm = ({
       <div className="flex gap-2">
         <button
           type="submit"
-          className="bg-primary text-white px-4 py-2 rounded"
+          disabled={isSubmitting}
+          className={`px-4 py-2 rounded text-white ${isSubmitting ? "bg-gray-400" : "bg-blue-600"
+            }`}
         >
-          Save
+          {isSubmitting ? "Saving..." : "Save"}
         </button>
         <button
           type="button"

@@ -1,5 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -30,6 +30,7 @@ model Site {
   clientId  String
   client    Client  @relation(fields: [clientId], references: [id])
   alarms    Alarm[]
+  obLogs    ObLog[]
 }
 
 model Alarm {
@@ -59,18 +60,20 @@ model Alarm {
 }
 
 model ObLog {
-  id      String   @id @default(uuid())
-  shortId Int      @unique @default(autoincrement())
-  logTime DateTime
-  message String
-  source  String
-  guardId String?
-  guard   Guard?   @relation(fields: [guardId], references: [id])
+  id        String   @id @default(uuid())
+  shortId   Int      @unique @default(autoincrement())
+  logTime   DateTime
+  actionLog String
+  notes     String
+  guardId   String?
+  guard     Guard?   @relation(fields: [guardId], references: [id])
+  siteId    String?
+  site      Site?    @relation(fields: [siteId], references: [id])
 }
 
 model AiCall {
   id              String    @id @default(uuid())
-  shortId       Int       @unique @default(autoincrement())
+  shortId         Int       @unique @default(autoincrement())
   alarmId         String
   alarm           Alarm     @relation(fields: [alarmId], references: [id])
   calledAt        DateTime  @default(now())

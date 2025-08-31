@@ -1,14 +1,13 @@
-import type { Guard } from '@/types';
-import type { Alarm } from '@/types';
+import type { Guard, Site } from '@/types';
 
 export interface OBLog {
   id?: string;
   shortId?: number; 
   logTime: string;
-  message: string;
-  source: string;
-  alarmId?: string;
+  notes: string;
+  actionLog: string;
+  siteId?: string;
   guardId?: string;
-  alarm?: Alarm;
+  site?: Site;
   guard?: Guard;
 }

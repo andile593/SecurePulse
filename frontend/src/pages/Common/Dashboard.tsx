@@ -88,7 +88,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-semibold">Recent Alarms</h2>
           <button
             onClick={() => navigate("/alarms")}
-            className="text-blue-600 hover:underline"
+            className="text-primary hover:border rounded"
           >
             View All
           </button>

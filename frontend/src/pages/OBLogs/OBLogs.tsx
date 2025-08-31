@@ -18,10 +18,10 @@ export default function OBLogList() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-semibold">OB Logs</h1>
+        <h1 className="text-2xl font-semibold">Occurrence Feed</h1>
         <button
           onClick={() => navigate("/OBlogs/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-primary text-white px-4 py-2 rounded "
         >
           + New Log
         </button>
@@ -30,23 +30,24 @@ export default function OBLogList() {
       {logs.length === 0 ? (
         <div className="p-4 text-gray-500">No logs found.</div>
       ) : (
-        <ul className="space-y-4 mt-6">
+        <div className="grid grid-cols-3 gap-4">
           {logs.map((log: OBLog) => (
-            <li
+            <div
               key={log.id}
               className="bg-white shadow-md p-4 rounded-md cursor-pointer hover:bg-gray-50"
               onClick={() => navigate(`/OBlogs/${log.id}`)}
             >
-              <p className="font-bold">{log.message || "Untitled Log"}</p>
-              <p className="text-sm text-gray-600">Source: {log.source || "—"}</p>
-              <p className="text-sm text-gray-600">
-                Created By: {log.guard?.name ?? "—"}
+              <div className="flex items-center justify-between mb-2 text-sm text-gray-500">
+                <span>{new Date(log.logTime).toLocaleString() || "—"}</span>
+                <span>{log.guard?.name || "Alarm"}</span>
+              </div>
+
+              <p className="font-bold mb-1 capitalize">{log.notes || "Untitled Log"}</p>
+              <p className="text-sm text-gray-600 mb-1">
+                Site: {log.site?.name || "—"}
               </p>
-              <p className="text-sm text-gray-600">
-                Created At:{" "}
-                {log.logTime
-                  ? new Date(log.logTime).toLocaleString()
-                  : "—"}
+              <p className="text-sm text-gray-600 mb-1">
+                Action: {log.actionLog || "—"}
               </p>
 
               <div className="flex gap-4 mt-2">
@@ -60,10 +61,11 @@ export default function OBLogList() {
                   Delete
                 </button>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
 }
+

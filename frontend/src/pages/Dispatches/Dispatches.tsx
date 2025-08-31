@@ -21,7 +21,7 @@ export default function DispatchList() {
         <h1 className="text-2xl font-semibold">Dispatches</h1>
         <button
           onClick={() => navigate("/dispatches/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-primary text-white px-4 py-2 rounded"
         >
           + New Dispatch
         </button>

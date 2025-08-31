@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Site } from '@/types/site';
+import { useClients } from '@/hooks/useClients';
 
 type SiteFormProps = {
   initialData?: Partial<Site>;
@@ -13,6 +14,9 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
   const [latitude, setLatitude] = useState(initialData.latitude?.toString() ?? '');
   const [longitude, setLongitude] = useState(initialData.longitude?.toString() ?? '');
   const [clientId, setClientId] = useState(initialData.clientId ?? '');
+
+  const { data: clients = [] } = useClients();
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,13 +75,20 @@ const SiteForm = ({ initialData = {}, onSubmit, onClose }: SiteFormProps) => {
         />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Client ID</label>
-        <input
+        <label className="block text-sm font-medium mb-1">Client</label>
+        <select
           className="w-full border p-2 rounded"
           value={clientId}
           onChange={(e) => setClientId(e.target.value)}
           required
-        />
+        >
+          <option value="">Select a Client</option>
+          {clients.map((client) => (
+            <option key={client.id} value={client.id}>
+              {client.name} {client.surname}
+            </option>
+          ))}
+        </select>
       </div>
       <div className="flex gap-2">
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save</button>

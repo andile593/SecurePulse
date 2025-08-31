@@ -54,14 +54,13 @@ const AlarmDetail = () => {
   if (error)
     return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!alarm) return <div className="p-4">Alarm not found.</div>;
+
   const client = clients.find((c) => c.id === alarm.clientId);
 
   const site = sites.find((s) => s.id === alarm.siteId);
 
   return (
     <div className="p-6 h-fit">
-
-
       {editing ? (
         <AlarmForm
           initialData={{ ...alarm }}

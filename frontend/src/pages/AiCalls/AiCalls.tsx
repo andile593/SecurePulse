@@ -38,11 +38,11 @@ export default function AiCallList() {
 
   return (
     <div className="p-6 space-y-8">
-      <div className="flex justify-between">
-        <h3 className="text-3xl font-bold mb-6">Call Activity</h3>
+      <div className="flex justify-between mb-4">
+        <h3 className="text-3xl font-bold ">Call Activity</h3>
         <button
           onClick={() => navigate("/ai-calls/new")}
-          className="bg-primary text-white px-5 py-2 rounded "
+          className="bg-primary text-white px-4 py-2 rounded "
         >
           + New AI Call
         </button>
