@@ -6,14 +6,17 @@ type ClientFormProps = {
   onSubmit: (data: Partial<Client>, deletedSiteIds: string[]) => void;
   onClose: () => void;
 };
+type TransmitterFormData = {
+  referenceCode: string;
+  siteId?: string;
+
+};
 
 type SiteFormData = {
   id?: string;
   name: string;
   address: string;
-  location?: string;
-  latitude?: number;
-  longitude?: number;
+  transmitters: TransmitterFormData[];
 };
 
 const ClientForm = ({
@@ -28,26 +31,23 @@ const ClientForm = ({
   const [sites, setSites] = useState<SiteFormData[]>(
     initialData.sites
       ? initialData.sites.map((site) => ({
-          id: site.id,
-          name: site.name ?? "",
-          address: site.address ?? "",
-          location: site.location,
-          latitude: site.latitude,
-          longitude: site.longitude,
-        }))
+        id: site.id,
+        name: site.name ?? "",
+        address: site.address ?? "",
+        transmitters: site.transmitters
+          ? site.transmitters.map((t) => ({ referenceCode: t.referenceCode }))
+          : [],
+      }))
       : []
   );
   const [deletedSiteIds, setDeletedSiteIds] = useState<string[]>([]);
 
   const addSite = () => {
-    setSites([...sites, { name: "", address: "" }]);
+    setSites([...sites, { name: "", address: "", transmitters: [] }]);
   };
 
-  const updateSite = (
-    index: number,
-    field: keyof SiteFormData,
-    value: string | number | undefined
-  ) => {
+
+  const updateSite = (index: number, field: keyof SiteFormData, value: string) => {
     const updatedSites = [...sites];
     updatedSites[index] = {
       ...updatedSites[index],
@@ -55,6 +55,7 @@ const ClientForm = ({
     };
     setSites(updatedSites);
   };
+
 
   const removeSite = (index: number) => {
     const siteToRemove = sites[index];
@@ -64,19 +65,66 @@ const ClientForm = ({
     setSites(sites.filter((_, i) => i !== index));
   };
 
+  const addTransmitter = (siteIndex: number) => {
+    const updatedSites = [...sites];
+    updatedSites[siteIndex].transmitters.push({ referenceCode: "" });
+    setSites(updatedSites);
+  };
+  const updateTransmitter = (
+    siteIndex: number,
+    transmitterIndex: number,
+    value: string
+  ) => {
+    const updatedSites = [...sites];
+    updatedSites[siteIndex].transmitters[transmitterIndex].referenceCode = value;
+    setSites(updatedSites);
+  };
+
+  const removeTransmitter = (siteIndex: number, transmitterIndex: number) => {
+    const updatedSites = [...sites];
+    updatedSites[siteIndex].transmitters.splice(transmitterIndex, 1);
+    setSites(updatedSites);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const hasEmptySite = sites.some(
+      (site) => !site.name || !site.address
+    );
+
+    const hasEmptyTransmitter = sites.some(
+      (site) => site.transmitters.some((t) => !t.referenceCode)
+    );
+
+    if (hasEmptySite || hasEmptyTransmitter) {
+      alert("Please fill in all site and transmitter fields");
+      return;
+    }
+
     onSubmit(
       {
         name,
         surname,
         email,
         phone,
-        sites,
+        sites: sites.map(site => {
+          const siteId = site.id ?? "temp-" + Math.random().toString(36).slice(2); // temporary ID
+          return {
+            ...site,
+            id: siteId,
+            transmitters: site.transmitters.map((t) => ({
+              referenceCode: t.referenceCode,
+              siteId, 
+            })),
+          };
+        }),
       },
       deletedSiteIds
     );
+
   };
+
 
   return (
     <form
@@ -146,42 +194,38 @@ const ClientForm = ({
               required
               className="w-full border p-1 rounded"
             />
-            <input
-              type="text"
-              placeholder="Location (optional)"
-              value={site.location ?? ""}
-              onChange={(e) => updateSite(index, "location", e.target.value)}
-              className="w-full border p-1 rounded"
-            />
-            {/* Optional latitude and longitude inputs */}
-            <input
-              type="number"
-              step="any"
-              placeholder="Latitude (optional)"
-              value={site.latitude ?? ""}
-              onChange={(e) =>
-                updateSite(
-                  index,
-                  "latitude",
-                  e.target.value ? Number(e.target.value) : undefined
-                )
-              }
-              className="w-full border p-1 rounded"
-            />
-            <input
-              type="number"
-              step="any"
-              placeholder="Longitude (optional)"
-              value={site.longitude ?? ""}
-              onChange={(e) =>
-                updateSite(
-                  index,
-                  "longitude",
-                  e.target.value ? Number(e.target.value) : undefined
-                )
-              }
-              className="w-full border p-1 rounded"
-            />
+            <div className="mt-2">
+              <h4 className="font-semibold mb-1">Transmitters</h4>
+              {site.transmitters.map((t, tIndex) => (
+                <div key={tIndex} className="flex items-center gap-2 mb-1">
+                  <input
+                    type="text"
+                    placeholder="Reference code"
+                    value={t.referenceCode}
+                    onChange={(e) =>
+                      updateTransmitter(index, tIndex, e.target.value)
+                    }
+                    className="border p-1 rounded flex-1"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeTransmitter(index, tIndex)}
+                    className="text-red-600 text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addTransmitter(index)}
+                className="text-green-600 text-sm"
+              >
+                Add Transmitter
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={() => removeSite(index)}

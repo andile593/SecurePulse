@@ -21,29 +21,29 @@ const ClientDetail = () => {
   const [editing, setEditing] = useState(false);
 
   const handleSubmit = (
-  data: Partial<Client>, 
-  deletedSiteIds: string[] = []
-) => {
-  if (!client) return;
+    data: Partial<Client>,
+    deletedSiteIds: string[] = []
+  ) => {
+    if (!client) return;
 
-  // Merge existing client with updated fields
-  const updatedClient = { ...client, ...data };
-  
-  // Call your update mutation passing client data and deletedSiteIds
-  updateClient(
-    { 
-      id: client.id!, 
-      client: updatedClient, 
-      deletedSiteIds 
-    },
-    {
-      onSuccess: () => {
-        refetch();
-        setEditing(false);
+    // Merge existing client with updated fields
+    const updatedClient = { ...client, ...data };
+
+    // Call your update mutation passing client data and deletedSiteIds
+    updateClient(
+      {
+        id: client.id!,
+        client: updatedClient,
+        deletedSiteIds
       },
-    }
-  );
-};
+      {
+        onSuccess: () => {
+          refetch();
+          setEditing(false);
+        },
+      }
+    );
+  };
 
 
   const handleDelete = () => {
@@ -70,7 +70,18 @@ const ClientDetail = () => {
 
       {editing ? (
         <ClientForm
-          initialData={{ ...client }}
+          initialData={{
+            ...client,
+            sites: client.sites?.map(site => ({
+              id: site.id,
+              name: site.name,
+              address: site.address,
+              transmitters: site.transmitters?.map(t => ({
+                referenceCode: t.referenceCode,
+                siteId: t.siteId,
+              })) || [],
+            })) || [],
+          }}
           onSubmit={handleSubmit}
           onClose={() => setEditing(false)}
         />

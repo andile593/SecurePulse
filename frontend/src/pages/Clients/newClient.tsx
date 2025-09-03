@@ -10,23 +10,22 @@ const NewClient = () => {
   const handleSubmit = (data: any) => {
     console.log("Creating client with:", data);
 
-     const payload: CreateClientInput = {
-    name: data.name,
-    surname: data.surname,
-    email: data.email,
-    phone: data.phone,
-    sites: data.sites.map((site: any) => ({
-      name: site.name,
-      address: site.address,
-      latitude: Number(site.latitude),
-      longitude: Number(site.longitude),
-    })),
-  };
+    const payload: CreateClientInput = {
+      name: data.name,
+      surname: data.surname,
+      email: data.email,
+      phone: data.phone,
+      sites: data.sites.map((site: any) => ({
+        name: site.name,
+        address: site.address,
+        location: site.location,
+      })),
+    };
 
-  createClient(payload, {
-    onSuccess: () => navigate("/clients"),
-    onError: (error) => console.error("Failed to create client:", error),
-  });
+    createClient(payload, {
+      onSuccess: () => navigate("/clients"),
+      onError: (error) => console.error("Failed to create client:", error),
+    });
   };
 
   const emptyClientsData = {

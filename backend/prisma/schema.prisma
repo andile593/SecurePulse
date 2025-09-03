@@ -7,7 +7,6 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
 model Client {
   id        String   @id @default(uuid())
   shortId   Int      @unique @default(autoincrement())
@@ -16,59 +15,41 @@ model Client {
   email     String
   phone     String
   sites     Site[]
-  alarms    Alarm[]
   createdAt DateTime @default(now())
 }
 
 model Site {
-  id        String  @id @default(uuid())
-  shortId   Int     @unique @default(autoincrement())
-  name      String
-  address   String
-  latitude  Float
-  longitude Float
-  clientId  String
-  client    Client  @relation(fields: [clientId], references: [id])
-  alarms    Alarm[]
-  obLogs    ObLog[]
+  id           String        @id @default(uuid())
+  shortId      Int           @unique @default(autoincrement())
+  name         String
+  address      String
+  clientId     String
+  client       Client        @relation(fields: [clientId], references: [id])
+  transmitters Transmitter[]
+  obLogs       ObLog[]
+}
+
+model Transmitter {
+  id            String   @id @default(uuid())
+  referenceCode String   @unique          // 🔑 transmitter ID
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id])
+  alarms        Alarm[]
 }
 
 model Alarm {
-  id          String   @id @default(uuid())
-  shortId     Int      @unique @default(autoincrement())
-  triggeredAt DateTime
-  eventType   String
-  priority    Int
-  status      String
-  source      String
+  id            String       @id @default(uuid())
+  shortId       Int          @unique @default(autoincrement())
+  source        String
+  eventType     String
+  triggeredAt   DateTime
+  zone          String
 
-  siteId String
-  site   Site   @relation(fields: [siteId], references: [id])
+  transmitterId String
+  transmitter   Transmitter  @relation(fields: [transmitterId], references: [id])
 
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
-
-  resolutionNotes String?
-  resolvedBy      String?
-  resolvedAt      DateTime?
-
-  lastAICheckAt DateTime?
-  aiDecision    String?
-
-  aiCalls  AiCall[]
-  dispatch Dispatch?
-}
-
-model ObLog {
-  id        String   @id @default(uuid())
-  shortId   Int      @unique @default(autoincrement())
-  logTime   DateTime
-  actionLog String
-  notes     String
-  guardId   String?
-  guard     Guard?   @relation(fields: [guardId], references: [id])
-  siteId    String?
-  site      Site?    @relation(fields: [siteId], references: [id])
+  aiCalls       AiCall[]
+  dispatch      Dispatch?
 }
 
 model AiCall {
@@ -100,6 +81,18 @@ model Dispatch {
 
   vehicleId String?
   vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+}
+
+model ObLog {
+  id        String   @id @default(uuid())
+  shortId   Int      @unique @default(autoincrement())
+  logTime   DateTime
+  actionLog String
+  notes     String
+  guardId   String?
+  guard     Guard?   @relation(fields: [guardId], references: [id])
+  siteId    String?
+  site      Site?    @relation(fields: [siteId], references: [id])
 }
 
 model User {

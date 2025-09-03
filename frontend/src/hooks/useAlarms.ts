@@ -20,6 +20,7 @@ export function useAlarms() {
     },
   });
 }
+
 export const useAlarm = (id: string) => {
   return useQuery<Alarm>({
     queryKey: ['alarm', id],

@@ -1,15 +1,18 @@
-import type { Alarm } from '@/types';
 import type { Client } from '@/types';
+import type { Transmitter, TransmitterCreateInput } from './transmitter';
 
 export interface Site {
   id?: string;
   shortId?: number;   
   name: string;
-  address: string;      
-  location?: string;    
-  latitude?: number;    
-  longitude?: number;   
+  address: string;
   clientId?: string;
   client?: Client;
-  alarms?: Alarm[];
+  transmitters?: Transmitter[];  
 }
+export type SiteCreateInput = {
+  name: string;
+  address: string;
+  clientId: string;
+  transmitters?: TransmitterCreateInput[]; 
+};

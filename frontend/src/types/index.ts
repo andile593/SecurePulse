@@ -9,3 +9,4 @@ export * from './user';
 export * from './role';
 export * from './vehicle';
 export * from './guard';
+export * from './transmitter';

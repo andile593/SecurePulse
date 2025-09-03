@@ -3,7 +3,24 @@ const prisma = new PrismaClient();
 
 async function createSite(data) {
   try {
-    return await prisma.site.create({ data });
+    const { name, address, clientId, transmitters } = data;
+
+    return await prisma.site.create({
+      data: {
+        name,
+        address,
+        clientId,
+        transmitters: {
+          create: transmitters?.map(t => ({
+            referenceCode: t.referenceCode,
+          })),
+        },
+      },
+      include: {
+        client: true,
+        transmitters: true, 
+      },
+    });
   } catch (error) {
     console.error("Failed to create site:", error.message);
     return null;
@@ -13,7 +30,7 @@ async function createSite(data) {
 async function getAllSites() {
   try {
     return await prisma.site.findMany({
-      include: { client: true, alarms: true },
+      include: { client: true, transmitters: true },
     });
   } catch (error) {
     console.error("Failed to fetch sites:", error.message);
@@ -25,7 +42,7 @@ async function getSiteById(id) {
   try {
     return await prisma.site.findUnique({
       where: { id },
-      include: { client: true, alarms: true },
+      include: { client: true, transmitters: true },
     });
   } catch (error) {
     console.error(`Failed to fetch site ${id}:`, error.message);
@@ -34,31 +51,42 @@ async function getSiteById(id) {
 }
 
 
+
 async function updateSite(id, data) {
-  
-  const { name, address, latitude, longitude, clientId } = data;
+  try {
+    const { name, address, clientId, transmitters } = data;
 
-  const updatePayload = {
-    name,
-    address,
-    latitude,
-    longitude,
-  };
+    const updatePayload = {
+      name,
+      address,
+    };
 
-  
-  if (clientId) {
-    updatePayload.client = { connect: { id: clientId } };
+    if (clientId) {
+      updatePayload.client = { connect: { id: clientId } };
+    }
+
+    // Handle transmitters update
+    if (transmitters) {
+      updatePayload.transmitters = {
+        deleteMany: {}, // remove existing transmitters
+        create: transmitters.map(t => ({ referenceCode: t.referenceCode })),
+      };
+    }
+
+    return prisma.site.update({
+      where: { id },
+      data: updatePayload,
+      include: {
+        client: true,
+        transmitters: true, // include updated transmitters
+      },
+    });
+  } catch (error) {
+    console.error(`Failed to update site ${id}:`, error.message);
+    return null;
   }
-
-  return prisma.site.update({
-    where: { id },
-    data: updatePayload,
-    include: {
-      client: true,
-      alarms: true,
-    },
-  });
 }
+
 
 async function deleteSite(id) {
   try {

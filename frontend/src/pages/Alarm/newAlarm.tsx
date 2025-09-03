@@ -21,21 +21,14 @@ const NewAlarm = () => {
 const emptyAlarmData: Partial<Alarm> = {
   triggeredAt: '',
   eventType: '',
-  priority: 1,
-  status: '',
   source: '',
-  siteId: '',
-  clientId: '',
-  resolutionNotes: '',
-  resolvedBy: '',
-  resolvedAt: '',
-  lastAICheckAt: '',
-  aiDecision: '',
+  transmitterId: '',   
 };
+
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Create New Vehicle</h1>
+      <h1 className="text-2xl font-semibold mb-4">Create New Alarm</h1>
       <AlarmForm
         initialData={emptyAlarmData}
         onSubmit={handleSubmit}

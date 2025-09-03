@@ -8,6 +8,8 @@ const NewSite = () => {
   const { mutate: createSite } = useCreateSite();
 
 const handleSubmit = (data: any) => {
+  console.log("data", data);
+  
   createSite(data, {
     onSuccess: () => {
       navigate("/sites");
@@ -21,8 +23,6 @@ const handleSubmit = (data: any) => {
 const emptySiteData: Partial<Site> = {
     name: '',
     address: '',
-    latitude: 0,
-    longitude: 0,
     clientId: '',
   };
 

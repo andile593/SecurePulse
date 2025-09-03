@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSite, useUpdateSite, useDeleteSite } from "@/hooks/useSites";
 import { useState } from "react";
 import SiteForm from "@/components/forms/SiteForm";
-import type { Site } from "@/types/site";
+import type { Site, SiteCreateInput } from "@/types/site";
 import { useClients } from "@/hooks/useClients";
 
 const SiteDetail = () => {
@@ -18,10 +18,22 @@ const SiteDetail = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const handleSubmit = (data: Partial<Site>) => {
+
+  const handleSubmit = (data: SiteCreateInput) => {
     if (!site) return;
 
-    const updatedSite = { ...site, ...data };
+
+    const updatedSite: Site = {
+      ...site,
+      name: data.name,
+      address: data.address,
+      clientId: data.clientId,
+      transmitters: data.transmitters?.map(t => ({
+        ...t,
+        siteId: site.id!, // attach siteId
+      })),
+    };
+
     updateSite(
       { id: site.id!, site: updatedSite },
       {
@@ -51,14 +63,13 @@ const SiteDetail = () => {
 
   const client = clients.find((c) => c.id === site.clientId);
 
-
   return (
     <div className="p-4">
       <h1 className="text-2xl font-semibold">Site Details</h1>
       {editing ? (
         <SiteForm
           initialData={{ ...site }}
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit} // ✅ now matches SiteCreateInput
           onClose={() => setEditing(false)}
         />
       ) : (
@@ -69,6 +80,14 @@ const SiteDetail = () => {
           <p>
             <strong>Address:</strong> {site.address}
           </p>
+          <p><strong>Transmitters:</strong></p>
+          <ul className="list-disc ml-6">
+            {site.transmitters?.map((t) => (
+              <li key={t.id || t.referenceCode}>{t.referenceCode}</li>
+            )) || <li>None</li>}
+          </ul>
+
+
           <p>
             <strong>Client:</strong> {client?.name} {client?.surname}
           </p>

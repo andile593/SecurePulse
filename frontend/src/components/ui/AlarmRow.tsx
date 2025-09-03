@@ -13,12 +13,10 @@ const eventTypeColors: Record<string, string> = {
 export function AlarmRow({
   alarm,
   aiCalls,
-  siteMap,
   navigate,
 }: {
   alarm: Alarm;
   aiCalls: AiCall[];
-  siteMap: Record<string, string>;
   navigate: any;
 }) {
 
@@ -37,11 +35,11 @@ export function AlarmRow({
   }
 
   const formattedDate = alarm.triggeredAt
-  ? `${format(new Date(alarm.triggeredAt), "HH:mm")}\n${format(
+    ? `${format(new Date(alarm.triggeredAt), "HH:mm")}\n${format(
       new Date(alarm.triggeredAt),
       "dd MMM yyyy"
     )}`
-  : "—";
+    : "—";
 
 
   return (
@@ -62,14 +60,17 @@ export function AlarmRow({
       <div className="w-[10%] px-2 py-2 text-center whitespace-pre">
         {formattedDate}
       </div>
-      <div className="w-[25%] flex items-center py-2">{alarm.siteId ? siteMap[alarm.siteId] : "—"}</div>
+      <div className="w-[25%] flex items-center py-2">
+        {alarm.transmitter?.site?.name || "—"}
+      </div>
+
 
       <div className="w-[20%] flex justify-center items-center">
         <StatusBadge status={getCallStatus()} />
       </div>
-      <div className="w-[15%] flex justify-center items-center font-bold">{alarm.source}</div>
+      <div className="w-[15%] flex justify-center items-center font-bold">{alarm.transmitter?.referenceCode}</div>
       <div className="w-[15%] flex justify-center items-center">
-        <StatusBadge status={alarm.aiDecision} />
+        {/* <StatusBadge status={alarm.aiDecision} /> */}
       </div>
     </div>
   );

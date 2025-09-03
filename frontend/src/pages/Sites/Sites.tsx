@@ -40,7 +40,10 @@ const Sites = () => {
               <p className="font-bold">{site.name}</p>
               <p className="text-sm text-gray-600">Client ID: {site.clientId || "—"}</p>
               <p className="text-sm text-gray-600">Address: {site.address || "—"}</p>
-              
+              <p className="text-sm text-gray-600 mt-1">
+                Transmitters: {site.transmitters?.map(t => t.referenceCode).join(", ") || "—"}
+              </p>
+
 
               <div className="flex gap-4 mt-2">
                 <button

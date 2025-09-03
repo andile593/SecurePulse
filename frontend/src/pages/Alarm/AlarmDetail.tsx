@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useAlarm, useUpdateAlarm, useDeleteAlarm } from "@/hooks/useAlarms";
 import { useSites } from "@/hooks/useSites";
+import { useClients } from "@/hooks/useClients";
 import AlarmForm from "@/components/forms/AlarmForm";
 import { useState } from "react";
 import type { Alarm } from "@/types/alarm";
-import { useClients } from "@/hooks/useClients"
 import CallIcon from '@mui/icons-material/Call';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
@@ -51,13 +51,16 @@ const AlarmDetail = () => {
   };
 
   if (isLoading) return <div className="p-4">Loading alarm details...</div>;
-  if (error)
-    return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!alarm) return <div className="p-4">Alarm not found.</div>;
 
-  const client = clients.find((c) => c.id === alarm.clientId);
+  // Find transmitter, then site and client via transmitter
+  const transmitter = sites
+    .flatMap((site) => site.transmitters?.map(t => ({ ...t, site })) ?? [])
+    .find((t) => t.id === alarm.transmitterId);
 
-  const site = sites.find((s) => s.id === alarm.siteId);
+  const site = transmitter?.site;
+  const client = clients.find((c) => c.id === site?.clientId);
 
   return (
     <div className="p-6 h-fit">
@@ -70,10 +73,13 @@ const AlarmDetail = () => {
       ) : (
         <>
           <div className="flex justify-between items-center w-full flex-wrap">
-            <h2 className="text-3xl font-semibold mb-4">Event - {client?.name} {client?.surname}</h2>
-            <p className="text-base pr-45 ">Source Code: {alarm.source}</p>
+            <h2 className="text-3xl font-semibold mb-4">
+              Event - {alarm.transmitter?.site?.name} 
+            </h2>
+            <p className="text-base pr-45">Source Code: {alarm.transmitter?.referenceCode}</p>
             <div className="w-full bg-gray h-px mb-4"></div>
           </div>
+
           <div className="grid grid-cols-4 gap-5">
             <div className="grid grid-cols-2 col-start-1 col-end-3 gap-2">
               <p className="text-base">Alarm ID</p>
@@ -83,7 +89,7 @@ const AlarmDetail = () => {
               <p className="text-base font-medium">{alarm.eventType}</p>
 
               <p className="text-base">Site Number</p>
-              <p className="text-base ffont-medium">M-{site?.shortId ?? "N/A"}</p>
+              <p className="text-base font-medium">{site?.shortId ?? "N/A"}</p>
 
               <p className="text-base">Site Name</p>
               <p className="text-base font-medium">{site?.name ?? "Unknown"}</p>
@@ -91,32 +97,34 @@ const AlarmDetail = () => {
               <p className="text-base">Site Address</p>
               <p className="text-base font-medium">{site?.address ?? "N/A"}</p>
 
-              <p className="text-base">Time & date</p>
+              <p className="text-base">Transmitter Code</p>
+              <p className="text-base font-medium">{transmitter?.referenceCode ?? "N/A"}</p>
+
+              <p className="text-base">Time & Date</p>
               <p className="text-base font-medium">
                 {new Date(alarm.triggeredAt).toLocaleString()}
               </p>
 
-              <p className="text-base">Response Code Check</p>
-              <p className="text-base font-medium">
-                {alarm.resolutionNotes ?? "N/A"}
-              </p>
+           
             </div>
-            <div className="col-start-3 col-end-5  gap-2">
+
+            {/* Decision Log */}
+            <div className="col-start-3 col-end-5 gap-2">
               <h3 className="text-lg font-semibold mb-4">Decision log</h3>
               <div className="p-7 bg-primary rounded-xl text-base leading-7 text-light_gray">
-                The client was reached within 1 ring. The cancellation code was
-                valid and matched the system. No signs of duress or distress
-                detected in tone. Alarm was cancelled based on standard
-                auto-handling protocol for intrusion alarm.
+                The client was reached within 1 ring. The cancellation code was valid and
+                matched the system. No signs of duress or distress detected in tone. Alarm
+                was cancelled based on standard auto-handling protocol for intrusion alarm.
               </div>
             </div>
-            <div className="col-start-1 col-end-5">
-               <h2 className="text-gray-700 font-semibold flex items-center gap-2 mb-4">
-                  <CallIcon className="text-gray-600" />
-                  AI Call Transcript
-                </h2>
-              <div className="bg-light_gray rounded-lg border border-gray p-4">
 
+            {/* AI Call Transcript */}
+            <div className="col-start-1 col-end-5">
+              <h2 className="text-gray-700 font-semibold flex items-center gap-2 mb-4">
+                <CallIcon className="text-gray-600" />
+                AI Call Transcript
+              </h2>
+              <div className="bg-light_gray rounded-lg border border-gray p-4">
                 {/* Transcript */}
                 <div className="space-y-3 text-sm leading-relaxed text-gray-800">
                   <p>
@@ -134,28 +142,25 @@ const AlarmDetail = () => {
                     Security Verification, Can You Please Provide Your Cancellation Code?
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">Client:</span> Sure, It’s
-                    4912.
+                    <span className="font-semibold text-gray-600">Client:</span> Sure, It’s 4912.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> Thank You. Code
-                    4912 Has Been Verified. Your Alarm Has Been Cancelled And No Dispatch Will
-                    Occur. Have A Safe Evening.
+                    <span className="font-semibold text-gray-600">AI:</span> Thank You. Code 4912
+                    Has Been Verified. Your Alarm Has Been Cancelled And No Dispatch Will Occur.
+                    Have A Safe Evening.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">Client:</span> Thanks.
-                    Appreciate The Call.
+                    <span className="font-semibold text-gray-600">Client:</span> Thanks. Appreciate The Call.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> You're Welcome.
-                    This Call Has Been Logged For Audit Purposes. Goodbye.
+                    <span className="font-semibold text-gray-600">AI:</span> You're Welcome. This Call Has Been Logged For Audit Purposes. Goodbye.
                   </p>
                 </div>
 
                 {/* Footer */}
                 <div className="flex items-center justify-between mt-4 border-t pt-3 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
-                    <PlayCircleOutlineIcon className=" text-gray-600"/>
+                    <PlayCircleOutlineIcon className="text-gray-600" />
                     <span>Audio Playback</span>
                   </div>
                   <div className="flex gap-4">
@@ -164,10 +169,10 @@ const AlarmDetail = () => {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-4 mt-8 justify-end">
             <button
               className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700"

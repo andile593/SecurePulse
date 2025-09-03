@@ -15,6 +15,9 @@ export default function Dashboard() {
   const { data: aiCalls = [] } = useAiCalls();
   const { data: sites = [], isLoading: sitesLoading } = useSites();
 
+  console.log(alarms);
+  
+
   if (alarmsLoading || sitesLoading)
     return <div className="p-6">Loading dashboard...</div>;
   if (alarmsError)
@@ -28,15 +31,11 @@ export default function Dashboard() {
 
   const cancelled = aiCalls.filter((a) => a.aiDecision === "Cancelled").length;
 
-  const escalatedAlarms = alarms.filter(
-    (a) => a.aiDecision?.toLowerCase() === "dispatched"
-  ).length;
+  // const escalatedAlarms = alarms.filter(
+  //   (a) => a.aiDecision?.toLowerCase() === "dispatched"
+  // ).length;
 
 
-  const siteMap = sites.reduce((acc, site) => {
-    if (site.id) acc[site.id] = site.name;
-    return acc;
-  }, {} as Record<string, string>);
 
   const prevTotalAlarms = 20;
   const prevCancelled = 5;
@@ -72,7 +71,7 @@ export default function Dashboard() {
             prevUnansweredCalls
           )}
         />
-        <SummaryCard
+        {/* <SummaryCard
           title="Response Sent Out"
           value={escalatedAlarms}
           color="bg-primary"
@@ -80,7 +79,7 @@ export default function Dashboard() {
             escalatedAlarms,
             prevEscalatedAlarms
           )}
-        />
+        /> */}
       </div>
 
       <div className="p-4">
@@ -113,7 +112,6 @@ export default function Dashboard() {
                 key={alarm.id}
                 alarm={alarm}
                 aiCalls={aiCalls}
-                siteMap={siteMap}
                 navigate={navigate}
               />
             ))}
