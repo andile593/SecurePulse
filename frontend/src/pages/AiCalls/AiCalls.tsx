@@ -19,19 +19,14 @@ export default function AiCallList() {
   const totalAiCalls = aiCalls.length
   const cancelled = aiCalls.filter((a) => a.aiDecision === "Cancelled").length;
   const unansweredCalls = aiCalls.filter((a) => a.aiDecision === "Inconclusive").length;
-  const escalatedAlarms = alarms.filter(
-    (a) => a.aiDecision?.toLowerCase() === "dispatched"
-  ).length;
+  // const escalatedAlarms = alarms.filter(
+  //   (a) => a.aiDecision?.toLowerCase() === "dispatched"
+  // ).length;
 
   const prevTotalAiCalls = 8;
   const prevCancelled = 5;
   const prevUnansweredCalls = 3;
   const prevEscalatedAlarms = 10;
-
-  const siteMap = sites.reduce((acc, site) => {
-    if (site.id) acc[site.id] = site.name;
-    return acc;
-  }, {} as Record<string, string>);
 
   const calcPercentageChange = (current: number, previous: number) =>
     previous === 0 ? 0 : ((current - previous) / previous) * 100;
@@ -69,7 +64,7 @@ export default function AiCallList() {
             prevUnansweredCalls
           )}
         />
-        <SummaryCard
+        {/* <SummaryCard
           title="Response Sent Out"
           value={escalatedAlarms}
           color="bg-primary"
@@ -77,7 +72,7 @@ export default function AiCallList() {
             escalatedAlarms,
             prevEscalatedAlarms
           )}
-        />
+        /> */}
       </div>
 
       {aiCalls.length === 0 ? (
@@ -95,18 +90,18 @@ export default function AiCallList() {
             <div className="w-[15%] text-center py-2">Results</div>
           </div>
           {aiCalls.map((aiCall) => {
-            // Find the alarm that belongs to this aiCall
+
             const alarm = alarms.find((a) => a.id === aiCall.alarmId);
 
-            // Resolve site name using siteMap
-            const siteName = alarm && alarm.siteId ? siteMap[alarm.siteId] : "—";
+            const siteName: string = alarm?.transmitter?.site?.name ?? "—";
+
 
             return (
               <AiCallRow
                 key={aiCall.id}
                 aiCall={aiCall}
-                alarm={alarm}  
-                siteName={siteName}  
+                alarm={alarm}
+                siteName={siteName}
                 navigate={navigate}
               />
             );

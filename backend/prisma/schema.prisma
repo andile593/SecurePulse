@@ -7,6 +7,7 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
 model Client {
   id        String   @id @default(uuid())
   shortId   Int      @unique @default(autoincrement())
@@ -30,26 +31,37 @@ model Site {
 }
 
 model Transmitter {
-  id            String   @id @default(uuid())
-  referenceCode String   @unique          // 🔑 transmitter ID
+  id            String  @id @default(uuid())
+  referenceCode String  @unique // 🔑 transmitter ID
   siteId        String
-  site          Site     @relation(fields: [siteId], references: [id])
+  site          Site    @relation(fields: [siteId], references: [id])
   alarms        Alarm[]
 }
 
 model Alarm {
-  id            String       @id @default(uuid())
-  shortId       Int          @unique @default(autoincrement())
-  source        String
-  eventType     String
-  triggeredAt   DateTime
-  zone          String
+  id          String    @id @default(uuid())
+  shortId     Int       @unique @default(autoincrement())
+  source      String
+  eventType   String
+  triggeredAt DateTime
+  zone        String
+  notes       String
+  resolvedAt  DateTime?
 
   transmitterId String
-  transmitter   Transmitter  @relation(fields: [transmitterId], references: [id])
+  transmitter   Transmitter @relation(fields: [transmitterId], references: [id])
 
-  aiCalls       AiCall[]
-  dispatch      Dispatch?
+  aiCalls    AiCall[]
+  dispatches Dispatch[]
+
+  status AlarmStatus @default(NEW)
+}
+
+enum AlarmStatus {
+  NEW
+  CancelledByClient
+  Dispatched
+  Closed
 }
 
 model AiCall {
@@ -60,9 +72,21 @@ model AiCall {
   calledAt        DateTime  @default(now())
   callDuration    String?
   notes           String?
-  aiDecision      String?
   confidenceScore Float?
   evaluatedAt     DateTime?
+
+  aiDecision AiDecision @default(Dialing)
+  outcome    String?
+  phone      String?
+
+  dispatches Dispatch[]
+}
+
+enum AiDecision {
+  Dialing
+  Cancelled
+  Unanswered
+  Dispatched
 }
 
 model Dispatch {
@@ -73,14 +97,21 @@ model Dispatch {
   resolvedAt    DateTime?
   responseNotes String?
 
-  alarmId String @unique
-  alarm   Alarm  @relation(fields: [alarmId], references: [id])
+  alarmId  String
+  alarm    Alarm   @relation(fields: [alarmId], references: [id])
+  aiCallId String?
+  aiCall   AiCall? @relation(fields: [aiCallId], references: [id])
 
   guardId String?
   guard   Guard?  @relation(fields: [guardId], references: [id])
 
   vehicleId String?
   vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+}
+
+enum DispatchStatus {
+  Active
+  Completed
 }
 
 model ObLog {

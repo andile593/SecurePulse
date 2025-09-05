@@ -10,7 +10,7 @@ async function createAlarm(data) {
           include: {
             site: {
               include: {
-                client: true, 
+                client: true,
               },
             },
           },
@@ -58,6 +58,8 @@ async function getAlarmById(id) {
             },
           },
         },
+        aiCalls: true,
+        dispatch: true,
       },
     });
   } catch (error) {
@@ -65,6 +67,7 @@ async function getAlarmById(id) {
     return null;
   }
 }
+
 
 async function updateAlarm(id, data) {
   try {
@@ -88,19 +91,24 @@ async function updateAlarm(id, data) {
     return null;
   }
 }
+async function updateAlarmStatus(id, status) {
+  try {
+    return await prisma.alarm.update({
+      where: { id },
+      data: { status },
+    });
+  } catch (error) {
+    console.error(`Failed to update alarm status ${id}:`, error.message);
+    return null;
+  }
+}
 
 async function deleteAlarm(id) {
   try {
-    await prisma.dispatch.deleteMany({
-      where: { alarmId: id },
-    });
-
-    await prisma.aiCall.deleteMany({
-      where: { alarmId: id },
-    });
-
-    return await prisma.alarm.delete({
-      where: { id },
+    return await prisma.$transaction(async (tx) => {
+      await tx.dispatch.deleteMany({ where: { alarmId: id } });
+      await tx.aiCall.deleteMany({ where: { alarmId: id } });
+      return tx.alarm.delete({ where: { id } });
     });
   } catch (err) {
     if (err.code === 'P2025') {
@@ -112,10 +120,12 @@ async function deleteAlarm(id) {
   }
 }
 
+
 module.exports = {
   createAlarm,
   getAllAlarms,
   getAlarmById,
   updateAlarm,
+  updateAlarmStatus,
   deleteAlarm,
 };
