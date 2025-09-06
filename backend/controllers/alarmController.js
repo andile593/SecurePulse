@@ -1,4 +1,5 @@
 const alarmService = require("../services/alarmService");
+const orchestrator = require("../orchestrator/orchestrator");
 
 async function createAlarm(req, res, next) {
   try {
@@ -15,6 +16,10 @@ async function createAlarm(req, res, next) {
       return res.status(400).json({ error: "Missing required fields" });
     }
     const alarm = await alarmService.createAlarm(req.body);
+    orchestrator.handleNewAlarm(alarm).catch((err) => {
+      console.error("Orchestrator failed:", err);
+    });
+
     res.status(201).json(alarm);
   } catch (error) {
     next(error);
