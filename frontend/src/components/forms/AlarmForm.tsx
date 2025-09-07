@@ -18,22 +18,23 @@ const AlarmForm = ({
   onClose,
   clientOptions = [],
   transmitterOptions = [],
-  selectedClientId,
-  setSelectedClientId,
 }: AlarmFormProps) => {
   const [eventType, setEventType] = useState(initialData.eventType ?? "");
   const [triggeredAt, setTriggeredAt] = useState(
     initialData.triggeredAt?.slice(0, 16) ?? ""
   );
   const [source, setSource] = useState(initialData.source ?? "");
+  const [selectedClientId, setSelectedClientId] = useState(
+    initialData.transmitter?.site?.client?.id ?? ""
+  );
   const [transmitterId, setTransmitterId] = useState(initialData.transmitterId ?? "");
+  const [zone, setZone] = useState(initialData.zone ?? "");
 
-  // Filter transmitters by selected client
   const filteredTransmitters = transmitterOptions.filter(
     (t) => t.clientId === selectedClientId
   );
 
-  
+
   useEffect(() => {
     setTransmitterId("");
   }, [selectedClientId]);
@@ -45,6 +46,7 @@ const AlarmForm = ({
       triggeredAt: new Date(triggeredAt).toISOString(),
       source,
       transmitterId,
+      zone,
     });
   };
 
@@ -114,6 +116,16 @@ const AlarmForm = ({
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Zone</label>
+        <input
+          className="w-full border p-2 rounded"
+          value={zone}
+          onChange={(e) => setZone(e.target.value)}
+          required
+        />
       </div>
 
       <div className="flex gap-2">
