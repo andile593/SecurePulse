@@ -5,11 +5,11 @@ import type { Dispatch } from '@/types';
 export interface Alarm {
   id?: string;
   shortId?: number;   
-  source: string;          // Type of Alarm (FSK, OLA)
-  eventType: string;       // Event Type
-  triggeredAt: string;     // Date and time
-  zone: string;            // Triggered zone
-  transmitterId: string;   // 🔑 FK to transmitter
+  source: string;          
+  eventType: string;      
+  triggeredAt: string;     
+  zone: string;            
+  transmitterId: string;   
   transmitter?: Transmitter;
   aiCalls?: AiCall[];
   dispatch?: Dispatch;
