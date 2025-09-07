@@ -3,20 +3,14 @@ const orchestrator = require("../services/alarmOrchestrator");
 
 async function createAlarm(req, res, next) {
   try {
-    const { triggeredAt, eventType, priority, status, siteId, clientId } =
-      req.body;
-    if (
-      !triggeredAt ||
-      !eventType ||
-      priority === undefined ||
-      !status ||
-      !siteId ||
-      !clientId
-    ) {
+    const { triggeredAt, eventType, source, transmitterId, zone } = req.body;
+
+    if (!triggeredAt || !eventType || !source || !transmitterId || !zone) {
       return res.status(400).json({ error: "Missing required fields" });
     }
+
     const alarm = await alarmService.createAlarm(req.body);
-    orchestrator.handleNewAlarm(alarm).catch((err) => {
+    orchestrator.handleNewAlarm(alarm.id).catch((err) => {
       console.error("Orchestrator failed:", err);
     });
 
