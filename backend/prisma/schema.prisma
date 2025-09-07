@@ -15,78 +15,57 @@ model Client {
   name      String
   email     String
   phone     String
-  sites     Site[]
   createdAt DateTime @default(now())
+  sites     Site[]
 }
 
 model Site {
-  id           String        @id @default(uuid())
-  shortId      Int           @unique @default(autoincrement())
-  name         String
-  address      String
-  clientId     String
+  id       String @id @default(uuid())
+  shortId  Int    @unique @default(autoincrement())
+  name     String
+  address  String
+  clientId String
+
   client       Client        @relation(fields: [clientId], references: [id])
   transmitters Transmitter[]
-  obLogs       ObLog[]
+  OBLogs       OBLog[]
 }
 
 model Transmitter {
-  id            String  @id @default(uuid())
-  referenceCode String  @unique // 🔑 transmitter ID
+  id            String @id @default(uuid())
+  referenceCode String @unique
   siteId        String
-  site          Site    @relation(fields: [siteId], references: [id])
-  alarms        Alarm[]
+
+  site   Site    @relation(fields: [siteId], references: [id])
+  alarms Alarm[]
 }
 
 model Alarm {
-  id          String    @id @default(uuid())
-  shortId     Int       @unique @default(autoincrement())
-  source      String
-  eventType   String
-  triggeredAt DateTime
-  zone        String
-  notes       String
-  resolvedAt  DateTime?
-
+  id            String   @id @default(uuid())
+  shortId       Int      @unique @default(autoincrement())
+  triggeredAt   DateTime
+  eventType     String
+  source        String
+  zone          String
   transmitterId String
-  transmitter   Transmitter @relation(fields: [transmitterId], references: [id])
 
-  aiCalls    AiCall[]
-  dispatches Dispatch[]
-
-  status AlarmStatus @default(NEW)
-}
-
-enum AlarmStatus {
-  NEW
-  CancelledByClient
-  Dispatched
-  Closed
+  transmitter Transmitter @relation(fields: [transmitterId], references: [id])
+  aiCalls     AiCall[]
+  dispatch    Dispatch?
 }
 
 model AiCall {
   id              String    @id @default(uuid())
   shortId         Int       @unique @default(autoincrement())
   alarmId         String
-  alarm           Alarm     @relation(fields: [alarmId], references: [id])
   calledAt        DateTime  @default(now())
   callDuration    String?
   notes           String?
+  aiDecision      String?
   confidenceScore Float?
   evaluatedAt     DateTime?
 
-  aiDecision AiDecision @default(Dialing)
-  outcome    String?
-  phone      String?
-
-  dispatches Dispatch[]
-}
-
-enum AiDecision {
-  Dialing
-  Cancelled
-  Unanswered
-  Dispatched
+  alarm Alarm @relation(fields: [alarmId], references: [id])
 }
 
 model Dispatch {
@@ -96,34 +75,26 @@ model Dispatch {
   arrivalTime   DateTime?
   resolvedAt    DateTime?
   responseNotes String?
+  alarmId       String    @unique
+  guardId       String?
+  vehicleId     String?
 
-  alarmId  String
-  alarm    Alarm   @relation(fields: [alarmId], references: [id])
-  aiCallId String?
-  aiCall   AiCall? @relation(fields: [aiCallId], references: [id])
-
-  guardId String?
-  guard   Guard?  @relation(fields: [guardId], references: [id])
-
-  vehicleId String?
-  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+  alarm   Alarm    @relation(fields: [alarmId], references: [id])
+  guard   Guard?   @relation(fields: [guardId], references: [id])
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id])
 }
 
-enum DispatchStatus {
-  Active
-  Completed
-}
-
-model ObLog {
+model OBLog {
   id        String   @id @default(uuid())
   shortId   Int      @unique @default(autoincrement())
   logTime   DateTime
+  guardId   String?
+  siteId    String?
   actionLog String
   notes     String
-  guardId   String?
-  guard     Guard?   @relation(fields: [guardId], references: [id])
-  siteId    String?
-  site      Site?    @relation(fields: [siteId], references: [id])
+
+  guard Guard? @relation(fields: [guardId], references: [id])
+  site  Site?  @relation(fields: [siteId], references: [id])
 }
 
 model User {
@@ -134,40 +105,39 @@ model User {
   name      String
   createdAt DateTime  @default(now())
   lastLogin DateTime?
+  roleId    String
 
-  roleId String
-  role   UserRole @relation(fields: [roleId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
 }
 
-model UserRole {
-  id    String @id
-  name  String @unique
+model Role {
+  id   String @id
+  name String @unique
+
   users User[]
 }
 
 model Vehicle {
-  id          String  @id @default(uuid())
-  shortId     Int     @unique @default(autoincrement())
-  name        String
-  plate       String  @unique
-  model       String
-  status      String
-  description String?
+  id      String @id @default(uuid())
+  shortId Int    @unique @default(autoincrement())
+  name    String
+  plate   String @unique
+  model   String
+  status  String
 
   dispatches Dispatch[]
   guards     Guard[]
 }
 
 model Guard {
-  id      String @id @default(uuid())
-  shortId Int    @unique @default(autoincrement())
-  name    String
-  phone   String
-  status  String
-
+  id                String  @id @default(uuid())
+  shortId           Int     @unique @default(autoincrement())
+  name              String
+  phone             String
+  status            String
   assignedVehicleId String?
-  assignedVehicle   Vehicle? @relation(fields: [assignedVehicleId], references: [id])
 
-  dispatches Dispatch[]
-  obLogs     ObLog[]
+  assignedVehicle Vehicle?   @relation(fields: [assignedVehicleId], references: [id])
+  dispatches      Dispatch[]
+  OBLogs          OBLog[]
 }

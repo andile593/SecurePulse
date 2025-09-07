@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const aiDialer = require('../services/aiDialer');
+// const aiDialer = require('../services/aiDialer');
 
 async function handleNewAlarm(id) {
 const CALLABLE_EVENTS = ["Burglary Alarm", "Intrusion Alarm"];

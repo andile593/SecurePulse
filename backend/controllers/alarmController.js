@@ -1,5 +1,5 @@
 const alarmService = require("../services/alarmService");
-const orchestrator = require("../orchestrator/orchestrator");
+const orchestrator = require("../services/alarmOrchestrator");
 
 async function createAlarm(req, res, next) {
   try {
