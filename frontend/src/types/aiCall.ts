@@ -10,5 +10,6 @@ export interface AiCall {
   notes?: string;
   aiDecision?: string;
   confidenceScore?: number;
+  phone: string;
   evaluatedAt?: string;
 }

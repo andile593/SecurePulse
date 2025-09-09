@@ -6,7 +6,7 @@ async function createAiCall(data) {
     return await prisma.aiCall.create({ data });
   } catch (error) {
     console.error("Failed to create AI call:", error.message);
-    return null; // fallback
+    return null; 
   }
 }
 
@@ -15,7 +15,7 @@ async function getAllAiCalls() {
     return await prisma.aiCall.findMany({ include: { alarm: true } });
   } catch (error) {
     console.error("Failed to fetch AI calls:", error.message);
-    return []; // fallback
+    return []; 
   }
 }
 
@@ -27,7 +27,7 @@ async function getAiCallById(id) {
     });
   } catch (error) {
     console.error(`Failed to fetch AI call ${id}:`, error.message);
-    return null; // fallback
+    return null; 
   }
 }
 
@@ -45,7 +45,7 @@ async function updateAiCall(id, data) {
     });
   } catch (error) {
     console.error(`Error updating AI call ${id}:`, error.message);
-    return null; // fallback
+    return null; 
   }
 }
 

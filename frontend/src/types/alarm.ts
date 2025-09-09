@@ -7,8 +7,7 @@ export interface Alarm {
   shortId?: number;   
   source: string;          
   eventType: string;      
-  triggeredAt: string;     
-  zone: string;            
+  triggeredAt: string;      
   transmitterId: string;   
   transmitter?: Transmitter;
   aiCalls?: AiCall[];

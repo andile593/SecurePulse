@@ -48,13 +48,13 @@ const CALLABLE_EVENTS = ["Burglary Alarm", "Intrusion Alarm"];
 //   });
 
   
-//   await prisma.aiCall.create({
-//     data: {
-//       alarmId: alarm.id,
-//       phone,
-//       aiDecision: "Dialing",
-//     },
-//   });
+  await prisma.aiCall.create({
+    data: {
+      alarmId: alarm.id,
+      phone,
+      aiDecision: "Dialing",
+    },
+  });
 
 // aiDialer.callClient({
 //     phone: client.phone,

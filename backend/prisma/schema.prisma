@@ -46,13 +46,13 @@ model Alarm {
   triggeredAt   DateTime
   eventType     String
   source        String
-  zone          String
   transmitterId String
 
   transmitter Transmitter @relation(fields: [transmitterId], references: [id])
   aiCalls     AiCall[]
   dispatch    Dispatch?
 }
+
 
 model AiCall {
   id              String    @id @default(uuid())
@@ -64,7 +64,7 @@ model AiCall {
   aiDecision      String?
   confidenceScore Float?
   evaluatedAt     DateTime?
-
+  phone           String? 
   alarm Alarm @relation(fields: [alarmId], references: [id])
 }
 

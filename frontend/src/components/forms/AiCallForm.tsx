@@ -28,6 +28,7 @@ const AiCallForm = ({
   );
   const [callDuration, setCallDuration] = useState(initialData.callDuration ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phone, setPhone] = useState(initialData.phone ?? "");
 
   const { data: alarms = [] } = useAlarms();
   const { data: sites = [] } = useSites();
@@ -51,7 +52,7 @@ const AiCallForm = ({
     const evaluatedAtIso = new Date(evaluatedAt).toISOString();
     onSubmit({
       aiDecision, confidenceScore, evaluatedAt: evaluatedAtIso, notes, alarmId, calledAt: new Date(calledAt).toISOString(),
-      callDuration,
+      callDuration, phone,
     });
     setTimeout(() => setIsSubmitting(false), 1000);
   };
@@ -75,6 +76,28 @@ const AiCallForm = ({
           <option value="Inconclusive">Inconclusive</option>
         </select>
       </div>
+      <select
+        className="w-full border p-2 rounded"
+        value={alarmId}
+        onChange={(e) => {
+          const selectedId = e.target.value;
+          setAlarmId(selectedId);
+
+          const selectedAlarm = alarms.find((a) => a.id === selectedId);
+          if (selectedAlarm?.transmitter?.site?.client?.phone) {
+            setPhone(selectedAlarm.transmitter.site.client.phone);
+          }
+        }}
+        required
+      >
+        <option value="">Select an Alarm</option>
+        {alarms.map((alarm) => (
+          <option key={alarm.id} value={alarm.id}>
+            {alarm.eventType} - {siteMap[alarm.transmitter?.siteId ?? ""] ?? "Unknown Site"}
+
+          </option>
+        ))}
+      </select>
 
       <div>
         <label className="block text-sm font-medium mb-1">
@@ -144,8 +167,9 @@ const AiCallForm = ({
           <option value="">Select a Alarm</option>
           {alarms.map((alarm) => (
             <option key={alarm.id} value={alarm.id}>
-              {alarm.eventType} - {siteMap[alarm.siteId] ?? "Unknown Site"}
+              {alarm.eventType} - {siteMap[alarm.transmitter?.siteId ?? ""] ?? "Unknown Site"}
             </option>
+
           ))}
 
         </select>
