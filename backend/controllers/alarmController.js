@@ -10,7 +10,8 @@ async function createAlarm(req, res, next) {
     }
 
     const alarm = await alarmService.createAlarm(req.body);
-    orchestrator.handleNewAlarm(alarm.id).catch((err) => {
+
+    orchestrator.handleNewAlarm(alarm).catch((err) => {
       console.error("Orchestrator failed:", err);
     });
 
