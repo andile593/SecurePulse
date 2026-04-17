@@ -1,5 +1,6 @@
 const alarmService = require("../services/alarmService");
 const orchestrator = require("../services/alarmOrchestrator");
+const { emitAlarmEvent } = require("../services/socketService");
 
 async function createAlarm(req, res, next) {
   try {
@@ -10,6 +11,8 @@ async function createAlarm(req, res, next) {
     }
 
     const alarm = await alarmService.createAlarm(req.body);
+
+    emitAlarmEvent(alarm);
 
     orchestrator.handleNewAlarm(alarm).catch((err) => {
       console.error("Orchestrator failed:", err);
