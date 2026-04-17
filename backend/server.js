@@ -18,7 +18,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(errorHandler);
+
 
 app.use('/clients', require('./routes/clients'));
 app.use('/alarms', require('./routes/alarms'));
@@ -30,6 +30,8 @@ app.use('/ai-calls', require('./routes/aiCall'));
 app.use('/users', require('./routes/user'));
 app.use('/dispatches', require('./routes/dispatch'));
 app.use('/roles', require('./routes/roles'));
+
+app.use(errorHandler);
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running at http://localhost:${PORT}`);
