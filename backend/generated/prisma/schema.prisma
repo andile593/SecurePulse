@@ -46,6 +46,7 @@ model Alarm {
   eventType     String
   source        String
   transmitterId String
+  status        String   @default("active")
 
   transmitter Transmitter @relation(fields: [transmitterId], references: [id])
   aiCalls     AiCall[]

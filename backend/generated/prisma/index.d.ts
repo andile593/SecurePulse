@@ -5403,6 +5403,7 @@ export namespace Prisma {
     eventType: string | null
     source: string | null
     transmitterId: string | null
+    status: string | null
   }
 
   export type AlarmMaxAggregateOutputType = {
@@ -5412,6 +5413,7 @@ export namespace Prisma {
     eventType: string | null
     source: string | null
     transmitterId: string | null
+    status: string | null
   }
 
   export type AlarmCountAggregateOutputType = {
@@ -5421,6 +5423,7 @@ export namespace Prisma {
     eventType: number
     source: number
     transmitterId: number
+    status: number
     _all: number
   }
 
@@ -5440,6 +5443,7 @@ export namespace Prisma {
     eventType?: true
     source?: true
     transmitterId?: true
+    status?: true
   }
 
   export type AlarmMaxAggregateInputType = {
@@ -5449,6 +5453,7 @@ export namespace Prisma {
     eventType?: true
     source?: true
     transmitterId?: true
+    status?: true
   }
 
   export type AlarmCountAggregateInputType = {
@@ -5458,6 +5463,7 @@ export namespace Prisma {
     eventType?: true
     source?: true
     transmitterId?: true
+    status?: true
     _all?: true
   }
 
@@ -5554,6 +5560,7 @@ export namespace Prisma {
     eventType: string
     source: string
     transmitterId: string
+    status: string
     _count: AlarmCountAggregateOutputType | null
     _avg: AlarmAvgAggregateOutputType | null
     _sum: AlarmSumAggregateOutputType | null
@@ -5582,6 +5589,7 @@ export namespace Prisma {
     eventType?: boolean
     source?: boolean
     transmitterId?: boolean
+    status?: boolean
     transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
     aiCalls?: boolean | Alarm$aiCallsArgs<ExtArgs>
     dispatch?: boolean | Alarm$dispatchArgs<ExtArgs>
@@ -5595,6 +5603,7 @@ export namespace Prisma {
     eventType?: boolean
     source?: boolean
     transmitterId?: boolean
+    status?: boolean
     transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alarm"]>
 
@@ -5605,6 +5614,7 @@ export namespace Prisma {
     eventType?: boolean
     source?: boolean
     transmitterId?: boolean
+    status?: boolean
     transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alarm"]>
 
@@ -5615,9 +5625,10 @@ export namespace Prisma {
     eventType?: boolean
     source?: boolean
     transmitterId?: boolean
+    status?: boolean
   }
 
-  export type AlarmOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "triggeredAt" | "eventType" | "source" | "transmitterId", ExtArgs["result"]["alarm"]>
+  export type AlarmOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "triggeredAt" | "eventType" | "source" | "transmitterId" | "status", ExtArgs["result"]["alarm"]>
   export type AlarmInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
     aiCalls?: boolean | Alarm$aiCallsArgs<ExtArgs>
@@ -5645,6 +5656,7 @@ export namespace Prisma {
       eventType: string
       source: string
       transmitterId: string
+      status: string
     }, ExtArgs["result"]["alarm"]>
     composites: {}
   }
@@ -6077,6 +6089,7 @@ export namespace Prisma {
     readonly eventType: FieldRef<"Alarm", 'String'>
     readonly source: FieldRef<"Alarm", 'String'>
     readonly transmitterId: FieldRef<"Alarm", 'String'>
+    readonly status: FieldRef<"Alarm", 'String'>
   }
     
 
@@ -14639,7 +14652,8 @@ export namespace Prisma {
     triggeredAt: 'triggeredAt',
     eventType: 'eventType',
     source: 'source',
-    transmitterId: 'transmitterId'
+    transmitterId: 'transmitterId',
+    status: 'status'
   };
 
   export type AlarmScalarFieldEnum = (typeof AlarmScalarFieldEnum)[keyof typeof AlarmScalarFieldEnum]
@@ -15011,6 +15025,7 @@ export namespace Prisma {
     eventType?: StringFilter<"Alarm"> | string
     source?: StringFilter<"Alarm"> | string
     transmitterId?: StringFilter<"Alarm"> | string
+    status?: StringFilter<"Alarm"> | string
     transmitter?: XOR<TransmitterScalarRelationFilter, TransmitterWhereInput>
     aiCalls?: AiCallListRelationFilter
     dispatch?: XOR<DispatchNullableScalarRelationFilter, DispatchWhereInput> | null
@@ -15023,6 +15038,7 @@ export namespace Prisma {
     eventType?: SortOrder
     source?: SortOrder
     transmitterId?: SortOrder
+    status?: SortOrder
     transmitter?: TransmitterOrderByWithRelationInput
     aiCalls?: AiCallOrderByRelationAggregateInput
     dispatch?: DispatchOrderByWithRelationInput
@@ -15038,6 +15054,7 @@ export namespace Prisma {
     eventType?: StringFilter<"Alarm"> | string
     source?: StringFilter<"Alarm"> | string
     transmitterId?: StringFilter<"Alarm"> | string
+    status?: StringFilter<"Alarm"> | string
     transmitter?: XOR<TransmitterScalarRelationFilter, TransmitterWhereInput>
     aiCalls?: AiCallListRelationFilter
     dispatch?: XOR<DispatchNullableScalarRelationFilter, DispatchWhereInput> | null
@@ -15050,6 +15067,7 @@ export namespace Prisma {
     eventType?: SortOrder
     source?: SortOrder
     transmitterId?: SortOrder
+    status?: SortOrder
     _count?: AlarmCountOrderByAggregateInput
     _avg?: AlarmAvgOrderByAggregateInput
     _max?: AlarmMaxOrderByAggregateInput
@@ -15067,6 +15085,7 @@ export namespace Prisma {
     eventType?: StringWithAggregatesFilter<"Alarm"> | string
     source?: StringWithAggregatesFilter<"Alarm"> | string
     transmitterId?: StringWithAggregatesFilter<"Alarm"> | string
+    status?: StringWithAggregatesFilter<"Alarm"> | string
   }
 
   export type AiCallWhereInput = {
@@ -15733,6 +15752,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
     transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
     aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchCreateNestedOneWithoutAlarmInput
@@ -15745,6 +15765,7 @@ export namespace Prisma {
     eventType: string
     source: string
     transmitterId: string
+    status?: string
     aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
   }
@@ -15754,6 +15775,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
     aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
@@ -15766,6 +15788,7 @@ export namespace Prisma {
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     transmitterId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
   }
@@ -15777,6 +15800,7 @@ export namespace Prisma {
     eventType: string
     source: string
     transmitterId: string
+    status?: string
   }
 
   export type AlarmUpdateManyMutationInput = {
@@ -15784,6 +15808,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
   }
 
   export type AlarmUncheckedUpdateManyInput = {
@@ -15793,6 +15818,7 @@ export namespace Prisma {
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     transmitterId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
   }
 
   export type AiCallCreateInput = {
@@ -16528,6 +16554,7 @@ export namespace Prisma {
     eventType?: SortOrder
     source?: SortOrder
     transmitterId?: SortOrder
+    status?: SortOrder
   }
 
   export type AlarmAvgOrderByAggregateInput = {
@@ -16541,6 +16568,7 @@ export namespace Prisma {
     eventType?: SortOrder
     source?: SortOrder
     transmitterId?: SortOrder
+    status?: SortOrder
   }
 
   export type AlarmMinOrderByAggregateInput = {
@@ -16550,6 +16578,7 @@ export namespace Prisma {
     eventType?: SortOrder
     source?: SortOrder
     transmitterId?: SortOrder
+    status?: SortOrder
   }
 
   export type AlarmSumOrderByAggregateInput = {
@@ -18037,6 +18066,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
     aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchCreateNestedOneWithoutAlarmInput
   }
@@ -18047,6 +18077,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
     aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
   }
@@ -18115,6 +18146,7 @@ export namespace Prisma {
     eventType?: StringFilter<"Alarm"> | string
     source?: StringFilter<"Alarm"> | string
     transmitterId?: StringFilter<"Alarm"> | string
+    status?: StringFilter<"Alarm"> | string
   }
 
   export type TransmitterCreateWithoutAlarmsInput = {
@@ -18288,6 +18320,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
     transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
     dispatch?: DispatchCreateNestedOneWithoutAlarmInput
   }
@@ -18299,6 +18332,7 @@ export namespace Prisma {
     eventType: string
     source: string
     transmitterId: string
+    status?: string
     dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
   }
 
@@ -18323,6 +18357,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
   }
@@ -18334,6 +18369,7 @@ export namespace Prisma {
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     transmitterId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
   }
 
@@ -18343,6 +18379,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
     transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
     aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
   }
@@ -18354,6 +18391,7 @@ export namespace Prisma {
     eventType: string
     source: string
     transmitterId: string
+    status?: string
     aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
   }
 
@@ -18428,6 +18466,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
     aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
   }
@@ -18439,6 +18478,7 @@ export namespace Prisma {
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
     transmitterId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
   }
 
@@ -19066,6 +19106,7 @@ export namespace Prisma {
     triggeredAt: Date | string
     eventType: string
     source: string
+    status?: string
   }
 
   export type AlarmUpdateWithoutTransmitterInput = {
@@ -19073,6 +19114,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
   }
@@ -19083,6 +19125,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
     aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
   }
@@ -19093,6 +19136,7 @@ export namespace Prisma {
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
   }
 
   export type AiCallCreateManyAlarmInput = {

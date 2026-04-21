@@ -1,20 +1,14 @@
 const alarmService = require("../services/alarmService");
 const orchestrator = require("../services/alarmOrchestrator");
-const { emitAlarmEvent } = require("../services/socketService");
+const { emitAlarmEvent, emitAlarmUpdated } = require("../services/socketService");
 
 async function createAlarm(req, res, next) {
   try {
     const { triggeredAt, eventType, source, transmitterId } = req.body;
 
-    console.log("BODY:", req.body);
-    console.log("FIELDS:", { triggeredAt, eventType, source, transmitterId });
-
     if (!triggeredAt || !eventType || !source || !transmitterId) {
-      console.log("FAILED VALIDATION");
       return res.status(400).json({ error: "Missing required fields" });
     }
-
-    console.log("PASSED VALIDATION");  
 
     const alarm = await alarmService.createAlarm(req.body);
     emitAlarmEvent(alarm);
@@ -70,15 +64,44 @@ async function deleteAlarm(req, res, next) {
 
 async function simulateAlarm(req, res, next) {
   try {
-    const alarm = await alarmService.simulateAlarm()
-    
+    const alarm = await alarmService.simulateAlarm();
     emitAlarmEvent(alarm);
-    
     orchestrator.handleNewAlarm(alarm).catch((err) => {
-      console.error('Orchestrator failed on simulated alarm:', err);
+      console.error("Orchestrator failed on simulated alarm:", err);
     });
-
     res.status(201).json(alarm);
+  } catch (error) {
+    next(error);
+  }
+}
+
+
+async function updateAlarmStatus(req, res, next) {
+  try {
+    const { status } = req.body;
+
+    const VALID_STATUSES = ['active', 'dispatched', 'resolved'];
+
+    if (!status) {
+      return res.status(400).json({ error: 'Missing required field: status' });
+    }
+
+    if (!VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
+      });
+    }
+
+    const updated = await alarmService.updateAlarmStatus(req.params.id, status);
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Alarm not found' });
+    }
+
+    // Emit to all connected clients so dashboards update in real time.
+    emitAlarmUpdated(updated);
+
+    res.json(updated);
   } catch (error) {
     next(error);
   }
@@ -89,6 +112,7 @@ module.exports = {
   getAlarms,
   getAlarmById,
   updateAlarm,
+  updateAlarmStatus,
   deleteAlarm,
-  simulateAlarm
+  simulateAlarm,
 };

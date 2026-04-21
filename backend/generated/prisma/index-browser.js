@@ -150,7 +150,8 @@ exports.Prisma.AlarmScalarFieldEnum = {
   triggeredAt: 'triggeredAt',
   eventType: 'eventType',
   source: 'source',
-  transmitterId: 'transmitterId'
+  transmitterId: 'transmitterId',
+  status: 'status'
 };
 
 exports.Prisma.AiCallScalarFieldEnum = {
