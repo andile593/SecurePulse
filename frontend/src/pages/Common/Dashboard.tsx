@@ -4,19 +4,62 @@ import { useSites } from "@/hooks/useSites";
 import { useNavigate } from "react-router-dom";
 import { SummaryCard } from "@/components/ui/SummaryCard";
 import { AlarmRow } from "@/components/ui/AlarmRow";
+import { useState, useCallback, useEffect } from "react";
+import { useAlarmSocket } from "@/hooks/useAlarmSocket";
+import API from "@/lib/api/axios";
+import type { Alarm } from "@/types/alarm";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const {
-    data: alarms = [],
+    data: fetchedAlarms = [],
     isLoading: alarmsLoading,
     error: alarmsError,
   } = useAlarms();
   const { data: aiCalls = [] } = useAiCalls();
   const { data: sites = [], isLoading: sitesLoading } = useSites();
 
-  console.log(alarms);
-  
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [simulating, setSimulating] = useState(false);
+
+  // Sync React Query data into local state on load.
+  useEffect(() => {
+    if (fetchedAlarms.length > 0) {
+      setAlarms(fetchedAlarms);
+    }
+  }, [fetchedAlarms]);
+
+  // Prepend new alarms from socket without page refresh.
+  const handleNewAlarm = useCallback((alarm: Alarm) => {
+    setAlarms((prev) => {
+      if (prev.some((a) => a.id === alarm.id)) return prev;
+      return [alarm, ...prev];
+    });
+  }, []);
+
+  const handleAlarmUpdated = useCallback((updated: Alarm) => {
+    setAlarms((prev) =>
+      prev.map((a) => (a.id === updated.id ? updated : a))
+    );
+  }, []);
+
+  useAlarmSocket({
+    onNewAlarm: handleNewAlarm,
+    onAlarmUpdated: handleAlarmUpdated,
+  });
+
+  // Hits the simulate endpoint — backend creates a realistic alarm,
+  // emits the socket event, and it appears here in real time.
+  const handleSimulate = async () => {
+    setSimulating(true);
+    try {
+      await API.post('/alarms/simulate', {});
+    } catch (err) {
+      console.error('Simulate failed:', err);
+    } finally {
+      setSimulating(false);
+    }
+  };
 
   if (alarmsLoading || sitesLoading)
     return <div className="p-6">Loading dashboard...</div>;
@@ -24,30 +67,32 @@ export default function Dashboard() {
     return <div className="p-6 text-red-600">Something went wrong</div>;
 
   const totalAlarms = alarms.length;
-
   const unansweredCalls = aiCalls.filter(
     (a) => a.aiDecision === "Inconclusive"
   ).length;
-
   const cancelled = aiCalls.filter((a) => a.aiDecision === "Cancelled").length;
-
-  // const escalatedAlarms = alarms.filter(
-  //   (a) => a.aiDecision?.toLowerCase() === "dispatched"
-  // ).length;
-
-
 
   const prevTotalAlarms = 20;
   const prevCancelled = 5;
   const prevUnansweredCalls = 3;
-  const prevEscalatedAlarms = 10;
 
   const calcPercentageChange = (current: number, previous: number) =>
     previous === 0 ? 0 : ((current - previous) / previous) * 100;
 
   return (
     <div className="p-6 space-y-8">
-      <h3 className="text-3xl font-bold mb-6">Overview</h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-3xl font-bold">Overview</h3>
+
+        {/* DEMO MODE button — clearly labelled, triggers simulate endpoint */}
+        <button
+          onClick={handleSimulate}
+          disabled={simulating}
+          className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded transition"
+        >
+          {simulating ? 'Simulating...' : ' Simulate Alarm (Demo)'}
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <SummaryCard
@@ -71,15 +116,6 @@ export default function Dashboard() {
             prevUnansweredCalls
           )}
         />
-        {/* <SummaryCard
-          title="Response Sent Out"
-          value={escalatedAlarms}
-          color="bg-primary"
-          percentageChange={calcPercentageChange(
-            escalatedAlarms,
-            prevEscalatedAlarms
-          )}
-        /> */}
       </div>
 
       <div className="p-4">
