@@ -31,6 +31,7 @@ const AlarmDetail = () => {
 
   const [editing, setEditing] = useState(false);
   const [dispatching, setDispatching] = useState(false);
+  const [resolving, setResolving] = useState(false);
 
   const handleSubmit = (data: Partial<Alarm>) => {
     if (!alarm) return;
@@ -56,19 +57,15 @@ const AlarmDetail = () => {
     }
   };
 
-  // CHANGED: Dispatch handler — updates alarm status to dispatched
-  // and writes a timestamped entry to the OB log automatically.
   const handleDispatch = () => {
     if (!alarm) return;
     if (!confirm("Dispatch a response unit to this alarm?")) return;
 
     setDispatching(true);
-
     updateAlarmStatus(
       { id: alarm.id!, status: 'dispatched' },
       {
         onSuccess: () => {
-          // Write OB log entry automatically on dispatch.
           createOBLog(
             {
               logTime: new Date().toISOString(),
@@ -89,6 +86,36 @@ const AlarmDetail = () => {
       }
     );
   };
+  
+  const handleResolve = () => {
+    if (!alarm) return;
+    if (!confirm("Mark this alarm as resolved and close the incident?")) return;
+
+    setResolving(true);
+    updateAlarmStatus(
+      { id: alarm.id!, status: 'resolved' },
+      {
+        onSuccess: () => {
+          createOBLog(
+            {
+              logTime: new Date().toISOString(),
+              actionLog: 'RESOLVED',
+              notes: `Incident closed for alarm #${alarm.shortId} — ${alarm.eventType} at ${alarm.transmitter?.site?.name ?? 'Unknown Site'}. Alarm resolved and archived.`,
+              siteId: alarm.transmitter?.siteId ?? undefined,
+            },
+            {
+              onSuccess: () => {
+                refetch();
+                setResolving(false);
+              },
+              onError: () => setResolving(false),
+            }
+          );
+        },
+        onError: () => setResolving(false),
+      }
+    );
+  };
 
   if (isLoading) return <div className="p-4">Loading alarm details...</div>;
   if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
@@ -101,6 +128,7 @@ const AlarmDetail = () => {
   const site = transmitter?.site;
   const client = clients.find((c) => c.id === site?.clientId);
   const currentStatus = alarm.status ?? 'active';
+  const isActive = currentStatus === 'active';
   const isDispatched = currentStatus === 'dispatched';
   const isResolved = currentStatus === 'resolved';
 
@@ -119,7 +147,6 @@ const AlarmDetail = () => {
               <h2 className="text-3xl font-semibold">
                 Event - {alarm.transmitter?.site?.name}
               </h2>
-              {/* Status badge */}
               <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${STATUS_COLORS[currentStatus] ?? 'bg-gray-100 text-gray-700'}`}>
                 {currentStatus}
               </span>
@@ -221,14 +248,25 @@ const AlarmDetail = () => {
 
           {/* Actions */}
           <div className="flex gap-4 mt-8 justify-end">
-            {/* Dispatch button — only show when alarm is active */}
-            {!isDispatched && !isResolved && (
+            {/* Dispatch — only when active */}
+            {isActive && (
               <button
                 className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:opacity-50"
                 onClick={handleDispatch}
                 disabled={dispatching}
               >
-                {dispatching ? 'Dispatching...' : '🚨 Dispatch Unit'}
+                {dispatching ? 'Dispatching...' : 'Dispatch Unit'}
+              </button>
+            )}
+
+            {/* Resolve — only when dispatched */}
+            {isDispatched && (
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                onClick={handleResolve}
+                disabled={resolving}
+              >
+                {resolving ? 'Resolving...' : 'Close Incident'}
               </button>
             )}
 
