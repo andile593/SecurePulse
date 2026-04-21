@@ -25,8 +25,14 @@ app.use(cors({
   credentials: true,
 }));
 
+
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`[DEBUG] ${req.method} ${req.url}`);
+  console.log(`[DEBUG] Body:`, req.body);
+  next();
+});
 // Routes
 app.use('/api/clients', require('./routes/clients'));
 app.use('/api/alarms', require('./routes/alarms'));

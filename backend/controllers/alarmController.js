@@ -4,14 +4,19 @@ const { emitAlarmEvent } = require("../services/socketService");
 
 async function createAlarm(req, res, next) {
   try {
-    const { triggeredAt, eventType, source, transmitterId, zone } = req.body;
+    const { triggeredAt, eventType, source, transmitterId } = req.body;
 
-    if (!triggeredAt || !eventType || !source || !transmitterId || !zone) {
+    console.log("BODY:", req.body);
+    console.log("FIELDS:", { triggeredAt, eventType, source, transmitterId });
+
+    if (!triggeredAt || !eventType || !source || !transmitterId) {
+      console.log("FAILED VALIDATION");
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const alarm = await alarmService.createAlarm(req.body);
+    console.log("PASSED VALIDATION");  
 
+    const alarm = await alarmService.createAlarm(req.body);
     emitAlarmEvent(alarm);
 
     orchestrator.handleNewAlarm(alarm).catch((err) => {

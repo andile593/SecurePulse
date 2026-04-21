@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/library.js';
+import * as runtime from './runtime/client.js';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -24,6 +24,11 @@ export type Client = $Result.DefaultSelection<Prisma.$ClientPayload>
  */
 export type Site = $Result.DefaultSelection<Prisma.$SitePayload>
 /**
+ * Model Transmitter
+ * 
+ */
+export type Transmitter = $Result.DefaultSelection<Prisma.$TransmitterPayload>
+/**
  * Model Alarm
  * 
  */
@@ -39,20 +44,20 @@ export type AiCall = $Result.DefaultSelection<Prisma.$AiCallPayload>
  */
 export type Dispatch = $Result.DefaultSelection<Prisma.$DispatchPayload>
 /**
- * Model ObLog
+ * Model OBLog
  * 
  */
-export type ObLog = $Result.DefaultSelection<Prisma.$ObLogPayload>
+export type OBLog = $Result.DefaultSelection<Prisma.$OBLogPayload>
 /**
  * Model User
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
- * Model UserRole
+ * Model Role
  * 
  */
-export type UserRole = $Result.DefaultSelection<Prisma.$UserRolePayload>
+export type Role = $Result.DefaultSelection<Prisma.$RolePayload>
 /**
  * Model Vehicle
  * 
@@ -70,17 +75,19 @@ export type Guard = $Result.DefaultSelection<Prisma.$GuardPayload>
  * Type-safe database client for TypeScript & Node.js
  * @example
  * ```
- * const prisma = new PrismaClient()
+ * const prisma = new PrismaClient({
+ *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+ * })
  * // Fetch zero or more Clients
  * const clients = await prisma.client.findMany()
  * ```
  *
  *
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -91,13 +98,15 @@ export class PrismaClient<
    * Type-safe database client for TypeScript & Node.js
    * @example
    * ```
-   * const prisma = new PrismaClient()
+   * const prisma = new PrismaClient({
+   *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   * })
    * // Fetch zero or more Clients
    * const clients = await prisma.client.findMany()
    * ```
    *
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   constructor(optionsArg ?: Prisma.Subset<ClientOptions, Prisma.PrismaClientOptions>);
@@ -113,13 +122,6 @@ export class PrismaClient<
    */
   $disconnect(): $Utils.JsPromise<void>;
 
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
-
 /**
    * Executes a prepared raw query and returns the number of affected rows.
    * @example
@@ -127,7 +129,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -139,7 +141,7 @@ export class PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -150,7 +152,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -162,7 +164,7 @@ export class PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -178,12 +180,11 @@ export class PrismaClient<
    * ])
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(arg: [...P], options?: { isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<runtime.Types.Utils.UnwrapTuple<P>>
 
   $transaction<R>(fn: (prisma: Omit<PrismaClient, runtime.ITXClientDenyList>) => $Utils.JsPromise<R>, options?: { maxWait?: number, timeout?: number, isolationLevel?: Prisma.TransactionIsolationLevel }): $Utils.JsPromise<R>
-
 
   $extends: $Extensions.ExtendsHook<"extends", Prisma.TypeMapCb<ClientOptions>, ExtArgs, $Utils.Call<Prisma.TypeMapCb<ClientOptions>, {
     extArgs: ExtArgs
@@ -208,6 +209,16 @@ export class PrismaClient<
     * ```
     */
   get site(): Prisma.SiteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.transmitter`: Exposes CRUD operations for the **Transmitter** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Transmitters
+    * const transmitters = await prisma.transmitter.findMany()
+    * ```
+    */
+  get transmitter(): Prisma.TransmitterDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.alarm`: Exposes CRUD operations for the **Alarm** model.
@@ -240,14 +251,14 @@ export class PrismaClient<
   get dispatch(): Prisma.DispatchDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.obLog`: Exposes CRUD operations for the **ObLog** model.
+   * `prisma.oBLog`: Exposes CRUD operations for the **OBLog** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more ObLogs
-    * const obLogs = await prisma.obLog.findMany()
+    * // Fetch zero or more OBLogs
+    * const oBLogs = await prisma.oBLog.findMany()
     * ```
     */
-  get obLog(): Prisma.ObLogDelegate<ExtArgs, ClientOptions>;
+  get oBLog(): Prisma.OBLogDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.user`: Exposes CRUD operations for the **User** model.
@@ -260,14 +271,14 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.userRole`: Exposes CRUD operations for the **UserRole** model.
+   * `prisma.role`: Exposes CRUD operations for the **Role** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more UserRoles
-    * const userRoles = await prisma.userRole.findMany()
+    * // Fetch zero or more Roles
+    * const roles = await prisma.role.findMany()
     * ```
     */
-  get userRole(): Prisma.UserRoleDelegate<ExtArgs, ClientOptions>;
+  get role(): Prisma.RoleDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.vehicle`: Exposes CRUD operations for the **Vehicle** model.
@@ -328,14 +339,6 @@ export namespace Prisma {
   export type DecimalJsLike = runtime.DecimalJsLike
 
   /**
-   * Metrics
-   */
-  export type Metrics = runtime.Metrics
-  export type Metric<T> = runtime.Metric<T>
-  export type MetricHistogram = runtime.MetricHistogram
-  export type MetricHistogramBucket = runtime.MetricHistogramBucket
-
-  /**
   * Extensions
   */
   export import Extension = $Extensions.UserArgs
@@ -346,11 +349,12 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.12.0
-   * Query Engine version: 8047c96bbd92db98a2abc7c9323ce77c02c89dbc
+   * Prisma Client JS version: 7.7.0
+   * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
    */
   export type PrismaVersion = {
     client: string
+    engine: string
   }
 
   export const prismaVersion: PrismaVersion
@@ -360,6 +364,7 @@ export namespace Prisma {
    */
 
 
+  export import Bytes = runtime.Bytes
   export import JsonObject = runtime.JsonObject
   export import JsonArray = runtime.JsonArray
   export import JsonValue = runtime.JsonValue
@@ -730,12 +735,13 @@ export namespace Prisma {
   export const ModelName: {
     Client: 'Client',
     Site: 'Site',
+    Transmitter: 'Transmitter',
     Alarm: 'Alarm',
     AiCall: 'AiCall',
     Dispatch: 'Dispatch',
-    ObLog: 'ObLog',
+    OBLog: 'OBLog',
     User: 'User',
-    UserRole: 'UserRole',
+    Role: 'Role',
     Vehicle: 'Vehicle',
     Guard: 'Guard'
   };
@@ -743,9 +749,6 @@ export namespace Prisma {
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
 
 
-  export type Datasources = {
-    db?: Datasource
-  }
 
   interface TypeMapCb<ClientOptions = {}> extends $Utils.Fn<{extArgs: $Extensions.InternalArgs }, $Utils.Record<string, any>> {
     returns: Prisma.TypeMap<this['params']['extArgs'], ClientOptions extends { omit: infer OmitOptions } ? OmitOptions : {}>
@@ -756,7 +759,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "client" | "site" | "alarm" | "aiCall" | "dispatch" | "obLog" | "user" | "userRole" | "vehicle" | "guard"
+      modelProps: "client" | "site" | "transmitter" | "alarm" | "aiCall" | "dispatch" | "oBLog" | "user" | "role" | "vehicle" | "guard"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -905,6 +908,80 @@ export namespace Prisma {
           count: {
             args: Prisma.SiteCountArgs<ExtArgs>
             result: $Utils.Optional<SiteCountAggregateOutputType> | number
+          }
+        }
+      }
+      Transmitter: {
+        payload: Prisma.$TransmitterPayload<ExtArgs>
+        fields: Prisma.TransmitterFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TransmitterFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TransmitterFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          findFirst: {
+            args: Prisma.TransmitterFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TransmitterFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          findMany: {
+            args: Prisma.TransmitterFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>[]
+          }
+          create: {
+            args: Prisma.TransmitterCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          createMany: {
+            args: Prisma.TransmitterCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TransmitterCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>[]
+          }
+          delete: {
+            args: Prisma.TransmitterDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          update: {
+            args: Prisma.TransmitterUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          deleteMany: {
+            args: Prisma.TransmitterDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TransmitterUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TransmitterUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>[]
+          }
+          upsert: {
+            args: Prisma.TransmitterUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TransmitterPayload>
+          }
+          aggregate: {
+            args: Prisma.TransmitterAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTransmitter>
+          }
+          groupBy: {
+            args: Prisma.TransmitterGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TransmitterGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TransmitterCountArgs<ExtArgs>
+            result: $Utils.Optional<TransmitterCountAggregateOutputType> | number
           }
         }
       }
@@ -1130,77 +1207,77 @@ export namespace Prisma {
           }
         }
       }
-      ObLog: {
-        payload: Prisma.$ObLogPayload<ExtArgs>
-        fields: Prisma.ObLogFieldRefs
+      OBLog: {
+        payload: Prisma.$OBLogPayload<ExtArgs>
+        fields: Prisma.OBLogFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.ObLogFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload> | null
+            args: Prisma.OBLogFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.ObLogFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           findFirst: {
-            args: Prisma.ObLogFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload> | null
+            args: Prisma.OBLogFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.ObLogFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           findMany: {
-            args: Prisma.ObLogFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>[]
+            args: Prisma.OBLogFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>[]
           }
           create: {
-            args: Prisma.ObLogCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           createMany: {
-            args: Prisma.ObLogCreateManyArgs<ExtArgs>
+            args: Prisma.OBLogCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.ObLogCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>[]
+            args: Prisma.OBLogCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>[]
           }
           delete: {
-            args: Prisma.ObLogDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           update: {
-            args: Prisma.ObLogUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           deleteMany: {
-            args: Prisma.ObLogDeleteManyArgs<ExtArgs>
+            args: Prisma.OBLogDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.ObLogUpdateManyArgs<ExtArgs>
+            args: Prisma.OBLogUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.ObLogUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>[]
+            args: Prisma.OBLogUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>[]
           }
           upsert: {
-            args: Prisma.ObLogUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ObLogPayload>
+            args: Prisma.OBLogUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$OBLogPayload>
           }
           aggregate: {
-            args: Prisma.ObLogAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateObLog>
+            args: Prisma.OBLogAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateOBLog>
           }
           groupBy: {
-            args: Prisma.ObLogGroupByArgs<ExtArgs>
-            result: $Utils.Optional<ObLogGroupByOutputType>[]
+            args: Prisma.OBLogGroupByArgs<ExtArgs>
+            result: $Utils.Optional<OBLogGroupByOutputType>[]
           }
           count: {
-            args: Prisma.ObLogCountArgs<ExtArgs>
-            result: $Utils.Optional<ObLogCountAggregateOutputType> | number
+            args: Prisma.OBLogCountArgs<ExtArgs>
+            result: $Utils.Optional<OBLogCountAggregateOutputType> | number
           }
         }
       }
@@ -1278,77 +1355,77 @@ export namespace Prisma {
           }
         }
       }
-      UserRole: {
-        payload: Prisma.$UserRolePayload<ExtArgs>
-        fields: Prisma.UserRoleFieldRefs
+      Role: {
+        payload: Prisma.$RolePayload<ExtArgs>
+        fields: Prisma.RoleFieldRefs
         operations: {
           findUnique: {
-            args: Prisma.UserRoleFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload> | null
+            args: Prisma.RoleFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload> | null
           }
           findUniqueOrThrow: {
-            args: Prisma.UserRoleFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           findFirst: {
-            args: Prisma.UserRoleFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload> | null
+            args: Prisma.RoleFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload> | null
           }
           findFirstOrThrow: {
-            args: Prisma.UserRoleFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           findMany: {
-            args: Prisma.UserRoleFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>[]
+            args: Prisma.RoleFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>[]
           }
           create: {
-            args: Prisma.UserRoleCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           createMany: {
-            args: Prisma.UserRoleCreateManyArgs<ExtArgs>
+            args: Prisma.RoleCreateManyArgs<ExtArgs>
             result: BatchPayload
           }
           createManyAndReturn: {
-            args: Prisma.UserRoleCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>[]
+            args: Prisma.RoleCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>[]
           }
           delete: {
-            args: Prisma.UserRoleDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           update: {
-            args: Prisma.UserRoleUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           deleteMany: {
-            args: Prisma.UserRoleDeleteManyArgs<ExtArgs>
+            args: Prisma.RoleDeleteManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateMany: {
-            args: Prisma.UserRoleUpdateManyArgs<ExtArgs>
+            args: Prisma.RoleUpdateManyArgs<ExtArgs>
             result: BatchPayload
           }
           updateManyAndReturn: {
-            args: Prisma.UserRoleUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>[]
+            args: Prisma.RoleUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>[]
           }
           upsert: {
-            args: Prisma.UserRoleUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$UserRolePayload>
+            args: Prisma.RoleUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$RolePayload>
           }
           aggregate: {
-            args: Prisma.UserRoleAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateUserRole>
+            args: Prisma.RoleAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateRole>
           }
           groupBy: {
-            args: Prisma.UserRoleGroupByArgs<ExtArgs>
-            result: $Utils.Optional<UserRoleGroupByOutputType>[]
+            args: Prisma.RoleGroupByArgs<ExtArgs>
+            result: $Utils.Optional<RoleGroupByOutputType>[]
           }
           count: {
-            args: Prisma.UserRoleCountArgs<ExtArgs>
-            result: $Utils.Optional<UserRoleCountAggregateOutputType> | number
+            args: Prisma.RoleCountArgs<ExtArgs>
+            result: $Utils.Optional<RoleCountAggregateOutputType> | number
           }
         }
       }
@@ -1529,32 +1606,32 @@ export namespace Prisma {
   export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
   export interface PrismaClientOptions {
     /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasources?: Datasources
-    /**
-     * Overwrites the datasource url from your schema.prisma file
-     */
-    datasourceUrl?: string
-    /**
      * @default "colorless"
      */
     errorFormat?: ErrorFormat
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
-     * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
+     * Read more in our [docs](https://pris.ly/d/logging).
      */
     log?: (LogLevel | LogDefinition)[]
     /**
@@ -1567,6 +1644,14 @@ export namespace Prisma {
       timeout?: number
       isolationLevel?: Prisma.TransactionIsolationLevel
     }
+    /**
+     * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
+     */
+    adapter?: runtime.SqlDriverAdapterFactory
+    /**
+     * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
+     */
+    accelerateUrl?: string
     /**
      * Global configuration for omitting model fields by default.
      * 
@@ -1582,16 +1667,33 @@ export namespace Prisma {
      * ```
      */
     omit?: Prisma.GlobalOmitConfig
+    /**
+     * SQL commenter plugins that add metadata to SQL queries as comments.
+     * Comments follow the sqlcommenter format: https://google.github.io/sqlcommenter/
+     * 
+     * @example
+     * ```
+     * const prisma = new PrismaClient({
+     *   adapter,
+     *   comments: [
+     *     traceContext(),
+     *     queryInsights(),
+     *   ],
+     * })
+     * ```
+     */
+    comments?: runtime.SqlCommenterPlugin[]
   }
   export type GlobalOmitConfig = {
     client?: ClientOmit
     site?: SiteOmit
+    transmitter?: TransmitterOmit
     alarm?: AlarmOmit
     aiCall?: AiCallOmit
     dispatch?: DispatchOmit
-    obLog?: ObLogOmit
+    oBLog?: OBLogOmit
     user?: UserOmit
-    userRole?: UserRoleOmit
+    role?: RoleOmit
     vehicle?: VehicleOmit
     guard?: GuardOmit
   }
@@ -1603,10 +1705,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -1646,25 +1753,6 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
-
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -1719,13 +1807,13 @@ export namespace Prisma {
    */
 
   export type SiteCountOutputType = {
-    alarms: number
-    obLogs: number
+    transmitters: number
+    OBLogs: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    alarms?: boolean | SiteCountOutputTypeCountAlarmsArgs
-    obLogs?: boolean | SiteCountOutputTypeCountObLogsArgs
+    transmitters?: boolean | SiteCountOutputTypeCountTransmittersArgs
+    OBLogs?: boolean | SiteCountOutputTypeCountOBLogsArgs
   }
 
   // Custom InputTypes
@@ -1742,15 +1830,46 @@ export namespace Prisma {
   /**
    * SiteCountOutputType without action
    */
-  export type SiteCountOutputTypeCountAlarmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: AlarmWhereInput
+  export type SiteCountOutputTypeCountTransmittersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TransmitterWhereInput
   }
 
   /**
    * SiteCountOutputType without action
    */
-  export type SiteCountOutputTypeCountObLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ObLogWhereInput
+  export type SiteCountOutputTypeCountOBLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OBLogWhereInput
+  }
+
+
+  /**
+   * Count Type TransmitterCountOutputType
+   */
+
+  export type TransmitterCountOutputType = {
+    alarms: number
+  }
+
+  export type TransmitterCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    alarms?: boolean | TransmitterCountOutputTypeCountAlarmsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * TransmitterCountOutputType without action
+   */
+  export type TransmitterCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TransmitterCountOutputType
+     */
+    select?: TransmitterCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * TransmitterCountOutputType without action
+   */
+  export type TransmitterCountOutputTypeCountAlarmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AlarmWhereInput
   }
 
 
@@ -1759,11 +1878,11 @@ export namespace Prisma {
    */
 
   export type AlarmCountOutputType = {
-    obLogs: number
+    aiCalls: number
   }
 
   export type AlarmCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    obLogs?: boolean | AlarmCountOutputTypeCountObLogsArgs
+    aiCalls?: boolean | AlarmCountOutputTypeCountAiCallsArgs
   }
 
   // Custom InputTypes
@@ -1780,38 +1899,38 @@ export namespace Prisma {
   /**
    * AlarmCountOutputType without action
    */
-  export type AlarmCountOutputTypeCountObLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ObLogWhereInput
+  export type AlarmCountOutputTypeCountAiCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AiCallWhereInput
   }
 
 
   /**
-   * Count Type UserRoleCountOutputType
+   * Count Type RoleCountOutputType
    */
 
-  export type UserRoleCountOutputType = {
+  export type RoleCountOutputType = {
     users: number
   }
 
-  export type UserRoleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    users?: boolean | UserRoleCountOutputTypeCountUsersArgs
+  export type RoleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    users?: boolean | RoleCountOutputTypeCountUsersArgs
   }
 
   // Custom InputTypes
   /**
-   * UserRoleCountOutputType without action
+   * RoleCountOutputType without action
    */
-  export type UserRoleCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRoleCountOutputType
+     * Select specific fields to fetch from the RoleCountOutputType
      */
-    select?: UserRoleCountOutputTypeSelect<ExtArgs> | null
+    select?: RoleCountOutputTypeSelect<ExtArgs> | null
   }
 
   /**
-   * UserRoleCountOutputType without action
+   * RoleCountOutputType without action
    */
-  export type UserRoleCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleCountOutputTypeCountUsersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
   }
 
@@ -1862,12 +1981,12 @@ export namespace Prisma {
 
   export type GuardCountOutputType = {
     dispatches: number
-    obLogs: number
+    OBLogs: number
   }
 
   export type GuardCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dispatches?: boolean | GuardCountOutputTypeCountDispatchesArgs
-    obLogs?: boolean | GuardCountOutputTypeCountObLogsArgs
+    OBLogs?: boolean | GuardCountOutputTypeCountOBLogsArgs
   }
 
   // Custom InputTypes
@@ -1891,8 +2010,8 @@ export namespace Prisma {
   /**
    * GuardCountOutputType without action
    */
-  export type GuardCountOutputTypeCountObLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ObLogWhereInput
+  export type GuardCountOutputTypeCountOBLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OBLogWhereInput
   }
 
 
@@ -1906,56 +2025,86 @@ export namespace Prisma {
 
   export type AggregateClient = {
     _count: ClientCountAggregateOutputType | null
+    _avg: ClientAvgAggregateOutputType | null
+    _sum: ClientSumAggregateOutputType | null
     _min: ClientMinAggregateOutputType | null
     _max: ClientMaxAggregateOutputType | null
   }
 
+  export type ClientAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type ClientSumAggregateOutputType = {
+    shortId: number | null
+  }
+
   export type ClientMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
+    surname: string | null
     name: string | null
-    contactEmail: string | null
+    email: string | null
     phone: string | null
     createdAt: Date | null
   }
 
   export type ClientMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
+    surname: string | null
     name: string | null
-    contactEmail: string | null
+    email: string | null
     phone: string | null
     createdAt: Date | null
   }
 
   export type ClientCountAggregateOutputType = {
     id: number
+    shortId: number
+    surname: number
     name: number
-    contactEmail: number
+    email: number
     phone: number
     createdAt: number
     _all: number
   }
 
 
+  export type ClientAvgAggregateInputType = {
+    shortId?: true
+  }
+
+  export type ClientSumAggregateInputType = {
+    shortId?: true
+  }
+
   export type ClientMinAggregateInputType = {
     id?: true
+    shortId?: true
+    surname?: true
     name?: true
-    contactEmail?: true
+    email?: true
     phone?: true
     createdAt?: true
   }
 
   export type ClientMaxAggregateInputType = {
     id?: true
+    shortId?: true
+    surname?: true
     name?: true
-    contactEmail?: true
+    email?: true
     phone?: true
     createdAt?: true
   }
 
   export type ClientCountAggregateInputType = {
     id?: true
+    shortId?: true
+    surname?: true
     name?: true
-    contactEmail?: true
+    email?: true
     phone?: true
     createdAt?: true
     _all?: true
@@ -1999,6 +2148,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ClientAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ClientSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ClientMinAggregateInputType
@@ -2029,17 +2190,23 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ClientCountAggregateInputType | true
+    _avg?: ClientAvgAggregateInputType
+    _sum?: ClientSumAggregateInputType
     _min?: ClientMinAggregateInputType
     _max?: ClientMaxAggregateInputType
   }
 
   export type ClientGroupByOutputType = {
     id: string
+    shortId: number
+    surname: string
     name: string
-    contactEmail: string
-    phone: string | null
+    email: string
+    phone: string
     createdAt: Date
     _count: ClientCountAggregateOutputType | null
+    _avg: ClientAvgAggregateOutputType | null
+    _sum: ClientSumAggregateOutputType | null
     _min: ClientMinAggregateOutputType | null
     _max: ClientMaxAggregateOutputType | null
   }
@@ -2060,8 +2227,10 @@ export namespace Prisma {
 
   export type ClientSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    surname?: boolean
     name?: boolean
-    contactEmail?: boolean
+    email?: boolean
     phone?: boolean
     createdAt?: boolean
     sites?: boolean | Client$sitesArgs<ExtArgs>
@@ -2070,29 +2239,35 @@ export namespace Prisma {
 
   export type ClientSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    surname?: boolean
     name?: boolean
-    contactEmail?: boolean
+    email?: boolean
     phone?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["client"]>
 
   export type ClientSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    surname?: boolean
     name?: boolean
-    contactEmail?: boolean
+    email?: boolean
     phone?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["client"]>
 
   export type ClientSelectScalar = {
     id?: boolean
+    shortId?: boolean
+    surname?: boolean
     name?: boolean
-    contactEmail?: boolean
+    email?: boolean
     phone?: boolean
     createdAt?: boolean
   }
 
-  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "contactEmail" | "phone" | "createdAt", ExtArgs["result"]["client"]>
+  export type ClientOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "surname" | "name" | "email" | "phone" | "createdAt", ExtArgs["result"]["client"]>
   export type ClientInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sites?: boolean | Client$sitesArgs<ExtArgs>
     _count?: boolean | ClientCountOutputTypeDefaultArgs<ExtArgs>
@@ -2107,9 +2282,11 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
+      surname: string
       name: string
-      contactEmail: string
-      phone: string | null
+      email: string
+      phone: string
       createdAt: Date
     }, ExtArgs["result"]["client"]>
     composites: {}
@@ -2536,8 +2713,10 @@ export namespace Prisma {
    */
   interface ClientFieldRefs {
     readonly id: FieldRef<"Client", 'String'>
+    readonly shortId: FieldRef<"Client", 'Int'>
+    readonly surname: FieldRef<"Client", 'String'>
     readonly name: FieldRef<"Client", 'String'>
-    readonly contactEmail: FieldRef<"Client", 'String'>
+    readonly email: FieldRef<"Client", 'String'>
     readonly phone: FieldRef<"Client", 'String'>
     readonly createdAt: FieldRef<"Client", 'DateTime'>
   }
@@ -2736,6 +2915,11 @@ export namespace Prisma {
      * Skip the first `n` Clients.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Clients.
+     */
     distinct?: ClientScalarFieldEnum | ClientScalarFieldEnum[]
   }
 
@@ -2983,84 +3167,68 @@ export namespace Prisma {
   }
 
   export type SiteAvgAggregateOutputType = {
-    latitude: number | null
-    longitude: number | null
+    shortId: number | null
   }
 
   export type SiteSumAggregateOutputType = {
-    latitude: number | null
-    longitude: number | null
+    shortId: number | null
   }
 
   export type SiteMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     name: string | null
     address: string | null
-    latitude: number | null
-    longitude: number | null
-    createdAt: Date | null
     clientId: string | null
   }
 
   export type SiteMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     name: string | null
     address: string | null
-    latitude: number | null
-    longitude: number | null
-    createdAt: Date | null
     clientId: string | null
   }
 
   export type SiteCountAggregateOutputType = {
     id: number
+    shortId: number
     name: number
     address: number
-    latitude: number
-    longitude: number
-    createdAt: number
     clientId: number
     _all: number
   }
 
 
   export type SiteAvgAggregateInputType = {
-    latitude?: true
-    longitude?: true
+    shortId?: true
   }
 
   export type SiteSumAggregateInputType = {
-    latitude?: true
-    longitude?: true
+    shortId?: true
   }
 
   export type SiteMinAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     address?: true
-    latitude?: true
-    longitude?: true
-    createdAt?: true
     clientId?: true
   }
 
   export type SiteMaxAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     address?: true
-    latitude?: true
-    longitude?: true
-    createdAt?: true
     clientId?: true
   }
 
   export type SiteCountAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     address?: true
-    latitude?: true
-    longitude?: true
-    createdAt?: true
     clientId?: true
     _all?: true
   }
@@ -3153,11 +3321,9 @@ export namespace Prisma {
 
   export type SiteGroupByOutputType = {
     id: string
+    shortId: number
     name: string
     address: string
-    latitude: number | null
-    longitude: number | null
-    createdAt: Date
     clientId: string
     _count: SiteCountAggregateOutputType | null
     _avg: SiteAvgAggregateOutputType | null
@@ -3182,55 +3348,47 @@ export namespace Prisma {
 
   export type SiteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     address?: boolean
-    latitude?: boolean
-    longitude?: boolean
-    createdAt?: boolean
     clientId?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    alarms?: boolean | Site$alarmsArgs<ExtArgs>
-    obLogs?: boolean | Site$obLogsArgs<ExtArgs>
+    transmitters?: boolean | Site$transmittersArgs<ExtArgs>
+    OBLogs?: boolean | Site$OBLogsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     address?: boolean
-    latitude?: boolean
-    longitude?: boolean
-    createdAt?: boolean
     clientId?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     address?: boolean
-    latitude?: boolean
-    longitude?: boolean
-    createdAt?: boolean
     clientId?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectScalar = {
     id?: boolean
+    shortId?: boolean
     name?: boolean
     address?: boolean
-    latitude?: boolean
-    longitude?: boolean
-    createdAt?: boolean
     clientId?: boolean
   }
 
-  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "address" | "latitude" | "longitude" | "createdAt" | "clientId", ExtArgs["result"]["site"]>
+  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "name" | "address" | "clientId", ExtArgs["result"]["site"]>
   export type SiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    alarms?: boolean | Site$alarmsArgs<ExtArgs>
-    obLogs?: boolean | Site$obLogsArgs<ExtArgs>
+    transmitters?: boolean | Site$transmittersArgs<ExtArgs>
+    OBLogs?: boolean | Site$OBLogsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3244,16 +3402,14 @@ export namespace Prisma {
     name: "Site"
     objects: {
       client: Prisma.$ClientPayload<ExtArgs>
-      alarms: Prisma.$AlarmPayload<ExtArgs>[]
-      obLogs: Prisma.$ObLogPayload<ExtArgs>[]
+      transmitters: Prisma.$TransmitterPayload<ExtArgs>[]
+      OBLogs: Prisma.$OBLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       name: string
       address: string
-      latitude: number | null
-      longitude: number | null
-      createdAt: Date
       clientId: string
     }, ExtArgs["result"]["site"]>
     composites: {}
@@ -3650,8 +3806,8 @@ export namespace Prisma {
   export interface Prisma__SiteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     client<T extends ClientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClientDefaultArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    alarms<T extends Site$alarmsArgs<ExtArgs> = {}>(args?: Subset<T, Site$alarmsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlarmPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    obLogs<T extends Site$obLogsArgs<ExtArgs> = {}>(args?: Subset<T, Site$obLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    transmitters<T extends Site$transmittersArgs<ExtArgs> = {}>(args?: Subset<T, Site$transmittersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    OBLogs<T extends Site$OBLogsArgs<ExtArgs> = {}>(args?: Subset<T, Site$OBLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3682,11 +3838,9 @@ export namespace Prisma {
    */
   interface SiteFieldRefs {
     readonly id: FieldRef<"Site", 'String'>
+    readonly shortId: FieldRef<"Site", 'Int'>
     readonly name: FieldRef<"Site", 'String'>
     readonly address: FieldRef<"Site", 'String'>
-    readonly latitude: FieldRef<"Site", 'Float'>
-    readonly longitude: FieldRef<"Site", 'Float'>
-    readonly createdAt: FieldRef<"Site", 'DateTime'>
     readonly clientId: FieldRef<"Site", 'String'>
   }
     
@@ -3884,6 +4038,11 @@ export namespace Prisma {
      * Skip the first `n` Sites.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Sites.
+     */
     distinct?: SiteScalarFieldEnum | SiteScalarFieldEnum[]
   }
 
@@ -4084,51 +4243,51 @@ export namespace Prisma {
   }
 
   /**
-   * Site.alarms
+   * Site.transmitters
    */
-  export type Site$alarmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Site$transmittersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the Alarm
+     * Select specific fields to fetch from the Transmitter
      */
-    select?: AlarmSelect<ExtArgs> | null
+    select?: TransmitterSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the Alarm
+     * Omit specific fields from the Transmitter
      */
-    omit?: AlarmOmit<ExtArgs> | null
+    omit?: TransmitterOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: AlarmInclude<ExtArgs> | null
-    where?: AlarmWhereInput
-    orderBy?: AlarmOrderByWithRelationInput | AlarmOrderByWithRelationInput[]
-    cursor?: AlarmWhereUniqueInput
+    include?: TransmitterInclude<ExtArgs> | null
+    where?: TransmitterWhereInput
+    orderBy?: TransmitterOrderByWithRelationInput | TransmitterOrderByWithRelationInput[]
+    cursor?: TransmitterWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: AlarmScalarFieldEnum | AlarmScalarFieldEnum[]
+    distinct?: TransmitterScalarFieldEnum | TransmitterScalarFieldEnum[]
   }
 
   /**
-   * Site.obLogs
+   * Site.OBLogs
    */
-  export type Site$obLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Site$OBLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
-    where?: ObLogWhereInput
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
-    cursor?: ObLogWhereUniqueInput
+    include?: OBLogInclude<ExtArgs> | null
+    where?: OBLogWhereInput
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
+    cursor?: OBLogWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
+    distinct?: OBLogScalarFieldEnum | OBLogScalarFieldEnum[]
   }
 
   /**
@@ -4151,6 +4310,1073 @@ export namespace Prisma {
 
 
   /**
+   * Model Transmitter
+   */
+
+  export type AggregateTransmitter = {
+    _count: TransmitterCountAggregateOutputType | null
+    _min: TransmitterMinAggregateOutputType | null
+    _max: TransmitterMaxAggregateOutputType | null
+  }
+
+  export type TransmitterMinAggregateOutputType = {
+    id: string | null
+    referenceCode: string | null
+    siteId: string | null
+  }
+
+  export type TransmitterMaxAggregateOutputType = {
+    id: string | null
+    referenceCode: string | null
+    siteId: string | null
+  }
+
+  export type TransmitterCountAggregateOutputType = {
+    id: number
+    referenceCode: number
+    siteId: number
+    _all: number
+  }
+
+
+  export type TransmitterMinAggregateInputType = {
+    id?: true
+    referenceCode?: true
+    siteId?: true
+  }
+
+  export type TransmitterMaxAggregateInputType = {
+    id?: true
+    referenceCode?: true
+    siteId?: true
+  }
+
+  export type TransmitterCountAggregateInputType = {
+    id?: true
+    referenceCode?: true
+    siteId?: true
+    _all?: true
+  }
+
+  export type TransmitterAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Transmitter to aggregate.
+     */
+    where?: TransmitterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Transmitters to fetch.
+     */
+    orderBy?: TransmitterOrderByWithRelationInput | TransmitterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TransmitterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Transmitters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Transmitters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Transmitters
+    **/
+    _count?: true | TransmitterCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TransmitterMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TransmitterMaxAggregateInputType
+  }
+
+  export type GetTransmitterAggregateType<T extends TransmitterAggregateArgs> = {
+        [P in keyof T & keyof AggregateTransmitter]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTransmitter[P]>
+      : GetScalarType<T[P], AggregateTransmitter[P]>
+  }
+
+
+
+
+  export type TransmitterGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TransmitterWhereInput
+    orderBy?: TransmitterOrderByWithAggregationInput | TransmitterOrderByWithAggregationInput[]
+    by: TransmitterScalarFieldEnum[] | TransmitterScalarFieldEnum
+    having?: TransmitterScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TransmitterCountAggregateInputType | true
+    _min?: TransmitterMinAggregateInputType
+    _max?: TransmitterMaxAggregateInputType
+  }
+
+  export type TransmitterGroupByOutputType = {
+    id: string
+    referenceCode: string
+    siteId: string
+    _count: TransmitterCountAggregateOutputType | null
+    _min: TransmitterMinAggregateOutputType | null
+    _max: TransmitterMaxAggregateOutputType | null
+  }
+
+  type GetTransmitterGroupByPayload<T extends TransmitterGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TransmitterGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TransmitterGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TransmitterGroupByOutputType[P]>
+            : GetScalarType<T[P], TransmitterGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TransmitterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    referenceCode?: boolean
+    siteId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    alarms?: boolean | Transmitter$alarmsArgs<ExtArgs>
+    _count?: boolean | TransmitterCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["transmitter"]>
+
+  export type TransmitterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    referenceCode?: boolean
+    siteId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["transmitter"]>
+
+  export type TransmitterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    referenceCode?: boolean
+    siteId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["transmitter"]>
+
+  export type TransmitterSelectScalar = {
+    id?: boolean
+    referenceCode?: boolean
+    siteId?: boolean
+  }
+
+  export type TransmitterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "referenceCode" | "siteId", ExtArgs["result"]["transmitter"]>
+  export type TransmitterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    alarms?: boolean | Transmitter$alarmsArgs<ExtArgs>
+    _count?: boolean | TransmitterCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type TransmitterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type TransmitterIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $TransmitterPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Transmitter"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      alarms: Prisma.$AlarmPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      referenceCode: string
+      siteId: string
+    }, ExtArgs["result"]["transmitter"]>
+    composites: {}
+  }
+
+  type TransmitterGetPayload<S extends boolean | null | undefined | TransmitterDefaultArgs> = $Result.GetResult<Prisma.$TransmitterPayload, S>
+
+  type TransmitterCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TransmitterFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TransmitterCountAggregateInputType | true
+    }
+
+  export interface TransmitterDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Transmitter'], meta: { name: 'Transmitter' } }
+    /**
+     * Find zero or one Transmitter that matches the filter.
+     * @param {TransmitterFindUniqueArgs} args - Arguments to find a Transmitter
+     * @example
+     * // Get one Transmitter
+     * const transmitter = await prisma.transmitter.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TransmitterFindUniqueArgs>(args: SelectSubset<T, TransmitterFindUniqueArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Transmitter that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TransmitterFindUniqueOrThrowArgs} args - Arguments to find a Transmitter
+     * @example
+     * // Get one Transmitter
+     * const transmitter = await prisma.transmitter.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TransmitterFindUniqueOrThrowArgs>(args: SelectSubset<T, TransmitterFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Transmitter that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterFindFirstArgs} args - Arguments to find a Transmitter
+     * @example
+     * // Get one Transmitter
+     * const transmitter = await prisma.transmitter.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TransmitterFindFirstArgs>(args?: SelectSubset<T, TransmitterFindFirstArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Transmitter that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterFindFirstOrThrowArgs} args - Arguments to find a Transmitter
+     * @example
+     * // Get one Transmitter
+     * const transmitter = await prisma.transmitter.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TransmitterFindFirstOrThrowArgs>(args?: SelectSubset<T, TransmitterFindFirstOrThrowArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Transmitters that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Transmitters
+     * const transmitters = await prisma.transmitter.findMany()
+     * 
+     * // Get first 10 Transmitters
+     * const transmitters = await prisma.transmitter.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const transmitterWithIdOnly = await prisma.transmitter.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TransmitterFindManyArgs>(args?: SelectSubset<T, TransmitterFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Transmitter.
+     * @param {TransmitterCreateArgs} args - Arguments to create a Transmitter.
+     * @example
+     * // Create one Transmitter
+     * const Transmitter = await prisma.transmitter.create({
+     *   data: {
+     *     // ... data to create a Transmitter
+     *   }
+     * })
+     * 
+     */
+    create<T extends TransmitterCreateArgs>(args: SelectSubset<T, TransmitterCreateArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Transmitters.
+     * @param {TransmitterCreateManyArgs} args - Arguments to create many Transmitters.
+     * @example
+     * // Create many Transmitters
+     * const transmitter = await prisma.transmitter.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TransmitterCreateManyArgs>(args?: SelectSubset<T, TransmitterCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Transmitters and returns the data saved in the database.
+     * @param {TransmitterCreateManyAndReturnArgs} args - Arguments to create many Transmitters.
+     * @example
+     * // Create many Transmitters
+     * const transmitter = await prisma.transmitter.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Transmitters and only return the `id`
+     * const transmitterWithIdOnly = await prisma.transmitter.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TransmitterCreateManyAndReturnArgs>(args?: SelectSubset<T, TransmitterCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Transmitter.
+     * @param {TransmitterDeleteArgs} args - Arguments to delete one Transmitter.
+     * @example
+     * // Delete one Transmitter
+     * const Transmitter = await prisma.transmitter.delete({
+     *   where: {
+     *     // ... filter to delete one Transmitter
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TransmitterDeleteArgs>(args: SelectSubset<T, TransmitterDeleteArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Transmitter.
+     * @param {TransmitterUpdateArgs} args - Arguments to update one Transmitter.
+     * @example
+     * // Update one Transmitter
+     * const transmitter = await prisma.transmitter.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TransmitterUpdateArgs>(args: SelectSubset<T, TransmitterUpdateArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Transmitters.
+     * @param {TransmitterDeleteManyArgs} args - Arguments to filter Transmitters to delete.
+     * @example
+     * // Delete a few Transmitters
+     * const { count } = await prisma.transmitter.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TransmitterDeleteManyArgs>(args?: SelectSubset<T, TransmitterDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Transmitters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Transmitters
+     * const transmitter = await prisma.transmitter.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TransmitterUpdateManyArgs>(args: SelectSubset<T, TransmitterUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Transmitters and returns the data updated in the database.
+     * @param {TransmitterUpdateManyAndReturnArgs} args - Arguments to update many Transmitters.
+     * @example
+     * // Update many Transmitters
+     * const transmitter = await prisma.transmitter.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Transmitters and only return the `id`
+     * const transmitterWithIdOnly = await prisma.transmitter.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TransmitterUpdateManyAndReturnArgs>(args: SelectSubset<T, TransmitterUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Transmitter.
+     * @param {TransmitterUpsertArgs} args - Arguments to update or create a Transmitter.
+     * @example
+     * // Update or create a Transmitter
+     * const transmitter = await prisma.transmitter.upsert({
+     *   create: {
+     *     // ... data to create a Transmitter
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Transmitter we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TransmitterUpsertArgs>(args: SelectSubset<T, TransmitterUpsertArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Transmitters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterCountArgs} args - Arguments to filter Transmitters to count.
+     * @example
+     * // Count the number of Transmitters
+     * const count = await prisma.transmitter.count({
+     *   where: {
+     *     // ... the filter for the Transmitters we want to count
+     *   }
+     * })
+    **/
+    count<T extends TransmitterCountArgs>(
+      args?: Subset<T, TransmitterCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TransmitterCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Transmitter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TransmitterAggregateArgs>(args: Subset<T, TransmitterAggregateArgs>): Prisma.PrismaPromise<GetTransmitterAggregateType<T>>
+
+    /**
+     * Group by Transmitter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TransmitterGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TransmitterGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TransmitterGroupByArgs['orderBy'] }
+        : { orderBy?: TransmitterGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TransmitterGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTransmitterGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Transmitter model
+   */
+  readonly fields: TransmitterFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Transmitter.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TransmitterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    alarms<T extends Transmitter$alarmsArgs<ExtArgs> = {}>(args?: Subset<T, Transmitter$alarmsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AlarmPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Transmitter model
+   */
+  interface TransmitterFieldRefs {
+    readonly id: FieldRef<"Transmitter", 'String'>
+    readonly referenceCode: FieldRef<"Transmitter", 'String'>
+    readonly siteId: FieldRef<"Transmitter", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Transmitter findUnique
+   */
+  export type TransmitterFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter, which Transmitter to fetch.
+     */
+    where: TransmitterWhereUniqueInput
+  }
+
+  /**
+   * Transmitter findUniqueOrThrow
+   */
+  export type TransmitterFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter, which Transmitter to fetch.
+     */
+    where: TransmitterWhereUniqueInput
+  }
+
+  /**
+   * Transmitter findFirst
+   */
+  export type TransmitterFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter, which Transmitter to fetch.
+     */
+    where?: TransmitterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Transmitters to fetch.
+     */
+    orderBy?: TransmitterOrderByWithRelationInput | TransmitterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Transmitters.
+     */
+    cursor?: TransmitterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Transmitters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Transmitters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Transmitters.
+     */
+    distinct?: TransmitterScalarFieldEnum | TransmitterScalarFieldEnum[]
+  }
+
+  /**
+   * Transmitter findFirstOrThrow
+   */
+  export type TransmitterFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter, which Transmitter to fetch.
+     */
+    where?: TransmitterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Transmitters to fetch.
+     */
+    orderBy?: TransmitterOrderByWithRelationInput | TransmitterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Transmitters.
+     */
+    cursor?: TransmitterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Transmitters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Transmitters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Transmitters.
+     */
+    distinct?: TransmitterScalarFieldEnum | TransmitterScalarFieldEnum[]
+  }
+
+  /**
+   * Transmitter findMany
+   */
+  export type TransmitterFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter, which Transmitters to fetch.
+     */
+    where?: TransmitterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Transmitters to fetch.
+     */
+    orderBy?: TransmitterOrderByWithRelationInput | TransmitterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Transmitters.
+     */
+    cursor?: TransmitterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Transmitters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Transmitters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Transmitters.
+     */
+    distinct?: TransmitterScalarFieldEnum | TransmitterScalarFieldEnum[]
+  }
+
+  /**
+   * Transmitter create
+   */
+  export type TransmitterCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Transmitter.
+     */
+    data: XOR<TransmitterCreateInput, TransmitterUncheckedCreateInput>
+  }
+
+  /**
+   * Transmitter createMany
+   */
+  export type TransmitterCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Transmitters.
+     */
+    data: TransmitterCreateManyInput | TransmitterCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Transmitter createManyAndReturn
+   */
+  export type TransmitterCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * The data used to create many Transmitters.
+     */
+    data: TransmitterCreateManyInput | TransmitterCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Transmitter update
+   */
+  export type TransmitterUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Transmitter.
+     */
+    data: XOR<TransmitterUpdateInput, TransmitterUncheckedUpdateInput>
+    /**
+     * Choose, which Transmitter to update.
+     */
+    where: TransmitterWhereUniqueInput
+  }
+
+  /**
+   * Transmitter updateMany
+   */
+  export type TransmitterUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Transmitters.
+     */
+    data: XOR<TransmitterUpdateManyMutationInput, TransmitterUncheckedUpdateManyInput>
+    /**
+     * Filter which Transmitters to update
+     */
+    where?: TransmitterWhereInput
+    /**
+     * Limit how many Transmitters to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Transmitter updateManyAndReturn
+   */
+  export type TransmitterUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * The data used to update Transmitters.
+     */
+    data: XOR<TransmitterUpdateManyMutationInput, TransmitterUncheckedUpdateManyInput>
+    /**
+     * Filter which Transmitters to update
+     */
+    where?: TransmitterWhereInput
+    /**
+     * Limit how many Transmitters to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Transmitter upsert
+   */
+  export type TransmitterUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Transmitter to update in case it exists.
+     */
+    where: TransmitterWhereUniqueInput
+    /**
+     * In case the Transmitter found by the `where` argument doesn't exist, create a new Transmitter with this data.
+     */
+    create: XOR<TransmitterCreateInput, TransmitterUncheckedCreateInput>
+    /**
+     * In case the Transmitter was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TransmitterUpdateInput, TransmitterUncheckedUpdateInput>
+  }
+
+  /**
+   * Transmitter delete
+   */
+  export type TransmitterDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+    /**
+     * Filter which Transmitter to delete.
+     */
+    where: TransmitterWhereUniqueInput
+  }
+
+  /**
+   * Transmitter deleteMany
+   */
+  export type TransmitterDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Transmitters to delete
+     */
+    where?: TransmitterWhereInput
+    /**
+     * Limit how many Transmitters to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Transmitter.alarms
+   */
+  export type Transmitter$alarmsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Alarm
+     */
+    select?: AlarmSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Alarm
+     */
+    omit?: AlarmOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AlarmInclude<ExtArgs> | null
+    where?: AlarmWhereInput
+    orderBy?: AlarmOrderByWithRelationInput | AlarmOrderByWithRelationInput[]
+    cursor?: AlarmWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AlarmScalarFieldEnum | AlarmScalarFieldEnum[]
+  }
+
+  /**
+   * Transmitter without action
+   */
+  export type TransmitterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Transmitter
+     */
+    select?: TransmitterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Transmitter
+     */
+    omit?: TransmitterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TransmitterInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Alarm
    */
 
@@ -4163,75 +5389,75 @@ export namespace Prisma {
   }
 
   export type AlarmAvgAggregateOutputType = {
-    priority: number | null
+    shortId: number | null
   }
 
   export type AlarmSumAggregateOutputType = {
-    priority: number | null
+    shortId: number | null
   }
 
   export type AlarmMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     triggeredAt: Date | null
-    alarmType: string | null
-    priority: number | null
-    status: string | null
-    siteId: string | null
+    eventType: string | null
+    source: string | null
+    transmitterId: string | null
   }
 
   export type AlarmMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     triggeredAt: Date | null
-    alarmType: string | null
-    priority: number | null
-    status: string | null
-    siteId: string | null
+    eventType: string | null
+    source: string | null
+    transmitterId: string | null
   }
 
   export type AlarmCountAggregateOutputType = {
     id: number
+    shortId: number
     triggeredAt: number
-    alarmType: number
-    priority: number
-    status: number
-    siteId: number
+    eventType: number
+    source: number
+    transmitterId: number
     _all: number
   }
 
 
   export type AlarmAvgAggregateInputType = {
-    priority?: true
+    shortId?: true
   }
 
   export type AlarmSumAggregateInputType = {
-    priority?: true
+    shortId?: true
   }
 
   export type AlarmMinAggregateInputType = {
     id?: true
+    shortId?: true
     triggeredAt?: true
-    alarmType?: true
-    priority?: true
-    status?: true
-    siteId?: true
+    eventType?: true
+    source?: true
+    transmitterId?: true
   }
 
   export type AlarmMaxAggregateInputType = {
     id?: true
+    shortId?: true
     triggeredAt?: true
-    alarmType?: true
-    priority?: true
-    status?: true
-    siteId?: true
+    eventType?: true
+    source?: true
+    transmitterId?: true
   }
 
   export type AlarmCountAggregateInputType = {
     id?: true
+    shortId?: true
     triggeredAt?: true
-    alarmType?: true
-    priority?: true
-    status?: true
-    siteId?: true
+    eventType?: true
+    source?: true
+    transmitterId?: true
     _all?: true
   }
 
@@ -4323,11 +5549,11 @@ export namespace Prisma {
 
   export type AlarmGroupByOutputType = {
     id: string
+    shortId: number
     triggeredAt: Date
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
+    eventType: string
+    source: string
+    transmitterId: string
     _count: AlarmCountAggregateOutputType | null
     _avg: AlarmAvgAggregateOutputType | null
     _sum: AlarmSumAggregateOutputType | null
@@ -4351,77 +5577,74 @@ export namespace Prisma {
 
   export type AlarmSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     triggeredAt?: boolean
-    alarmType?: boolean
-    priority?: boolean
-    status?: boolean
-    siteId?: boolean
-    site?: boolean | SiteDefaultArgs<ExtArgs>
-    aiCall?: boolean | Alarm$aiCallArgs<ExtArgs>
+    eventType?: boolean
+    source?: boolean
+    transmitterId?: boolean
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
+    aiCalls?: boolean | Alarm$aiCallsArgs<ExtArgs>
     dispatch?: boolean | Alarm$dispatchArgs<ExtArgs>
-    obLogs?: boolean | Alarm$obLogsArgs<ExtArgs>
     _count?: boolean | AlarmCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alarm"]>
 
   export type AlarmSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     triggeredAt?: boolean
-    alarmType?: boolean
-    priority?: boolean
-    status?: boolean
-    siteId?: boolean
-    site?: boolean | SiteDefaultArgs<ExtArgs>
+    eventType?: boolean
+    source?: boolean
+    transmitterId?: boolean
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alarm"]>
 
   export type AlarmSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     triggeredAt?: boolean
-    alarmType?: boolean
-    priority?: boolean
-    status?: boolean
-    siteId?: boolean
-    site?: boolean | SiteDefaultArgs<ExtArgs>
+    eventType?: boolean
+    source?: boolean
+    transmitterId?: boolean
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["alarm"]>
 
   export type AlarmSelectScalar = {
     id?: boolean
+    shortId?: boolean
     triggeredAt?: boolean
-    alarmType?: boolean
-    priority?: boolean
-    status?: boolean
-    siteId?: boolean
+    eventType?: boolean
+    source?: boolean
+    transmitterId?: boolean
   }
 
-  export type AlarmOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "triggeredAt" | "alarmType" | "priority" | "status" | "siteId", ExtArgs["result"]["alarm"]>
+  export type AlarmOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "triggeredAt" | "eventType" | "source" | "transmitterId", ExtArgs["result"]["alarm"]>
   export type AlarmInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    site?: boolean | SiteDefaultArgs<ExtArgs>
-    aiCall?: boolean | Alarm$aiCallArgs<ExtArgs>
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
+    aiCalls?: boolean | Alarm$aiCallsArgs<ExtArgs>
     dispatch?: boolean | Alarm$dispatchArgs<ExtArgs>
-    obLogs?: boolean | Alarm$obLogsArgs<ExtArgs>
     _count?: boolean | AlarmCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AlarmIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    site?: boolean | SiteDefaultArgs<ExtArgs>
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }
   export type AlarmIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    site?: boolean | SiteDefaultArgs<ExtArgs>
+    transmitter?: boolean | TransmitterDefaultArgs<ExtArgs>
   }
 
   export type $AlarmPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Alarm"
     objects: {
-      site: Prisma.$SitePayload<ExtArgs>
-      aiCall: Prisma.$AiCallPayload<ExtArgs> | null
+      transmitter: Prisma.$TransmitterPayload<ExtArgs>
+      aiCalls: Prisma.$AiCallPayload<ExtArgs>[]
       dispatch: Prisma.$DispatchPayload<ExtArgs> | null
-      obLogs: Prisma.$ObLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       triggeredAt: Date
-      alarmType: string
-      priority: number
-      status: string
-      siteId: string
+      eventType: string
+      source: string
+      transmitterId: string
     }, ExtArgs["result"]["alarm"]>
     composites: {}
   }
@@ -4816,10 +6039,9 @@ export namespace Prisma {
    */
   export interface Prisma__AlarmClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    aiCall<T extends Alarm$aiCallArgs<ExtArgs> = {}>(args?: Subset<T, Alarm$aiCallArgs<ExtArgs>>): Prisma__AiCallClient<$Result.GetResult<Prisma.$AiCallPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    transmitter<T extends TransmitterDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TransmitterDefaultArgs<ExtArgs>>): Prisma__TransmitterClient<$Result.GetResult<Prisma.$TransmitterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    aiCalls<T extends Alarm$aiCallsArgs<ExtArgs> = {}>(args?: Subset<T, Alarm$aiCallsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AiCallPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dispatch<T extends Alarm$dispatchArgs<ExtArgs> = {}>(args?: Subset<T, Alarm$dispatchArgs<ExtArgs>>): Prisma__DispatchClient<$Result.GetResult<Prisma.$DispatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    obLogs<T extends Alarm$obLogsArgs<ExtArgs> = {}>(args?: Subset<T, Alarm$obLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4850,11 +6072,11 @@ export namespace Prisma {
    */
   interface AlarmFieldRefs {
     readonly id: FieldRef<"Alarm", 'String'>
+    readonly shortId: FieldRef<"Alarm", 'Int'>
     readonly triggeredAt: FieldRef<"Alarm", 'DateTime'>
-    readonly alarmType: FieldRef<"Alarm", 'String'>
-    readonly priority: FieldRef<"Alarm", 'Int'>
-    readonly status: FieldRef<"Alarm", 'String'>
-    readonly siteId: FieldRef<"Alarm", 'String'>
+    readonly eventType: FieldRef<"Alarm", 'String'>
+    readonly source: FieldRef<"Alarm", 'String'>
+    readonly transmitterId: FieldRef<"Alarm", 'String'>
   }
     
 
@@ -5051,6 +6273,11 @@ export namespace Prisma {
      * Skip the first `n` Alarms.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Alarms.
+     */
     distinct?: AlarmScalarFieldEnum | AlarmScalarFieldEnum[]
   }
 
@@ -5251,9 +6478,9 @@ export namespace Prisma {
   }
 
   /**
-   * Alarm.aiCall
+   * Alarm.aiCalls
    */
-  export type Alarm$aiCallArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Alarm$aiCallsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the AiCall
      */
@@ -5267,6 +6494,11 @@ export namespace Prisma {
      */
     include?: AiCallInclude<ExtArgs> | null
     where?: AiCallWhereInput
+    orderBy?: AiCallOrderByWithRelationInput | AiCallOrderByWithRelationInput[]
+    cursor?: AiCallWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AiCallScalarFieldEnum | AiCallScalarFieldEnum[]
   }
 
   /**
@@ -5286,30 +6518,6 @@ export namespace Prisma {
      */
     include?: DispatchInclude<ExtArgs> | null
     where?: DispatchWhereInput
-  }
-
-  /**
-   * Alarm.obLogs
-   */
-  export type Alarm$obLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ObLog
-     */
-    select?: ObLogSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the ObLog
-     */
-    omit?: ObLogOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: ObLogInclude<ExtArgs> | null
-    where?: ObLogWhereInput
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
-    cursor?: ObLogWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
   }
 
   /**
@@ -5344,75 +6552,103 @@ export namespace Prisma {
   }
 
   export type AiCallAvgAggregateOutputType = {
+    shortId: number | null
     confidenceScore: number | null
   }
 
   export type AiCallSumAggregateOutputType = {
+    shortId: number | null
     confidenceScore: number | null
   }
 
   export type AiCallMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
+    alarmId: string | null
+    calledAt: Date | null
+    callDuration: string | null
+    notes: string | null
     aiDecision: string | null
     confidenceScore: number | null
     evaluatedAt: Date | null
-    notes: string | null
-    alarmId: string | null
+    phone: string | null
   }
 
   export type AiCallMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
+    alarmId: string | null
+    calledAt: Date | null
+    callDuration: string | null
+    notes: string | null
     aiDecision: string | null
     confidenceScore: number | null
     evaluatedAt: Date | null
-    notes: string | null
-    alarmId: string | null
+    phone: string | null
   }
 
   export type AiCallCountAggregateOutputType = {
     id: number
+    shortId: number
+    alarmId: number
+    calledAt: number
+    callDuration: number
+    notes: number
     aiDecision: number
     confidenceScore: number
     evaluatedAt: number
-    notes: number
-    alarmId: number
+    phone: number
     _all: number
   }
 
 
   export type AiCallAvgAggregateInputType = {
+    shortId?: true
     confidenceScore?: true
   }
 
   export type AiCallSumAggregateInputType = {
+    shortId?: true
     confidenceScore?: true
   }
 
   export type AiCallMinAggregateInputType = {
     id?: true
+    shortId?: true
+    alarmId?: true
+    calledAt?: true
+    callDuration?: true
+    notes?: true
     aiDecision?: true
     confidenceScore?: true
     evaluatedAt?: true
-    notes?: true
-    alarmId?: true
+    phone?: true
   }
 
   export type AiCallMaxAggregateInputType = {
     id?: true
+    shortId?: true
+    alarmId?: true
+    calledAt?: true
+    callDuration?: true
+    notes?: true
     aiDecision?: true
     confidenceScore?: true
     evaluatedAt?: true
-    notes?: true
-    alarmId?: true
+    phone?: true
   }
 
   export type AiCallCountAggregateInputType = {
     id?: true
+    shortId?: true
+    alarmId?: true
+    calledAt?: true
+    callDuration?: true
+    notes?: true
     aiDecision?: true
     confidenceScore?: true
     evaluatedAt?: true
-    notes?: true
-    alarmId?: true
+    phone?: true
     _all?: true
   }
 
@@ -5504,11 +6740,15 @@ export namespace Prisma {
 
   export type AiCallGroupByOutputType = {
     id: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date
-    notes: string | null
+    shortId: number
     alarmId: string
+    calledAt: Date
+    callDuration: string | null
+    notes: string | null
+    aiDecision: string | null
+    confidenceScore: number | null
+    evaluatedAt: Date | null
+    phone: string | null
     _count: AiCallCountAggregateOutputType | null
     _avg: AiCallAvgAggregateOutputType | null
     _sum: AiCallSumAggregateOutputType | null
@@ -5532,44 +6772,60 @@ export namespace Prisma {
 
   export type AiCallSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    alarmId?: boolean
+    calledAt?: boolean
+    callDuration?: boolean
+    notes?: boolean
     aiDecision?: boolean
     confidenceScore?: boolean
     evaluatedAt?: boolean
-    notes?: boolean
-    alarmId?: boolean
+    phone?: boolean
     alarm?: boolean | AlarmDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["aiCall"]>
 
   export type AiCallSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    alarmId?: boolean
+    calledAt?: boolean
+    callDuration?: boolean
+    notes?: boolean
     aiDecision?: boolean
     confidenceScore?: boolean
     evaluatedAt?: boolean
-    notes?: boolean
-    alarmId?: boolean
+    phone?: boolean
     alarm?: boolean | AlarmDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["aiCall"]>
 
   export type AiCallSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
+    alarmId?: boolean
+    calledAt?: boolean
+    callDuration?: boolean
+    notes?: boolean
     aiDecision?: boolean
     confidenceScore?: boolean
     evaluatedAt?: boolean
-    notes?: boolean
-    alarmId?: boolean
+    phone?: boolean
     alarm?: boolean | AlarmDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["aiCall"]>
 
   export type AiCallSelectScalar = {
     id?: boolean
+    shortId?: boolean
+    alarmId?: boolean
+    calledAt?: boolean
+    callDuration?: boolean
+    notes?: boolean
     aiDecision?: boolean
     confidenceScore?: boolean
     evaluatedAt?: boolean
-    notes?: boolean
-    alarmId?: boolean
+    phone?: boolean
   }
 
-  export type AiCallOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "aiDecision" | "confidenceScore" | "evaluatedAt" | "notes" | "alarmId", ExtArgs["result"]["aiCall"]>
+  export type AiCallOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "alarmId" | "calledAt" | "callDuration" | "notes" | "aiDecision" | "confidenceScore" | "evaluatedAt" | "phone", ExtArgs["result"]["aiCall"]>
   export type AiCallInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     alarm?: boolean | AlarmDefaultArgs<ExtArgs>
   }
@@ -5587,11 +6843,15 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      aiDecision: string
-      confidenceScore: number
-      evaluatedAt: Date
-      notes: string | null
+      shortId: number
       alarmId: string
+      calledAt: Date
+      callDuration: string | null
+      notes: string | null
+      aiDecision: string | null
+      confidenceScore: number | null
+      evaluatedAt: Date | null
+      phone: string | null
     }, ExtArgs["result"]["aiCall"]>
     composites: {}
   }
@@ -6017,11 +7277,15 @@ export namespace Prisma {
    */
   interface AiCallFieldRefs {
     readonly id: FieldRef<"AiCall", 'String'>
+    readonly shortId: FieldRef<"AiCall", 'Int'>
+    readonly alarmId: FieldRef<"AiCall", 'String'>
+    readonly calledAt: FieldRef<"AiCall", 'DateTime'>
+    readonly callDuration: FieldRef<"AiCall", 'String'>
+    readonly notes: FieldRef<"AiCall", 'String'>
     readonly aiDecision: FieldRef<"AiCall", 'String'>
     readonly confidenceScore: FieldRef<"AiCall", 'Float'>
     readonly evaluatedAt: FieldRef<"AiCall", 'DateTime'>
-    readonly notes: FieldRef<"AiCall", 'String'>
-    readonly alarmId: FieldRef<"AiCall", 'String'>
+    readonly phone: FieldRef<"AiCall", 'String'>
   }
     
 
@@ -6218,6 +7482,11 @@ export namespace Prisma {
      * Skip the first `n` AiCalls.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AiCalls.
+     */
     distinct?: AiCallScalarFieldEnum | AiCallScalarFieldEnum[]
   }
 
@@ -6442,12 +7711,23 @@ export namespace Prisma {
 
   export type AggregateDispatch = {
     _count: DispatchCountAggregateOutputType | null
+    _avg: DispatchAvgAggregateOutputType | null
+    _sum: DispatchSumAggregateOutputType | null
     _min: DispatchMinAggregateOutputType | null
     _max: DispatchMaxAggregateOutputType | null
   }
 
+  export type DispatchAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type DispatchSumAggregateOutputType = {
+    shortId: number | null
+  }
+
   export type DispatchMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     dispatchedAt: Date | null
     arrivalTime: Date | null
     resolvedAt: Date | null
@@ -6459,6 +7739,7 @@ export namespace Prisma {
 
   export type DispatchMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     dispatchedAt: Date | null
     arrivalTime: Date | null
     resolvedAt: Date | null
@@ -6470,6 +7751,7 @@ export namespace Prisma {
 
   export type DispatchCountAggregateOutputType = {
     id: number
+    shortId: number
     dispatchedAt: number
     arrivalTime: number
     resolvedAt: number
@@ -6481,8 +7763,17 @@ export namespace Prisma {
   }
 
 
+  export type DispatchAvgAggregateInputType = {
+    shortId?: true
+  }
+
+  export type DispatchSumAggregateInputType = {
+    shortId?: true
+  }
+
   export type DispatchMinAggregateInputType = {
     id?: true
+    shortId?: true
     dispatchedAt?: true
     arrivalTime?: true
     resolvedAt?: true
@@ -6494,6 +7785,7 @@ export namespace Prisma {
 
   export type DispatchMaxAggregateInputType = {
     id?: true
+    shortId?: true
     dispatchedAt?: true
     arrivalTime?: true
     resolvedAt?: true
@@ -6505,6 +7797,7 @@ export namespace Prisma {
 
   export type DispatchCountAggregateInputType = {
     id?: true
+    shortId?: true
     dispatchedAt?: true
     arrivalTime?: true
     resolvedAt?: true
@@ -6553,6 +7846,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: DispatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DispatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: DispatchMinAggregateInputType
@@ -6583,12 +7888,15 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: DispatchCountAggregateInputType | true
+    _avg?: DispatchAvgAggregateInputType
+    _sum?: DispatchSumAggregateInputType
     _min?: DispatchMinAggregateInputType
     _max?: DispatchMaxAggregateInputType
   }
 
   export type DispatchGroupByOutputType = {
     id: string
+    shortId: number
     dispatchedAt: Date
     arrivalTime: Date | null
     resolvedAt: Date | null
@@ -6597,6 +7905,8 @@ export namespace Prisma {
     guardId: string | null
     vehicleId: string | null
     _count: DispatchCountAggregateOutputType | null
+    _avg: DispatchAvgAggregateOutputType | null
+    _sum: DispatchSumAggregateOutputType | null
     _min: DispatchMinAggregateOutputType | null
     _max: DispatchMaxAggregateOutputType | null
   }
@@ -6617,6 +7927,7 @@ export namespace Prisma {
 
   export type DispatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     dispatchedAt?: boolean
     arrivalTime?: boolean
     resolvedAt?: boolean
@@ -6631,6 +7942,7 @@ export namespace Prisma {
 
   export type DispatchSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     dispatchedAt?: boolean
     arrivalTime?: boolean
     resolvedAt?: boolean
@@ -6645,6 +7957,7 @@ export namespace Prisma {
 
   export type DispatchSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     dispatchedAt?: boolean
     arrivalTime?: boolean
     resolvedAt?: boolean
@@ -6659,6 +7972,7 @@ export namespace Prisma {
 
   export type DispatchSelectScalar = {
     id?: boolean
+    shortId?: boolean
     dispatchedAt?: boolean
     arrivalTime?: boolean
     resolvedAt?: boolean
@@ -6668,7 +7982,7 @@ export namespace Prisma {
     vehicleId?: boolean
   }
 
-  export type DispatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dispatchedAt" | "arrivalTime" | "resolvedAt" | "responseNotes" | "alarmId" | "guardId" | "vehicleId", ExtArgs["result"]["dispatch"]>
+  export type DispatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "dispatchedAt" | "arrivalTime" | "resolvedAt" | "responseNotes" | "alarmId" | "guardId" | "vehicleId", ExtArgs["result"]["dispatch"]>
   export type DispatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     alarm?: boolean | AlarmDefaultArgs<ExtArgs>
     guard?: boolean | Dispatch$guardArgs<ExtArgs>
@@ -6694,6 +8008,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       dispatchedAt: Date
       arrivalTime: Date | null
       resolvedAt: Date | null
@@ -7128,6 +8443,7 @@ export namespace Prisma {
    */
   interface DispatchFieldRefs {
     readonly id: FieldRef<"Dispatch", 'String'>
+    readonly shortId: FieldRef<"Dispatch", 'Int'>
     readonly dispatchedAt: FieldRef<"Dispatch", 'DateTime'>
     readonly arrivalTime: FieldRef<"Dispatch", 'DateTime'>
     readonly resolvedAt: FieldRef<"Dispatch", 'DateTime'>
@@ -7331,6 +8647,11 @@ export namespace Prisma {
      * Skip the first `n` Dispatches.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Dispatches.
+     */
     distinct?: DispatchScalarFieldEnum | DispatchScalarFieldEnum[]
   }
 
@@ -7588,388 +8909,415 @@ export namespace Prisma {
 
 
   /**
-   * Model ObLog
+   * Model OBLog
    */
 
-  export type AggregateObLog = {
-    _count: ObLogCountAggregateOutputType | null
-    _min: ObLogMinAggregateOutputType | null
-    _max: ObLogMaxAggregateOutputType | null
+  export type AggregateOBLog = {
+    _count: OBLogCountAggregateOutputType | null
+    _avg: OBLogAvgAggregateOutputType | null
+    _sum: OBLogSumAggregateOutputType | null
+    _min: OBLogMinAggregateOutputType | null
+    _max: OBLogMaxAggregateOutputType | null
   }
 
-  export type ObLogMinAggregateOutputType = {
+  export type OBLogAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type OBLogSumAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type OBLogMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     logTime: Date | null
-    message: string | null
-    source: string | null
-    alarmId: string | null
-    siteId: string | null
     guardId: string | null
+    siteId: string | null
+    actionLog: string | null
+    notes: string | null
   }
 
-  export type ObLogMaxAggregateOutputType = {
+  export type OBLogMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     logTime: Date | null
-    message: string | null
-    source: string | null
-    alarmId: string | null
-    siteId: string | null
     guardId: string | null
+    siteId: string | null
+    actionLog: string | null
+    notes: string | null
   }
 
-  export type ObLogCountAggregateOutputType = {
+  export type OBLogCountAggregateOutputType = {
     id: number
+    shortId: number
     logTime: number
-    message: number
-    source: number
-    alarmId: number
-    siteId: number
     guardId: number
+    siteId: number
+    actionLog: number
+    notes: number
     _all: number
   }
 
 
-  export type ObLogMinAggregateInputType = {
-    id?: true
-    logTime?: true
-    message?: true
-    source?: true
-    alarmId?: true
-    siteId?: true
-    guardId?: true
+  export type OBLogAvgAggregateInputType = {
+    shortId?: true
   }
 
-  export type ObLogMaxAggregateInputType = {
-    id?: true
-    logTime?: true
-    message?: true
-    source?: true
-    alarmId?: true
-    siteId?: true
-    guardId?: true
+  export type OBLogSumAggregateInputType = {
+    shortId?: true
   }
 
-  export type ObLogCountAggregateInputType = {
+  export type OBLogMinAggregateInputType = {
     id?: true
+    shortId?: true
     logTime?: true
-    message?: true
-    source?: true
-    alarmId?: true
-    siteId?: true
     guardId?: true
+    siteId?: true
+    actionLog?: true
+    notes?: true
+  }
+
+  export type OBLogMaxAggregateInputType = {
+    id?: true
+    shortId?: true
+    logTime?: true
+    guardId?: true
+    siteId?: true
+    actionLog?: true
+    notes?: true
+  }
+
+  export type OBLogCountAggregateInputType = {
+    id?: true
+    shortId?: true
+    logTime?: true
+    guardId?: true
+    siteId?: true
+    actionLog?: true
+    notes?: true
     _all?: true
   }
 
-  export type ObLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which ObLog to aggregate.
+     * Filter which OBLog to aggregate.
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ObLogs to fetch.
+     * Determine the order of OBLogs to fetch.
      */
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: ObLogWhereUniqueInput
+    cursor?: OBLogWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ObLogs from the position of the cursor.
+     * Take `±n` OBLogs from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ObLogs.
+     * Skip the first `n` OBLogs.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned ObLogs
+     * Count returned OBLogs
     **/
-    _count?: true | ObLogCountAggregateInputType
+    _count?: true | OBLogCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: OBLogAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: OBLogSumAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: ObLogMinAggregateInputType
+    _min?: OBLogMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: ObLogMaxAggregateInputType
+    _max?: OBLogMaxAggregateInputType
   }
 
-  export type GetObLogAggregateType<T extends ObLogAggregateArgs> = {
-        [P in keyof T & keyof AggregateObLog]: P extends '_count' | 'count'
+  export type GetOBLogAggregateType<T extends OBLogAggregateArgs> = {
+        [P in keyof T & keyof AggregateOBLog]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateObLog[P]>
-      : GetScalarType<T[P], AggregateObLog[P]>
+        : GetScalarType<T[P], AggregateOBLog[P]>
+      : GetScalarType<T[P], AggregateOBLog[P]>
   }
 
 
 
 
-  export type ObLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ObLogWhereInput
-    orderBy?: ObLogOrderByWithAggregationInput | ObLogOrderByWithAggregationInput[]
-    by: ObLogScalarFieldEnum[] | ObLogScalarFieldEnum
-    having?: ObLogScalarWhereWithAggregatesInput
+  export type OBLogGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OBLogWhereInput
+    orderBy?: OBLogOrderByWithAggregationInput | OBLogOrderByWithAggregationInput[]
+    by: OBLogScalarFieldEnum[] | OBLogScalarFieldEnum
+    having?: OBLogScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: ObLogCountAggregateInputType | true
-    _min?: ObLogMinAggregateInputType
-    _max?: ObLogMaxAggregateInputType
+    _count?: OBLogCountAggregateInputType | true
+    _avg?: OBLogAvgAggregateInputType
+    _sum?: OBLogSumAggregateInputType
+    _min?: OBLogMinAggregateInputType
+    _max?: OBLogMaxAggregateInputType
   }
 
-  export type ObLogGroupByOutputType = {
+  export type OBLogGroupByOutputType = {
     id: string
+    shortId: number
     logTime: Date
-    message: string
-    source: string
-    alarmId: string | null
-    siteId: string | null
     guardId: string | null
-    _count: ObLogCountAggregateOutputType | null
-    _min: ObLogMinAggregateOutputType | null
-    _max: ObLogMaxAggregateOutputType | null
+    siteId: string | null
+    actionLog: string
+    notes: string
+    _count: OBLogCountAggregateOutputType | null
+    _avg: OBLogAvgAggregateOutputType | null
+    _sum: OBLogSumAggregateOutputType | null
+    _min: OBLogMinAggregateOutputType | null
+    _max: OBLogMaxAggregateOutputType | null
   }
 
-  type GetObLogGroupByPayload<T extends ObLogGroupByArgs> = Prisma.PrismaPromise<
+  type GetOBLogGroupByPayload<T extends OBLogGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<ObLogGroupByOutputType, T['by']> &
+      PickEnumerable<OBLogGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof ObLogGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof OBLogGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], ObLogGroupByOutputType[P]>
-            : GetScalarType<T[P], ObLogGroupByOutputType[P]>
+              : GetScalarType<T[P], OBLogGroupByOutputType[P]>
+            : GetScalarType<T[P], OBLogGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type ObLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type OBLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     logTime?: boolean
-    message?: boolean
-    source?: boolean
-    alarmId?: boolean
-    siteId?: boolean
     guardId?: boolean
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
-  }, ExtArgs["result"]["obLog"]>
+    siteId?: boolean
+    actionLog?: boolean
+    notes?: boolean
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
+  }, ExtArgs["result"]["oBLog"]>
 
-  export type ObLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type OBLogSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     logTime?: boolean
-    message?: boolean
-    source?: boolean
-    alarmId?: boolean
-    siteId?: boolean
     guardId?: boolean
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
-  }, ExtArgs["result"]["obLog"]>
+    siteId?: boolean
+    actionLog?: boolean
+    notes?: boolean
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
+  }, ExtArgs["result"]["oBLog"]>
 
-  export type ObLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type OBLogSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     logTime?: boolean
-    message?: boolean
-    source?: boolean
-    alarmId?: boolean
-    siteId?: boolean
     guardId?: boolean
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
-  }, ExtArgs["result"]["obLog"]>
+    siteId?: boolean
+    actionLog?: boolean
+    notes?: boolean
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
+  }, ExtArgs["result"]["oBLog"]>
 
-  export type ObLogSelectScalar = {
+  export type OBLogSelectScalar = {
     id?: boolean
+    shortId?: boolean
     logTime?: boolean
-    message?: boolean
-    source?: boolean
-    alarmId?: boolean
-    siteId?: boolean
     guardId?: boolean
+    siteId?: boolean
+    actionLog?: boolean
+    notes?: boolean
   }
 
-  export type ObLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "logTime" | "message" | "source" | "alarmId" | "siteId" | "guardId", ExtArgs["result"]["obLog"]>
-  export type ObLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
+  export type OBLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "logTime" | "guardId" | "siteId" | "actionLog" | "notes", ExtArgs["result"]["oBLog"]>
+  export type OBLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
   }
-  export type ObLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
+  export type OBLogIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
   }
-  export type ObLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    alarm?: boolean | ObLog$alarmArgs<ExtArgs>
-    site?: boolean | ObLog$siteArgs<ExtArgs>
-    guard?: boolean | ObLog$guardArgs<ExtArgs>
+  export type OBLogIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    guard?: boolean | OBLog$guardArgs<ExtArgs>
+    site?: boolean | OBLog$siteArgs<ExtArgs>
   }
 
-  export type $ObLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "ObLog"
+  export type $OBLogPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "OBLog"
     objects: {
-      alarm: Prisma.$AlarmPayload<ExtArgs> | null
-      site: Prisma.$SitePayload<ExtArgs> | null
       guard: Prisma.$GuardPayload<ExtArgs> | null
+      site: Prisma.$SitePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       logTime: Date
-      message: string
-      source: string
-      alarmId: string | null
-      siteId: string | null
       guardId: string | null
-    }, ExtArgs["result"]["obLog"]>
+      siteId: string | null
+      actionLog: string
+      notes: string
+    }, ExtArgs["result"]["oBLog"]>
     composites: {}
   }
 
-  type ObLogGetPayload<S extends boolean | null | undefined | ObLogDefaultArgs> = $Result.GetResult<Prisma.$ObLogPayload, S>
+  type OBLogGetPayload<S extends boolean | null | undefined | OBLogDefaultArgs> = $Result.GetResult<Prisma.$OBLogPayload, S>
 
-  type ObLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<ObLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: ObLogCountAggregateInputType | true
+  type OBLogCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<OBLogFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: OBLogCountAggregateInputType | true
     }
 
-  export interface ObLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ObLog'], meta: { name: 'ObLog' } }
+  export interface OBLogDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['OBLog'], meta: { name: 'OBLog' } }
     /**
-     * Find zero or one ObLog that matches the filter.
-     * @param {ObLogFindUniqueArgs} args - Arguments to find a ObLog
+     * Find zero or one OBLog that matches the filter.
+     * @param {OBLogFindUniqueArgs} args - Arguments to find a OBLog
      * @example
-     * // Get one ObLog
-     * const obLog = await prisma.obLog.findUnique({
+     * // Get one OBLog
+     * const oBLog = await prisma.oBLog.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends ObLogFindUniqueArgs>(args: SelectSubset<T, ObLogFindUniqueArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends OBLogFindUniqueArgs>(args: SelectSubset<T, OBLogFindUniqueArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one ObLog that matches the filter or throw an error with `error.code='P2025'`
+     * Find one OBLog that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {ObLogFindUniqueOrThrowArgs} args - Arguments to find a ObLog
+     * @param {OBLogFindUniqueOrThrowArgs} args - Arguments to find a OBLog
      * @example
-     * // Get one ObLog
-     * const obLog = await prisma.obLog.findUniqueOrThrow({
+     * // Get one OBLog
+     * const oBLog = await prisma.oBLog.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends ObLogFindUniqueOrThrowArgs>(args: SelectSubset<T, ObLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends OBLogFindUniqueOrThrowArgs>(args: SelectSubset<T, OBLogFindUniqueOrThrowArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first ObLog that matches the filter.
+     * Find the first OBLog that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogFindFirstArgs} args - Arguments to find a ObLog
+     * @param {OBLogFindFirstArgs} args - Arguments to find a OBLog
      * @example
-     * // Get one ObLog
-     * const obLog = await prisma.obLog.findFirst({
+     * // Get one OBLog
+     * const oBLog = await prisma.oBLog.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends ObLogFindFirstArgs>(args?: SelectSubset<T, ObLogFindFirstArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends OBLogFindFirstArgs>(args?: SelectSubset<T, OBLogFindFirstArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first ObLog that matches the filter or
+     * Find the first OBLog that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogFindFirstOrThrowArgs} args - Arguments to find a ObLog
+     * @param {OBLogFindFirstOrThrowArgs} args - Arguments to find a OBLog
      * @example
-     * // Get one ObLog
-     * const obLog = await prisma.obLog.findFirstOrThrow({
+     * // Get one OBLog
+     * const oBLog = await prisma.oBLog.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends ObLogFindFirstOrThrowArgs>(args?: SelectSubset<T, ObLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends OBLogFindFirstOrThrowArgs>(args?: SelectSubset<T, OBLogFindFirstOrThrowArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more ObLogs that matches the filter.
+     * Find zero or more OBLogs that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {OBLogFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all ObLogs
-     * const obLogs = await prisma.obLog.findMany()
+     * // Get all OBLogs
+     * const oBLogs = await prisma.oBLog.findMany()
      * 
-     * // Get first 10 ObLogs
-     * const obLogs = await prisma.obLog.findMany({ take: 10 })
+     * // Get first 10 OBLogs
+     * const oBLogs = await prisma.oBLog.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const obLogWithIdOnly = await prisma.obLog.findMany({ select: { id: true } })
+     * const oBLogWithIdOnly = await prisma.oBLog.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends ObLogFindManyArgs>(args?: SelectSubset<T, ObLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends OBLogFindManyArgs>(args?: SelectSubset<T, OBLogFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a ObLog.
-     * @param {ObLogCreateArgs} args - Arguments to create a ObLog.
+     * Create a OBLog.
+     * @param {OBLogCreateArgs} args - Arguments to create a OBLog.
      * @example
-     * // Create one ObLog
-     * const ObLog = await prisma.obLog.create({
+     * // Create one OBLog
+     * const OBLog = await prisma.oBLog.create({
      *   data: {
-     *     // ... data to create a ObLog
+     *     // ... data to create a OBLog
      *   }
      * })
      * 
      */
-    create<T extends ObLogCreateArgs>(args: SelectSubset<T, ObLogCreateArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends OBLogCreateArgs>(args: SelectSubset<T, OBLogCreateArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many ObLogs.
-     * @param {ObLogCreateManyArgs} args - Arguments to create many ObLogs.
+     * Create many OBLogs.
+     * @param {OBLogCreateManyArgs} args - Arguments to create many OBLogs.
      * @example
-     * // Create many ObLogs
-     * const obLog = await prisma.obLog.createMany({
+     * // Create many OBLogs
+     * const oBLog = await prisma.oBLog.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends ObLogCreateManyArgs>(args?: SelectSubset<T, ObLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends OBLogCreateManyArgs>(args?: SelectSubset<T, OBLogCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many ObLogs and returns the data saved in the database.
-     * @param {ObLogCreateManyAndReturnArgs} args - Arguments to create many ObLogs.
+     * Create many OBLogs and returns the data saved in the database.
+     * @param {OBLogCreateManyAndReturnArgs} args - Arguments to create many OBLogs.
      * @example
-     * // Create many ObLogs
-     * const obLog = await prisma.obLog.createManyAndReturn({
+     * // Create many OBLogs
+     * const oBLog = await prisma.oBLog.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many ObLogs and only return the `id`
-     * const obLogWithIdOnly = await prisma.obLog.createManyAndReturn({
+     * // Create many OBLogs and only return the `id`
+     * const oBLogWithIdOnly = await prisma.oBLog.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -7979,28 +9327,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends ObLogCreateManyAndReturnArgs>(args?: SelectSubset<T, ObLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends OBLogCreateManyAndReturnArgs>(args?: SelectSubset<T, OBLogCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a ObLog.
-     * @param {ObLogDeleteArgs} args - Arguments to delete one ObLog.
+     * Delete a OBLog.
+     * @param {OBLogDeleteArgs} args - Arguments to delete one OBLog.
      * @example
-     * // Delete one ObLog
-     * const ObLog = await prisma.obLog.delete({
+     * // Delete one OBLog
+     * const OBLog = await prisma.oBLog.delete({
      *   where: {
-     *     // ... filter to delete one ObLog
+     *     // ... filter to delete one OBLog
      *   }
      * })
      * 
      */
-    delete<T extends ObLogDeleteArgs>(args: SelectSubset<T, ObLogDeleteArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends OBLogDeleteArgs>(args: SelectSubset<T, OBLogDeleteArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one ObLog.
-     * @param {ObLogUpdateArgs} args - Arguments to update one ObLog.
+     * Update one OBLog.
+     * @param {OBLogUpdateArgs} args - Arguments to update one OBLog.
      * @example
-     * // Update one ObLog
-     * const obLog = await prisma.obLog.update({
+     * // Update one OBLog
+     * const oBLog = await prisma.oBLog.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8010,30 +9358,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends ObLogUpdateArgs>(args: SelectSubset<T, ObLogUpdateArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends OBLogUpdateArgs>(args: SelectSubset<T, OBLogUpdateArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more ObLogs.
-     * @param {ObLogDeleteManyArgs} args - Arguments to filter ObLogs to delete.
+     * Delete zero or more OBLogs.
+     * @param {OBLogDeleteManyArgs} args - Arguments to filter OBLogs to delete.
      * @example
-     * // Delete a few ObLogs
-     * const { count } = await prisma.obLog.deleteMany({
+     * // Delete a few OBLogs
+     * const { count } = await prisma.oBLog.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends ObLogDeleteManyArgs>(args?: SelectSubset<T, ObLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends OBLogDeleteManyArgs>(args?: SelectSubset<T, OBLogDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more ObLogs.
+     * Update zero or more OBLogs.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {OBLogUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many ObLogs
-     * const obLog = await prisma.obLog.updateMany({
+     * // Update many OBLogs
+     * const oBLog = await prisma.oBLog.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8043,14 +9391,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends ObLogUpdateManyArgs>(args: SelectSubset<T, ObLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends OBLogUpdateManyArgs>(args: SelectSubset<T, OBLogUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more ObLogs and returns the data updated in the database.
-     * @param {ObLogUpdateManyAndReturnArgs} args - Arguments to update many ObLogs.
+     * Update zero or more OBLogs and returns the data updated in the database.
+     * @param {OBLogUpdateManyAndReturnArgs} args - Arguments to update many OBLogs.
      * @example
-     * // Update many ObLogs
-     * const obLog = await prisma.obLog.updateManyAndReturn({
+     * // Update many OBLogs
+     * const oBLog = await prisma.oBLog.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -8059,8 +9407,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more ObLogs and only return the `id`
-     * const obLogWithIdOnly = await prisma.obLog.updateManyAndReturn({
+     * // Update zero or more OBLogs and only return the `id`
+     * const oBLogWithIdOnly = await prisma.oBLog.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -8073,56 +9421,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends ObLogUpdateManyAndReturnArgs>(args: SelectSubset<T, ObLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends OBLogUpdateManyAndReturnArgs>(args: SelectSubset<T, OBLogUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one ObLog.
-     * @param {ObLogUpsertArgs} args - Arguments to update or create a ObLog.
+     * Create or update one OBLog.
+     * @param {OBLogUpsertArgs} args - Arguments to update or create a OBLog.
      * @example
-     * // Update or create a ObLog
-     * const obLog = await prisma.obLog.upsert({
+     * // Update or create a OBLog
+     * const oBLog = await prisma.oBLog.upsert({
      *   create: {
-     *     // ... data to create a ObLog
+     *     // ... data to create a OBLog
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the ObLog we want to update
+     *     // ... the filter for the OBLog we want to update
      *   }
      * })
      */
-    upsert<T extends ObLogUpsertArgs>(args: SelectSubset<T, ObLogUpsertArgs<ExtArgs>>): Prisma__ObLogClient<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends OBLogUpsertArgs>(args: SelectSubset<T, OBLogUpsertArgs<ExtArgs>>): Prisma__OBLogClient<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of ObLogs.
+     * Count the number of OBLogs.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogCountArgs} args - Arguments to filter ObLogs to count.
+     * @param {OBLogCountArgs} args - Arguments to filter OBLogs to count.
      * @example
-     * // Count the number of ObLogs
-     * const count = await prisma.obLog.count({
+     * // Count the number of OBLogs
+     * const count = await prisma.oBLog.count({
      *   where: {
-     *     // ... the filter for the ObLogs we want to count
+     *     // ... the filter for the OBLogs we want to count
      *   }
      * })
     **/
-    count<T extends ObLogCountArgs>(
-      args?: Subset<T, ObLogCountArgs>,
+    count<T extends OBLogCountArgs>(
+      args?: Subset<T, OBLogCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], ObLogCountAggregateOutputType>
+          : GetScalarType<T['select'], OBLogCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a ObLog.
+     * Allows you to perform aggregations operations on a OBLog.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {OBLogAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -8142,13 +9490,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends ObLogAggregateArgs>(args: Subset<T, ObLogAggregateArgs>): Prisma.PrismaPromise<GetObLogAggregateType<T>>
+    aggregate<T extends OBLogAggregateArgs>(args: Subset<T, OBLogAggregateArgs>): Prisma.PrismaPromise<GetOBLogAggregateType<T>>
 
     /**
-     * Group by ObLog.
+     * Group by OBLog.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {ObLogGroupByArgs} args - Group by arguments.
+     * @param {OBLogGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -8163,14 +9511,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends ObLogGroupByArgs,
+      T extends OBLogGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: ObLogGroupByArgs['orderBy'] }
-        : { orderBy?: ObLogGroupByArgs['orderBy'] },
+        ? { orderBy: OBLogGroupByArgs['orderBy'] }
+        : { orderBy?: OBLogGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -8219,24 +9567,23 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, ObLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetObLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, OBLogGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetOBLogGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the ObLog model
+   * Fields of the OBLog model
    */
-  readonly fields: ObLogFieldRefs;
+  readonly fields: OBLogFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for ObLog.
+   * The delegate class that acts as a "Promise-like" for OBLog.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__ObLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__OBLogClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    alarm<T extends ObLog$alarmArgs<ExtArgs> = {}>(args?: Subset<T, ObLog$alarmArgs<ExtArgs>>): Prisma__AlarmClient<$Result.GetResult<Prisma.$AlarmPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    site<T extends ObLog$siteArgs<ExtArgs> = {}>(args?: Subset<T, ObLog$siteArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    guard<T extends ObLog$guardArgs<ExtArgs> = {}>(args?: Subset<T, ObLog$guardArgs<ExtArgs>>): Prisma__GuardClient<$Result.GetResult<Prisma.$GuardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    guard<T extends OBLog$guardArgs<ExtArgs> = {}>(args?: Subset<T, OBLog$guardArgs<ExtArgs>>): Prisma__GuardClient<$Result.GetResult<Prisma.$GuardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    site<T extends OBLog$siteArgs<ExtArgs> = {}>(args?: Subset<T, OBLog$siteArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8263,453 +9610,420 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the ObLog model
+   * Fields of the OBLog model
    */
-  interface ObLogFieldRefs {
-    readonly id: FieldRef<"ObLog", 'String'>
-    readonly logTime: FieldRef<"ObLog", 'DateTime'>
-    readonly message: FieldRef<"ObLog", 'String'>
-    readonly source: FieldRef<"ObLog", 'String'>
-    readonly alarmId: FieldRef<"ObLog", 'String'>
-    readonly siteId: FieldRef<"ObLog", 'String'>
-    readonly guardId: FieldRef<"ObLog", 'String'>
+  interface OBLogFieldRefs {
+    readonly id: FieldRef<"OBLog", 'String'>
+    readonly shortId: FieldRef<"OBLog", 'Int'>
+    readonly logTime: FieldRef<"OBLog", 'DateTime'>
+    readonly guardId: FieldRef<"OBLog", 'String'>
+    readonly siteId: FieldRef<"OBLog", 'String'>
+    readonly actionLog: FieldRef<"OBLog", 'String'>
+    readonly notes: FieldRef<"OBLog", 'String'>
   }
     
 
   // Custom InputTypes
   /**
-   * ObLog findUnique
+   * OBLog findUnique
    */
-  export type ObLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter, which ObLog to fetch.
+     * Filter, which OBLog to fetch.
      */
-    where: ObLogWhereUniqueInput
+    where: OBLogWhereUniqueInput
   }
 
   /**
-   * ObLog findUniqueOrThrow
+   * OBLog findUniqueOrThrow
    */
-  export type ObLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter, which ObLog to fetch.
+     * Filter, which OBLog to fetch.
      */
-    where: ObLogWhereUniqueInput
+    where: OBLogWhereUniqueInput
   }
 
   /**
-   * ObLog findFirst
+   * OBLog findFirst
    */
-  export type ObLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter, which ObLog to fetch.
+     * Filter, which OBLog to fetch.
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ObLogs to fetch.
+     * Determine the order of OBLogs to fetch.
      */
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for ObLogs.
+     * Sets the position for searching for OBLogs.
      */
-    cursor?: ObLogWhereUniqueInput
+    cursor?: OBLogWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ObLogs from the position of the cursor.
+     * Take `±n` OBLogs from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ObLogs.
+     * Skip the first `n` OBLogs.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of ObLogs.
+     * Filter by unique combinations of OBLogs.
      */
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
+    distinct?: OBLogScalarFieldEnum | OBLogScalarFieldEnum[]
   }
 
   /**
-   * ObLog findFirstOrThrow
+   * OBLog findFirstOrThrow
    */
-  export type ObLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter, which ObLog to fetch.
+     * Filter, which OBLog to fetch.
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ObLogs to fetch.
+     * Determine the order of OBLogs to fetch.
      */
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for ObLogs.
+     * Sets the position for searching for OBLogs.
      */
-    cursor?: ObLogWhereUniqueInput
+    cursor?: OBLogWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ObLogs from the position of the cursor.
+     * Take `±n` OBLogs from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ObLogs.
+     * Skip the first `n` OBLogs.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of ObLogs.
+     * Filter by unique combinations of OBLogs.
      */
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
+    distinct?: OBLogScalarFieldEnum | OBLogScalarFieldEnum[]
   }
 
   /**
-   * ObLog findMany
+   * OBLog findMany
    */
-  export type ObLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter, which ObLogs to fetch.
+     * Filter, which OBLogs to fetch.
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of ObLogs to fetch.
+     * Determine the order of OBLogs to fetch.
      */
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing ObLogs.
+     * Sets the position for listing OBLogs.
      */
-    cursor?: ObLogWhereUniqueInput
+    cursor?: OBLogWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` ObLogs from the position of the cursor.
+     * Take `±n` OBLogs from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` ObLogs.
+     * Skip the first `n` OBLogs.
      */
     skip?: number
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of OBLogs.
+     */
+    distinct?: OBLogScalarFieldEnum | OBLogScalarFieldEnum[]
   }
 
   /**
-   * ObLog create
+   * OBLog create
    */
-  export type ObLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * The data needed to create a ObLog.
+     * The data needed to create a OBLog.
      */
-    data: XOR<ObLogCreateInput, ObLogUncheckedCreateInput>
+    data: XOR<OBLogCreateInput, OBLogUncheckedCreateInput>
   }
 
   /**
-   * ObLog createMany
+   * OBLog createMany
    */
-  export type ObLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many ObLogs.
+     * The data used to create many OBLogs.
      */
-    data: ObLogCreateManyInput | ObLogCreateManyInput[]
+    data: OBLogCreateManyInput | OBLogCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * ObLog createManyAndReturn
+   * OBLog createManyAndReturn
    */
-  export type ObLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelectCreateManyAndReturn<ExtArgs> | null
+    select?: OBLogSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
-     * The data used to create many ObLogs.
+     * The data used to create many OBLogs.
      */
-    data: ObLogCreateManyInput | ObLogCreateManyInput[]
+    data: OBLogCreateManyInput | OBLogCreateManyInput[]
     skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogIncludeCreateManyAndReturn<ExtArgs> | null
+    include?: OBLogIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * ObLog update
+   * OBLog update
    */
-  export type ObLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * The data needed to update a ObLog.
+     * The data needed to update a OBLog.
      */
-    data: XOR<ObLogUpdateInput, ObLogUncheckedUpdateInput>
+    data: XOR<OBLogUpdateInput, OBLogUncheckedUpdateInput>
     /**
-     * Choose, which ObLog to update.
+     * Choose, which OBLog to update.
      */
-    where: ObLogWhereUniqueInput
+    where: OBLogWhereUniqueInput
   }
 
   /**
-   * ObLog updateMany
+   * OBLog updateMany
    */
-  export type ObLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update ObLogs.
+     * The data used to update OBLogs.
      */
-    data: XOR<ObLogUpdateManyMutationInput, ObLogUncheckedUpdateManyInput>
+    data: XOR<OBLogUpdateManyMutationInput, OBLogUncheckedUpdateManyInput>
     /**
-     * Filter which ObLogs to update
+     * Filter which OBLogs to update
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
-     * Limit how many ObLogs to update.
+     * Limit how many OBLogs to update.
      */
     limit?: number
   }
 
   /**
-   * ObLog updateManyAndReturn
+   * OBLog updateManyAndReturn
    */
-  export type ObLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: OBLogSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
-     * The data used to update ObLogs.
+     * The data used to update OBLogs.
      */
-    data: XOR<ObLogUpdateManyMutationInput, ObLogUncheckedUpdateManyInput>
+    data: XOR<OBLogUpdateManyMutationInput, OBLogUncheckedUpdateManyInput>
     /**
-     * Filter which ObLogs to update
+     * Filter which OBLogs to update
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
-     * Limit how many ObLogs to update.
+     * Limit how many OBLogs to update.
      */
     limit?: number
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogIncludeUpdateManyAndReturn<ExtArgs> | null
+    include?: OBLogIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
-   * ObLog upsert
+   * OBLog upsert
    */
-  export type ObLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * The filter to search for the ObLog to update in case it exists.
+     * The filter to search for the OBLog to update in case it exists.
      */
-    where: ObLogWhereUniqueInput
+    where: OBLogWhereUniqueInput
     /**
-     * In case the ObLog found by the `where` argument doesn't exist, create a new ObLog with this data.
+     * In case the OBLog found by the `where` argument doesn't exist, create a new OBLog with this data.
      */
-    create: XOR<ObLogCreateInput, ObLogUncheckedCreateInput>
+    create: XOR<OBLogCreateInput, OBLogUncheckedCreateInput>
     /**
-     * In case the ObLog was found with the provided `where` argument, update it with this data.
+     * In case the OBLog was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<ObLogUpdateInput, ObLogUncheckedUpdateInput>
+    update: XOR<OBLogUpdateInput, OBLogUncheckedUpdateInput>
   }
 
   /**
-   * ObLog delete
+   * OBLog delete
    */
-  export type ObLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: OBLogInclude<ExtArgs> | null
     /**
-     * Filter which ObLog to delete.
+     * Filter which OBLog to delete.
      */
-    where: ObLogWhereUniqueInput
+    where: OBLogWhereUniqueInput
   }
 
   /**
-   * ObLog deleteMany
+   * OBLog deleteMany
    */
-  export type ObLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLogDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which ObLogs to delete
+     * Filter which OBLogs to delete
      */
-    where?: ObLogWhereInput
+    where?: OBLogWhereInput
     /**
-     * Limit how many ObLogs to delete.
+     * Limit how many OBLogs to delete.
      */
     limit?: number
   }
 
   /**
-   * ObLog.alarm
+   * OBLog.guard
    */
-  export type ObLog$alarmArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Alarm
-     */
-    select?: AlarmSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Alarm
-     */
-    omit?: AlarmOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: AlarmInclude<ExtArgs> | null
-    where?: AlarmWhereInput
-  }
-
-  /**
-   * ObLog.site
-   */
-  export type ObLog$siteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Site
-     */
-    select?: SiteSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Site
-     */
-    omit?: SiteOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: SiteInclude<ExtArgs> | null
-    where?: SiteWhereInput
-  }
-
-  /**
-   * ObLog.guard
-   */
-  export type ObLog$guardArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLog$guardArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Guard
      */
@@ -8726,21 +10040,40 @@ export namespace Prisma {
   }
 
   /**
-   * ObLog without action
+   * OBLog.site
    */
-  export type ObLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type OBLog$siteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the Site
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: SiteSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the Site
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: SiteOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
+    include?: SiteInclude<ExtArgs> | null
+    where?: SiteWhereInput
+  }
+
+  /**
+   * OBLog without action
+   */
+  export type OBLogDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OBLog
+     */
+    select?: OBLogSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OBLog
+     */
+    omit?: OBLogOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OBLogInclude<ExtArgs> | null
   }
 
 
@@ -8750,14 +10083,25 @@ export namespace Prisma {
 
   export type AggregateUser = {
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
 
+  export type UserAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type UserSumAggregateOutputType = {
+    shortId: number | null
+  }
+
   export type UserMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     email: string | null
-    passwordHash: string | null
+    password: string | null
     name: string | null
     createdAt: Date | null
     lastLogin: Date | null
@@ -8766,8 +10110,9 @@ export namespace Prisma {
 
   export type UserMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     email: string | null
-    passwordHash: string | null
+    password: string | null
     name: string | null
     createdAt: Date | null
     lastLogin: Date | null
@@ -8776,8 +10121,9 @@ export namespace Prisma {
 
   export type UserCountAggregateOutputType = {
     id: number
+    shortId: number
     email: number
-    passwordHash: number
+    password: number
     name: number
     createdAt: number
     lastLogin: number
@@ -8786,10 +10132,19 @@ export namespace Prisma {
   }
 
 
+  export type UserAvgAggregateInputType = {
+    shortId?: true
+  }
+
+  export type UserSumAggregateInputType = {
+    shortId?: true
+  }
+
   export type UserMinAggregateInputType = {
     id?: true
+    shortId?: true
     email?: true
-    passwordHash?: true
+    password?: true
     name?: true
     createdAt?: true
     lastLogin?: true
@@ -8798,8 +10153,9 @@ export namespace Prisma {
 
   export type UserMaxAggregateInputType = {
     id?: true
+    shortId?: true
     email?: true
-    passwordHash?: true
+    password?: true
     name?: true
     createdAt?: true
     lastLogin?: true
@@ -8808,8 +10164,9 @@ export namespace Prisma {
 
   export type UserCountAggregateInputType = {
     id?: true
+    shortId?: true
     email?: true
-    passwordHash?: true
+    password?: true
     name?: true
     createdAt?: true
     lastLogin?: true
@@ -8855,6 +10212,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: UserAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: UserMinAggregateInputType
@@ -8885,19 +10254,24 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: UserCountAggregateInputType | true
+    _avg?: UserAvgAggregateInputType
+    _sum?: UserSumAggregateInputType
     _min?: UserMinAggregateInputType
     _max?: UserMaxAggregateInputType
   }
 
   export type UserGroupByOutputType = {
     id: string
+    shortId: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt: Date
     lastLogin: Date | null
     roleId: string
     _count: UserCountAggregateOutputType | null
+    _avg: UserAvgAggregateOutputType | null
+    _sum: UserSumAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
   }
@@ -8918,67 +10292,72 @@ export namespace Prisma {
 
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     email?: boolean
-    passwordHash?: boolean
+    password?: boolean
     name?: boolean
     createdAt?: boolean
     lastLogin?: boolean
     roleId?: boolean
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     email?: boolean
-    passwordHash?: boolean
+    password?: boolean
     name?: boolean
     createdAt?: boolean
     lastLogin?: boolean
     roleId?: boolean
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     email?: boolean
-    passwordHash?: boolean
+    password?: boolean
     name?: boolean
     createdAt?: boolean
     lastLogin?: boolean
     roleId?: boolean
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     id?: boolean
+    shortId?: boolean
     email?: boolean
-    passwordHash?: boolean
+    password?: boolean
     name?: boolean
     createdAt?: boolean
     lastLogin?: boolean
     roleId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "createdAt" | "lastLogin" | "roleId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "email" | "password" | "name" | "createdAt" | "lastLogin" | "roleId", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    role?: boolean | UserRoleDefaultArgs<ExtArgs>
+    role?: boolean | RoleDefaultArgs<ExtArgs>
   }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      role: Prisma.$UserRolePayload<ExtArgs>
+      role: Prisma.$RolePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       email: string
-      passwordHash: string
+      password: string
       name: string
       createdAt: Date
       lastLogin: Date | null
@@ -9377,7 +10756,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    role<T extends UserRoleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserRoleDefaultArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    role<T extends RoleDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RoleDefaultArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9408,8 +10787,9 @@ export namespace Prisma {
    */
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'String'>
+    readonly shortId: FieldRef<"User", 'Int'>
     readonly email: FieldRef<"User", 'String'>
-    readonly passwordHash: FieldRef<"User", 'String'>
+    readonly password: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly lastLogin: FieldRef<"User", 'DateTime'>
@@ -9610,6 +10990,11 @@ export namespace Prisma {
      * Skip the first `n` Users.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Users.
+     */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
@@ -9829,310 +11214,310 @@ export namespace Prisma {
 
 
   /**
-   * Model UserRole
+   * Model Role
    */
 
-  export type AggregateUserRole = {
-    _count: UserRoleCountAggregateOutputType | null
-    _min: UserRoleMinAggregateOutputType | null
-    _max: UserRoleMaxAggregateOutputType | null
+  export type AggregateRole = {
+    _count: RoleCountAggregateOutputType | null
+    _min: RoleMinAggregateOutputType | null
+    _max: RoleMaxAggregateOutputType | null
   }
 
-  export type UserRoleMinAggregateOutputType = {
+  export type RoleMinAggregateOutputType = {
     id: string | null
     name: string | null
   }
 
-  export type UserRoleMaxAggregateOutputType = {
+  export type RoleMaxAggregateOutputType = {
     id: string | null
     name: string | null
   }
 
-  export type UserRoleCountAggregateOutputType = {
+  export type RoleCountAggregateOutputType = {
     id: number
     name: number
     _all: number
   }
 
 
-  export type UserRoleMinAggregateInputType = {
+  export type RoleMinAggregateInputType = {
     id?: true
     name?: true
   }
 
-  export type UserRoleMaxAggregateInputType = {
+  export type RoleMaxAggregateInputType = {
     id?: true
     name?: true
   }
 
-  export type UserRoleCountAggregateInputType = {
+  export type RoleCountAggregateInputType = {
     id?: true
     name?: true
     _all?: true
   }
 
-  export type UserRoleAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which UserRole to aggregate.
+     * Filter which Role to aggregate.
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of UserRoles to fetch.
+     * Determine the order of Roles to fetch.
      */
-    orderBy?: UserRoleOrderByWithRelationInput | UserRoleOrderByWithRelationInput[]
+    orderBy?: RoleOrderByWithRelationInput | RoleOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
      * Sets the start position
      */
-    cursor?: UserRoleWhereUniqueInput
+    cursor?: RoleWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` UserRoles from the position of the cursor.
+     * Take `±n` Roles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` UserRoles.
+     * Skip the first `n` Roles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Count returned UserRoles
+     * Count returned Roles
     **/
-    _count?: true | UserRoleCountAggregateInputType
+    _count?: true | RoleCountAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the minimum value
     **/
-    _min?: UserRoleMinAggregateInputType
+    _min?: RoleMinAggregateInputType
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
      * Select which fields to find the maximum value
     **/
-    _max?: UserRoleMaxAggregateInputType
+    _max?: RoleMaxAggregateInputType
   }
 
-  export type GetUserRoleAggregateType<T extends UserRoleAggregateArgs> = {
-        [P in keyof T & keyof AggregateUserRole]: P extends '_count' | 'count'
+  export type GetRoleAggregateType<T extends RoleAggregateArgs> = {
+        [P in keyof T & keyof AggregateRole]: P extends '_count' | 'count'
       ? T[P] extends true
         ? number
-        : GetScalarType<T[P], AggregateUserRole[P]>
-      : GetScalarType<T[P], AggregateUserRole[P]>
+        : GetScalarType<T[P], AggregateRole[P]>
+      : GetScalarType<T[P], AggregateRole[P]>
   }
 
 
 
 
-  export type UserRoleGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserRoleWhereInput
-    orderBy?: UserRoleOrderByWithAggregationInput | UserRoleOrderByWithAggregationInput[]
-    by: UserRoleScalarFieldEnum[] | UserRoleScalarFieldEnum
-    having?: UserRoleScalarWhereWithAggregatesInput
+  export type RoleGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RoleWhereInput
+    orderBy?: RoleOrderByWithAggregationInput | RoleOrderByWithAggregationInput[]
+    by: RoleScalarFieldEnum[] | RoleScalarFieldEnum
+    having?: RoleScalarWhereWithAggregatesInput
     take?: number
     skip?: number
-    _count?: UserRoleCountAggregateInputType | true
-    _min?: UserRoleMinAggregateInputType
-    _max?: UserRoleMaxAggregateInputType
+    _count?: RoleCountAggregateInputType | true
+    _min?: RoleMinAggregateInputType
+    _max?: RoleMaxAggregateInputType
   }
 
-  export type UserRoleGroupByOutputType = {
+  export type RoleGroupByOutputType = {
     id: string
     name: string
-    _count: UserRoleCountAggregateOutputType | null
-    _min: UserRoleMinAggregateOutputType | null
-    _max: UserRoleMaxAggregateOutputType | null
+    _count: RoleCountAggregateOutputType | null
+    _min: RoleMinAggregateOutputType | null
+    _max: RoleMaxAggregateOutputType | null
   }
 
-  type GetUserRoleGroupByPayload<T extends UserRoleGroupByArgs> = Prisma.PrismaPromise<
+  type GetRoleGroupByPayload<T extends RoleGroupByArgs> = Prisma.PrismaPromise<
     Array<
-      PickEnumerable<UserRoleGroupByOutputType, T['by']> &
+      PickEnumerable<RoleGroupByOutputType, T['by']> &
         {
-          [P in ((keyof T) & (keyof UserRoleGroupByOutputType))]: P extends '_count'
+          [P in ((keyof T) & (keyof RoleGroupByOutputType))]: P extends '_count'
             ? T[P] extends boolean
               ? number
-              : GetScalarType<T[P], UserRoleGroupByOutputType[P]>
-            : GetScalarType<T[P], UserRoleGroupByOutputType[P]>
+              : GetScalarType<T[P], RoleGroupByOutputType[P]>
+            : GetScalarType<T[P], RoleGroupByOutputType[P]>
         }
       >
     >
 
 
-  export type UserRoleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type RoleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    users?: boolean | UserRole$usersArgs<ExtArgs>
-    _count?: boolean | UserRoleCountOutputTypeDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["userRole"]>
+    users?: boolean | Role$usersArgs<ExtArgs>
+    _count?: boolean | RoleCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["role"]>
 
-  export type UserRoleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type RoleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-  }, ExtArgs["result"]["userRole"]>
+  }, ExtArgs["result"]["role"]>
 
-  export type UserRoleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+  export type RoleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-  }, ExtArgs["result"]["userRole"]>
+  }, ExtArgs["result"]["role"]>
 
-  export type UserRoleSelectScalar = {
+  export type RoleSelectScalar = {
     id?: boolean
     name?: boolean
   }
 
-  export type UserRoleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["userRole"]>
-  export type UserRoleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    users?: boolean | UserRole$usersArgs<ExtArgs>
-    _count?: boolean | UserRoleCountOutputTypeDefaultArgs<ExtArgs>
+  export type RoleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["role"]>
+  export type RoleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    users?: boolean | Role$usersArgs<ExtArgs>
+    _count?: boolean | RoleCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type UserRoleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type UserRoleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type RoleIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type RoleIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
-  export type $UserRolePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "UserRole"
+  export type $RolePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Role"
     objects: {
       users: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
-    }, ExtArgs["result"]["userRole"]>
+    }, ExtArgs["result"]["role"]>
     composites: {}
   }
 
-  type UserRoleGetPayload<S extends boolean | null | undefined | UserRoleDefaultArgs> = $Result.GetResult<Prisma.$UserRolePayload, S>
+  type RoleGetPayload<S extends boolean | null | undefined | RoleDefaultArgs> = $Result.GetResult<Prisma.$RolePayload, S>
 
-  type UserRoleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<UserRoleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: UserRoleCountAggregateInputType | true
+  type RoleCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<RoleFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: RoleCountAggregateInputType | true
     }
 
-  export interface UserRoleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserRole'], meta: { name: 'UserRole' } }
+  export interface RoleDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Role'], meta: { name: 'Role' } }
     /**
-     * Find zero or one UserRole that matches the filter.
-     * @param {UserRoleFindUniqueArgs} args - Arguments to find a UserRole
+     * Find zero or one Role that matches the filter.
+     * @param {RoleFindUniqueArgs} args - Arguments to find a Role
      * @example
-     * // Get one UserRole
-     * const userRole = await prisma.userRole.findUnique({
+     * // Get one Role
+     * const role = await prisma.role.findUnique({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUnique<T extends UserRoleFindUniqueArgs>(args: SelectSubset<T, UserRoleFindUniqueArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findUnique<T extends RoleFindUniqueArgs>(args: SelectSubset<T, RoleFindUniqueArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find one UserRole that matches the filter or throw an error with `error.code='P2025'`
+     * Find one Role that matches the filter or throw an error with `error.code='P2025'`
      * if no matches were found.
-     * @param {UserRoleFindUniqueOrThrowArgs} args - Arguments to find a UserRole
+     * @param {RoleFindUniqueOrThrowArgs} args - Arguments to find a Role
      * @example
-     * // Get one UserRole
-     * const userRole = await prisma.userRole.findUniqueOrThrow({
+     * // Get one Role
+     * const role = await prisma.role.findUniqueOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findUniqueOrThrow<T extends UserRoleFindUniqueOrThrowArgs>(args: SelectSubset<T, UserRoleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findUniqueOrThrow<T extends RoleFindUniqueOrThrowArgs>(args: SelectSubset<T, RoleFindUniqueOrThrowArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first UserRole that matches the filter.
+     * Find the first Role that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleFindFirstArgs} args - Arguments to find a UserRole
+     * @param {RoleFindFirstArgs} args - Arguments to find a Role
      * @example
-     * // Get one UserRole
-     * const userRole = await prisma.userRole.findFirst({
+     * // Get one Role
+     * const role = await prisma.role.findFirst({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirst<T extends UserRoleFindFirstArgs>(args?: SelectSubset<T, UserRoleFindFirstArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    findFirst<T extends RoleFindFirstArgs>(args?: SelectSubset<T, RoleFindFirstArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find the first UserRole that matches the filter or
+     * Find the first Role that matches the filter or
      * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleFindFirstOrThrowArgs} args - Arguments to find a UserRole
+     * @param {RoleFindFirstOrThrowArgs} args - Arguments to find a Role
      * @example
-     * // Get one UserRole
-     * const userRole = await prisma.userRole.findFirstOrThrow({
+     * // Get one Role
+     * const role = await prisma.role.findFirstOrThrow({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      */
-    findFirstOrThrow<T extends UserRoleFindFirstOrThrowArgs>(args?: SelectSubset<T, UserRoleFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    findFirstOrThrow<T extends RoleFindFirstOrThrowArgs>(args?: SelectSubset<T, RoleFindFirstOrThrowArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Find zero or more UserRoles that matches the filter.
+     * Find zero or more Roles that matches the filter.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @param {RoleFindManyArgs} args - Arguments to filter and select certain fields only.
      * @example
-     * // Get all UserRoles
-     * const userRoles = await prisma.userRole.findMany()
+     * // Get all Roles
+     * const roles = await prisma.role.findMany()
      * 
-     * // Get first 10 UserRoles
-     * const userRoles = await prisma.userRole.findMany({ take: 10 })
+     * // Get first 10 Roles
+     * const roles = await prisma.role.findMany({ take: 10 })
      * 
      * // Only select the `id`
-     * const userRoleWithIdOnly = await prisma.userRole.findMany({ select: { id: true } })
+     * const roleWithIdOnly = await prisma.role.findMany({ select: { id: true } })
      * 
      */
-    findMany<T extends UserRoleFindManyArgs>(args?: SelectSubset<T, UserRoleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+    findMany<T extends RoleFindManyArgs>(args?: SelectSubset<T, RoleFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
 
     /**
-     * Create a UserRole.
-     * @param {UserRoleCreateArgs} args - Arguments to create a UserRole.
+     * Create a Role.
+     * @param {RoleCreateArgs} args - Arguments to create a Role.
      * @example
-     * // Create one UserRole
-     * const UserRole = await prisma.userRole.create({
+     * // Create one Role
+     * const Role = await prisma.role.create({
      *   data: {
-     *     // ... data to create a UserRole
+     *     // ... data to create a Role
      *   }
      * })
      * 
      */
-    create<T extends UserRoleCreateArgs>(args: SelectSubset<T, UserRoleCreateArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    create<T extends RoleCreateArgs>(args: SelectSubset<T, RoleCreateArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Create many UserRoles.
-     * @param {UserRoleCreateManyArgs} args - Arguments to create many UserRoles.
+     * Create many Roles.
+     * @param {RoleCreateManyArgs} args - Arguments to create many Roles.
      * @example
-     * // Create many UserRoles
-     * const userRole = await prisma.userRole.createMany({
+     * // Create many Roles
+     * const role = await prisma.role.createMany({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      *     
      */
-    createMany<T extends UserRoleCreateManyArgs>(args?: SelectSubset<T, UserRoleCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    createMany<T extends RoleCreateManyArgs>(args?: SelectSubset<T, RoleCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Create many UserRoles and returns the data saved in the database.
-     * @param {UserRoleCreateManyAndReturnArgs} args - Arguments to create many UserRoles.
+     * Create many Roles and returns the data saved in the database.
+     * @param {RoleCreateManyAndReturnArgs} args - Arguments to create many Roles.
      * @example
-     * // Create many UserRoles
-     * const userRole = await prisma.userRole.createManyAndReturn({
+     * // Create many Roles
+     * const role = await prisma.role.createManyAndReturn({
      *   data: [
      *     // ... provide data here
      *   ]
      * })
      * 
-     * // Create many UserRoles and only return the `id`
-     * const userRoleWithIdOnly = await prisma.userRole.createManyAndReturn({
+     * // Create many Roles and only return the `id`
+     * const roleWithIdOnly = await prisma.role.createManyAndReturn({
      *   select: { id: true },
      *   data: [
      *     // ... provide data here
@@ -10142,28 +11527,28 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    createManyAndReturn<T extends UserRoleCreateManyAndReturnArgs>(args?: SelectSubset<T, UserRoleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+    createManyAndReturn<T extends RoleCreateManyAndReturnArgs>(args?: SelectSubset<T, RoleCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Delete a UserRole.
-     * @param {UserRoleDeleteArgs} args - Arguments to delete one UserRole.
+     * Delete a Role.
+     * @param {RoleDeleteArgs} args - Arguments to delete one Role.
      * @example
-     * // Delete one UserRole
-     * const UserRole = await prisma.userRole.delete({
+     * // Delete one Role
+     * const Role = await prisma.role.delete({
      *   where: {
-     *     // ... filter to delete one UserRole
+     *     // ... filter to delete one Role
      *   }
      * })
      * 
      */
-    delete<T extends UserRoleDeleteArgs>(args: SelectSubset<T, UserRoleDeleteArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    delete<T extends RoleDeleteArgs>(args: SelectSubset<T, RoleDeleteArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Update one UserRole.
-     * @param {UserRoleUpdateArgs} args - Arguments to update one UserRole.
+     * Update one Role.
+     * @param {RoleUpdateArgs} args - Arguments to update one Role.
      * @example
-     * // Update one UserRole
-     * const userRole = await prisma.userRole.update({
+     * // Update one Role
+     * const role = await prisma.role.update({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -10173,30 +11558,30 @@ export namespace Prisma {
      * })
      * 
      */
-    update<T extends UserRoleUpdateArgs>(args: SelectSubset<T, UserRoleUpdateArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    update<T extends RoleUpdateArgs>(args: SelectSubset<T, RoleUpdateArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
     /**
-     * Delete zero or more UserRoles.
-     * @param {UserRoleDeleteManyArgs} args - Arguments to filter UserRoles to delete.
+     * Delete zero or more Roles.
+     * @param {RoleDeleteManyArgs} args - Arguments to filter Roles to delete.
      * @example
-     * // Delete a few UserRoles
-     * const { count } = await prisma.userRole.deleteMany({
+     * // Delete a few Roles
+     * const { count } = await prisma.role.deleteMany({
      *   where: {
      *     // ... provide filter here
      *   }
      * })
      * 
      */
-    deleteMany<T extends UserRoleDeleteManyArgs>(args?: SelectSubset<T, UserRoleDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    deleteMany<T extends RoleDeleteManyArgs>(args?: SelectSubset<T, RoleDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more UserRoles.
+     * Update zero or more Roles.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleUpdateManyArgs} args - Arguments to update one or more rows.
+     * @param {RoleUpdateManyArgs} args - Arguments to update one or more rows.
      * @example
-     * // Update many UserRoles
-     * const userRole = await prisma.userRole.updateMany({
+     * // Update many Roles
+     * const role = await prisma.role.updateMany({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -10206,14 +11591,14 @@ export namespace Prisma {
      * })
      * 
      */
-    updateMany<T extends UserRoleUpdateManyArgs>(args: SelectSubset<T, UserRoleUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+    updateMany<T extends RoleUpdateManyArgs>(args: SelectSubset<T, RoleUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
 
     /**
-     * Update zero or more UserRoles and returns the data updated in the database.
-     * @param {UserRoleUpdateManyAndReturnArgs} args - Arguments to update many UserRoles.
+     * Update zero or more Roles and returns the data updated in the database.
+     * @param {RoleUpdateManyAndReturnArgs} args - Arguments to update many Roles.
      * @example
-     * // Update many UserRoles
-     * const userRole = await prisma.userRole.updateManyAndReturn({
+     * // Update many Roles
+     * const role = await prisma.role.updateManyAndReturn({
      *   where: {
      *     // ... provide filter here
      *   },
@@ -10222,8 +11607,8 @@ export namespace Prisma {
      *   ]
      * })
      * 
-     * // Update zero or more UserRoles and only return the `id`
-     * const userRoleWithIdOnly = await prisma.userRole.updateManyAndReturn({
+     * // Update zero or more Roles and only return the `id`
+     * const roleWithIdOnly = await prisma.role.updateManyAndReturn({
      *   select: { id: true },
      *   where: {
      *     // ... provide filter here
@@ -10236,56 +11621,56 @@ export namespace Prisma {
      * Read more here: https://pris.ly/d/null-undefined
      * 
      */
-    updateManyAndReturn<T extends UserRoleUpdateManyAndReturnArgs>(args: SelectSubset<T, UserRoleUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+    updateManyAndReturn<T extends RoleUpdateManyAndReturnArgs>(args: SelectSubset<T, RoleUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
     /**
-     * Create or update one UserRole.
-     * @param {UserRoleUpsertArgs} args - Arguments to update or create a UserRole.
+     * Create or update one Role.
+     * @param {RoleUpsertArgs} args - Arguments to update or create a Role.
      * @example
-     * // Update or create a UserRole
-     * const userRole = await prisma.userRole.upsert({
+     * // Update or create a Role
+     * const role = await prisma.role.upsert({
      *   create: {
-     *     // ... data to create a UserRole
+     *     // ... data to create a Role
      *   },
      *   update: {
      *     // ... in case it already exists, update
      *   },
      *   where: {
-     *     // ... the filter for the UserRole we want to update
+     *     // ... the filter for the Role we want to update
      *   }
      * })
      */
-    upsert<T extends UserRoleUpsertArgs>(args: SelectSubset<T, UserRoleUpsertArgs<ExtArgs>>): Prisma__UserRoleClient<$Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+    upsert<T extends RoleUpsertArgs>(args: SelectSubset<T, RoleUpsertArgs<ExtArgs>>): Prisma__RoleClient<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
-     * Count the number of UserRoles.
+     * Count the number of Roles.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleCountArgs} args - Arguments to filter UserRoles to count.
+     * @param {RoleCountArgs} args - Arguments to filter Roles to count.
      * @example
-     * // Count the number of UserRoles
-     * const count = await prisma.userRole.count({
+     * // Count the number of Roles
+     * const count = await prisma.role.count({
      *   where: {
-     *     // ... the filter for the UserRoles we want to count
+     *     // ... the filter for the Roles we want to count
      *   }
      * })
     **/
-    count<T extends UserRoleCountArgs>(
-      args?: Subset<T, UserRoleCountArgs>,
+    count<T extends RoleCountArgs>(
+      args?: Subset<T, RoleCountArgs>,
     ): Prisma.PrismaPromise<
       T extends $Utils.Record<'select', any>
         ? T['select'] extends true
           ? number
-          : GetScalarType<T['select'], UserRoleCountAggregateOutputType>
+          : GetScalarType<T['select'], RoleCountAggregateOutputType>
         : number
     >
 
     /**
-     * Allows you to perform aggregations operations on a UserRole.
+     * Allows you to perform aggregations operations on a Role.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @param {RoleAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
      * @example
      * // Ordered by age ascending
      * // Where email contains prisma.io
@@ -10305,13 +11690,13 @@ export namespace Prisma {
      *   take: 10,
      * })
     **/
-    aggregate<T extends UserRoleAggregateArgs>(args: Subset<T, UserRoleAggregateArgs>): Prisma.PrismaPromise<GetUserRoleAggregateType<T>>
+    aggregate<T extends RoleAggregateArgs>(args: Subset<T, RoleAggregateArgs>): Prisma.PrismaPromise<GetRoleAggregateType<T>>
 
     /**
-     * Group by UserRole.
+     * Group by Role.
      * Note, that providing `undefined` is treated as the value not being there.
      * Read more here: https://pris.ly/d/null-undefined
-     * @param {UserRoleGroupByArgs} args - Group by arguments.
+     * @param {RoleGroupByArgs} args - Group by arguments.
      * @example
      * // Group by city, order by createdAt, get count
      * const result = await prisma.user.groupBy({
@@ -10326,14 +11711,14 @@ export namespace Prisma {
      * 
     **/
     groupBy<
-      T extends UserRoleGroupByArgs,
+      T extends RoleGroupByArgs,
       HasSelectOrTake extends Or<
         Extends<'skip', Keys<T>>,
         Extends<'take', Keys<T>>
       >,
       OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: UserRoleGroupByArgs['orderBy'] }
-        : { orderBy?: UserRoleGroupByArgs['orderBy'] },
+        ? { orderBy: RoleGroupByArgs['orderBy'] }
+        : { orderBy?: RoleGroupByArgs['orderBy'] },
       OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
       ByFields extends MaybeTupleToUnion<T['by']>,
       ByValid extends Has<ByFields, OrderFields>,
@@ -10382,22 +11767,22 @@ export namespace Prisma {
             ? never
             : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
         }[OrderFields]
-    >(args: SubsetIntersection<T, UserRoleGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserRoleGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+    >(args: SubsetIntersection<T, RoleGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRoleGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
   /**
-   * Fields of the UserRole model
+   * Fields of the Role model
    */
-  readonly fields: UserRoleFieldRefs;
+  readonly fields: RoleFieldRefs;
   }
 
   /**
-   * The delegate class that acts as a "Promise-like" for UserRole.
+   * The delegate class that acts as a "Promise-like" for Role.
    * Why is this prefixed with `Prisma__`?
    * Because we want to prevent naming conflicts as mentioned in
    * https://github.com/prisma/prisma-client-js/issues/707
    */
-  export interface Prisma__UserRoleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+  export interface Prisma__RoleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    users<T extends UserRole$usersArgs<ExtArgs> = {}>(args?: Subset<T, UserRole$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    users<T extends Role$usersArgs<ExtArgs> = {}>(args?: Subset<T, Role$usersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10424,402 +11809,407 @@ export namespace Prisma {
 
 
   /**
-   * Fields of the UserRole model
+   * Fields of the Role model
    */
-  interface UserRoleFieldRefs {
-    readonly id: FieldRef<"UserRole", 'String'>
-    readonly name: FieldRef<"UserRole", 'String'>
+  interface RoleFieldRefs {
+    readonly id: FieldRef<"Role", 'String'>
+    readonly name: FieldRef<"Role", 'String'>
   }
     
 
   // Custom InputTypes
   /**
-   * UserRole findUnique
+   * Role findUnique
    */
-  export type UserRoleFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter, which UserRole to fetch.
+     * Filter, which Role to fetch.
      */
-    where: UserRoleWhereUniqueInput
+    where: RoleWhereUniqueInput
   }
 
   /**
-   * UserRole findUniqueOrThrow
+   * Role findUniqueOrThrow
    */
-  export type UserRoleFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter, which UserRole to fetch.
+     * Filter, which Role to fetch.
      */
-    where: UserRoleWhereUniqueInput
+    where: RoleWhereUniqueInput
   }
 
   /**
-   * UserRole findFirst
+   * Role findFirst
    */
-  export type UserRoleFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter, which UserRole to fetch.
+     * Filter, which Role to fetch.
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of UserRoles to fetch.
+     * Determine the order of Roles to fetch.
      */
-    orderBy?: UserRoleOrderByWithRelationInput | UserRoleOrderByWithRelationInput[]
+    orderBy?: RoleOrderByWithRelationInput | RoleOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for UserRoles.
+     * Sets the position for searching for Roles.
      */
-    cursor?: UserRoleWhereUniqueInput
+    cursor?: RoleWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` UserRoles from the position of the cursor.
+     * Take `±n` Roles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` UserRoles.
+     * Skip the first `n` Roles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of UserRoles.
+     * Filter by unique combinations of Roles.
      */
-    distinct?: UserRoleScalarFieldEnum | UserRoleScalarFieldEnum[]
+    distinct?: RoleScalarFieldEnum | RoleScalarFieldEnum[]
   }
 
   /**
-   * UserRole findFirstOrThrow
+   * Role findFirstOrThrow
    */
-  export type UserRoleFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter, which UserRole to fetch.
+     * Filter, which Role to fetch.
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of UserRoles to fetch.
+     * Determine the order of Roles to fetch.
      */
-    orderBy?: UserRoleOrderByWithRelationInput | UserRoleOrderByWithRelationInput[]
+    orderBy?: RoleOrderByWithRelationInput | RoleOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for searching for UserRoles.
+     * Sets the position for searching for Roles.
      */
-    cursor?: UserRoleWhereUniqueInput
+    cursor?: RoleWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` UserRoles from the position of the cursor.
+     * Take `±n` Roles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` UserRoles.
+     * Skip the first `n` Roles.
      */
     skip?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
      * 
-     * Filter by unique combinations of UserRoles.
+     * Filter by unique combinations of Roles.
      */
-    distinct?: UserRoleScalarFieldEnum | UserRoleScalarFieldEnum[]
+    distinct?: RoleScalarFieldEnum | RoleScalarFieldEnum[]
   }
 
   /**
-   * UserRole findMany
+   * Role findMany
    */
-  export type UserRoleFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter, which UserRoles to fetch.
+     * Filter, which Roles to fetch.
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
      * 
-     * Determine the order of UserRoles to fetch.
+     * Determine the order of Roles to fetch.
      */
-    orderBy?: UserRoleOrderByWithRelationInput | UserRoleOrderByWithRelationInput[]
+    orderBy?: RoleOrderByWithRelationInput | RoleOrderByWithRelationInput[]
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
      * 
-     * Sets the position for listing UserRoles.
+     * Sets the position for listing Roles.
      */
-    cursor?: UserRoleWhereUniqueInput
+    cursor?: RoleWhereUniqueInput
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Take `±n` UserRoles from the position of the cursor.
+     * Take `±n` Roles from the position of the cursor.
      */
     take?: number
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
      * 
-     * Skip the first `n` UserRoles.
+     * Skip the first `n` Roles.
      */
     skip?: number
-    distinct?: UserRoleScalarFieldEnum | UserRoleScalarFieldEnum[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Roles.
+     */
+    distinct?: RoleScalarFieldEnum | RoleScalarFieldEnum[]
   }
 
   /**
-   * UserRole create
+   * Role create
    */
-  export type UserRoleCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * The data needed to create a UserRole.
+     * The data needed to create a Role.
      */
-    data: XOR<UserRoleCreateInput, UserRoleUncheckedCreateInput>
+    data: XOR<RoleCreateInput, RoleUncheckedCreateInput>
   }
 
   /**
-   * UserRole createMany
+   * Role createMany
    */
-  export type UserRoleCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to create many UserRoles.
+     * The data used to create many Roles.
      */
-    data: UserRoleCreateManyInput | UserRoleCreateManyInput[]
+    data: RoleCreateManyInput | RoleCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * UserRole createManyAndReturn
+   * Role createManyAndReturn
    */
-  export type UserRoleCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelectCreateManyAndReturn<ExtArgs> | null
+    select?: RoleSelectCreateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
-     * The data used to create many UserRoles.
+     * The data used to create many Roles.
      */
-    data: UserRoleCreateManyInput | UserRoleCreateManyInput[]
+    data: RoleCreateManyInput | RoleCreateManyInput[]
     skipDuplicates?: boolean
   }
 
   /**
-   * UserRole update
+   * Role update
    */
-  export type UserRoleUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * The data needed to update a UserRole.
+     * The data needed to update a Role.
      */
-    data: XOR<UserRoleUpdateInput, UserRoleUncheckedUpdateInput>
+    data: XOR<RoleUpdateInput, RoleUncheckedUpdateInput>
     /**
-     * Choose, which UserRole to update.
+     * Choose, which Role to update.
      */
-    where: UserRoleWhereUniqueInput
+    where: RoleWhereUniqueInput
   }
 
   /**
-   * UserRole updateMany
+   * Role updateMany
    */
-  export type UserRoleUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * The data used to update UserRoles.
+     * The data used to update Roles.
      */
-    data: XOR<UserRoleUpdateManyMutationInput, UserRoleUncheckedUpdateManyInput>
+    data: XOR<RoleUpdateManyMutationInput, RoleUncheckedUpdateManyInput>
     /**
-     * Filter which UserRoles to update
+     * Filter which Roles to update
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
-     * Limit how many UserRoles to update.
+     * Limit how many Roles to update.
      */
     limit?: number
   }
 
   /**
-   * UserRole updateManyAndReturn
+   * Role updateManyAndReturn
    */
-  export type UserRoleUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelectUpdateManyAndReturn<ExtArgs> | null
+    select?: RoleSelectUpdateManyAndReturn<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
-     * The data used to update UserRoles.
+     * The data used to update Roles.
      */
-    data: XOR<UserRoleUpdateManyMutationInput, UserRoleUncheckedUpdateManyInput>
+    data: XOR<RoleUpdateManyMutationInput, RoleUncheckedUpdateManyInput>
     /**
-     * Filter which UserRoles to update
+     * Filter which Roles to update
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
-     * Limit how many UserRoles to update.
+     * Limit how many Roles to update.
      */
     limit?: number
   }
 
   /**
-   * UserRole upsert
+   * Role upsert
    */
-  export type UserRoleUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * The filter to search for the UserRole to update in case it exists.
+     * The filter to search for the Role to update in case it exists.
      */
-    where: UserRoleWhereUniqueInput
+    where: RoleWhereUniqueInput
     /**
-     * In case the UserRole found by the `where` argument doesn't exist, create a new UserRole with this data.
+     * In case the Role found by the `where` argument doesn't exist, create a new Role with this data.
      */
-    create: XOR<UserRoleCreateInput, UserRoleUncheckedCreateInput>
+    create: XOR<RoleCreateInput, RoleUncheckedCreateInput>
     /**
-     * In case the UserRole was found with the provided `where` argument, update it with this data.
+     * In case the Role was found with the provided `where` argument, update it with this data.
      */
-    update: XOR<UserRoleUpdateInput, UserRoleUncheckedUpdateInput>
+    update: XOR<RoleUpdateInput, RoleUncheckedUpdateInput>
   }
 
   /**
-   * UserRole delete
+   * Role delete
    */
-  export type UserRoleDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
     /**
-     * Filter which UserRole to delete.
+     * Filter which Role to delete.
      */
-    where: UserRoleWhereUniqueInput
+    where: RoleWhereUniqueInput
   }
 
   /**
-   * UserRole deleteMany
+   * Role deleteMany
    */
-  export type UserRoleDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Filter which UserRoles to delete
+     * Filter which Roles to delete
      */
-    where?: UserRoleWhereInput
+    where?: RoleWhereInput
     /**
-     * Limit how many UserRoles to delete.
+     * Limit how many Roles to delete.
      */
     limit?: number
   }
 
   /**
-   * UserRole.users
+   * Role.users
    */
-  export type UserRole$usersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Role$usersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -10841,21 +12231,21 @@ export namespace Prisma {
   }
 
   /**
-   * UserRole without action
+   * Role without action
    */
-  export type UserRoleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type RoleDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the UserRole
+     * Select specific fields to fetch from the Role
      */
-    select?: UserRoleSelect<ExtArgs> | null
+    select?: RoleSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the UserRole
+     * Omit specific fields from the Role
      */
-    omit?: UserRoleOmit<ExtArgs> | null
+    omit?: RoleOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: UserRoleInclude<ExtArgs> | null
+    include?: RoleInclude<ExtArgs> | null
   }
 
 
@@ -10865,51 +12255,81 @@ export namespace Prisma {
 
   export type AggregateVehicle = {
     _count: VehicleCountAggregateOutputType | null
+    _avg: VehicleAvgAggregateOutputType | null
+    _sum: VehicleSumAggregateOutputType | null
     _min: VehicleMinAggregateOutputType | null
     _max: VehicleMaxAggregateOutputType | null
   }
 
+  export type VehicleAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type VehicleSumAggregateOutputType = {
+    shortId: number | null
+  }
+
   export type VehicleMinAggregateOutputType = {
     id: string | null
-    plateNumber: string | null
-    description: string | null
+    shortId: number | null
+    name: string | null
+    plate: string | null
+    model: string | null
     status: string | null
   }
 
   export type VehicleMaxAggregateOutputType = {
     id: string | null
-    plateNumber: string | null
-    description: string | null
+    shortId: number | null
+    name: string | null
+    plate: string | null
+    model: string | null
     status: string | null
   }
 
   export type VehicleCountAggregateOutputType = {
     id: number
-    plateNumber: number
-    description: number
+    shortId: number
+    name: number
+    plate: number
+    model: number
     status: number
     _all: number
   }
 
 
+  export type VehicleAvgAggregateInputType = {
+    shortId?: true
+  }
+
+  export type VehicleSumAggregateInputType = {
+    shortId?: true
+  }
+
   export type VehicleMinAggregateInputType = {
     id?: true
-    plateNumber?: true
-    description?: true
+    shortId?: true
+    name?: true
+    plate?: true
+    model?: true
     status?: true
   }
 
   export type VehicleMaxAggregateInputType = {
     id?: true
-    plateNumber?: true
-    description?: true
+    shortId?: true
+    name?: true
+    plate?: true
+    model?: true
     status?: true
   }
 
   export type VehicleCountAggregateInputType = {
     id?: true
-    plateNumber?: true
-    description?: true
+    shortId?: true
+    name?: true
+    plate?: true
+    model?: true
     status?: true
     _all?: true
   }
@@ -10952,6 +12372,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: VehicleAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: VehicleSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: VehicleMinAggregateInputType
@@ -10982,16 +12414,22 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: VehicleCountAggregateInputType | true
+    _avg?: VehicleAvgAggregateInputType
+    _sum?: VehicleSumAggregateInputType
     _min?: VehicleMinAggregateInputType
     _max?: VehicleMaxAggregateInputType
   }
 
   export type VehicleGroupByOutputType = {
     id: string
-    plateNumber: string
-    description: string | null
+    shortId: number
+    name: string
+    plate: string
+    model: string
     status: string
     _count: VehicleCountAggregateOutputType | null
+    _avg: VehicleAvgAggregateOutputType | null
+    _sum: VehicleSumAggregateOutputType | null
     _min: VehicleMinAggregateOutputType | null
     _max: VehicleMaxAggregateOutputType | null
   }
@@ -11012,8 +12450,10 @@ export namespace Prisma {
 
   export type VehicleSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    plateNumber?: boolean
-    description?: boolean
+    shortId?: boolean
+    name?: boolean
+    plate?: boolean
+    model?: boolean
     status?: boolean
     dispatches?: boolean | Vehicle$dispatchesArgs<ExtArgs>
     guards?: boolean | Vehicle$guardsArgs<ExtArgs>
@@ -11022,26 +12462,32 @@ export namespace Prisma {
 
   export type VehicleSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    plateNumber?: boolean
-    description?: boolean
+    shortId?: boolean
+    name?: boolean
+    plate?: boolean
+    model?: boolean
     status?: boolean
   }, ExtArgs["result"]["vehicle"]>
 
   export type VehicleSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    plateNumber?: boolean
-    description?: boolean
+    shortId?: boolean
+    name?: boolean
+    plate?: boolean
+    model?: boolean
     status?: boolean
   }, ExtArgs["result"]["vehicle"]>
 
   export type VehicleSelectScalar = {
     id?: boolean
-    plateNumber?: boolean
-    description?: boolean
+    shortId?: boolean
+    name?: boolean
+    plate?: boolean
+    model?: boolean
     status?: boolean
   }
 
-  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "plateNumber" | "description" | "status", ExtArgs["result"]["vehicle"]>
+  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "name" | "plate" | "model" | "status", ExtArgs["result"]["vehicle"]>
   export type VehicleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     dispatches?: boolean | Vehicle$dispatchesArgs<ExtArgs>
     guards?: boolean | Vehicle$guardsArgs<ExtArgs>
@@ -11058,8 +12504,10 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      plateNumber: string
-      description: string | null
+      shortId: number
+      name: string
+      plate: string
+      model: string
       status: string
     }, ExtArgs["result"]["vehicle"]>
     composites: {}
@@ -11487,8 +12935,10 @@ export namespace Prisma {
    */
   interface VehicleFieldRefs {
     readonly id: FieldRef<"Vehicle", 'String'>
-    readonly plateNumber: FieldRef<"Vehicle", 'String'>
-    readonly description: FieldRef<"Vehicle", 'String'>
+    readonly shortId: FieldRef<"Vehicle", 'Int'>
+    readonly name: FieldRef<"Vehicle", 'String'>
+    readonly plate: FieldRef<"Vehicle", 'String'>
+    readonly model: FieldRef<"Vehicle", 'String'>
     readonly status: FieldRef<"Vehicle", 'String'>
   }
     
@@ -11686,6 +13136,11 @@ export namespace Prisma {
      * Skip the first `n` Vehicles.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Vehicles.
+     */
     distinct?: VehicleScalarFieldEnum | VehicleScalarFieldEnum[]
   }
 
@@ -11950,12 +13405,23 @@ export namespace Prisma {
 
   export type AggregateGuard = {
     _count: GuardCountAggregateOutputType | null
+    _avg: GuardAvgAggregateOutputType | null
+    _sum: GuardSumAggregateOutputType | null
     _min: GuardMinAggregateOutputType | null
     _max: GuardMaxAggregateOutputType | null
   }
 
+  export type GuardAvgAggregateOutputType = {
+    shortId: number | null
+  }
+
+  export type GuardSumAggregateOutputType = {
+    shortId: number | null
+  }
+
   export type GuardMinAggregateOutputType = {
     id: string | null
+    shortId: number | null
     name: string | null
     phone: string | null
     status: string | null
@@ -11964,6 +13430,7 @@ export namespace Prisma {
 
   export type GuardMaxAggregateOutputType = {
     id: string | null
+    shortId: number | null
     name: string | null
     phone: string | null
     status: string | null
@@ -11972,6 +13439,7 @@ export namespace Prisma {
 
   export type GuardCountAggregateOutputType = {
     id: number
+    shortId: number
     name: number
     phone: number
     status: number
@@ -11980,8 +13448,17 @@ export namespace Prisma {
   }
 
 
+  export type GuardAvgAggregateInputType = {
+    shortId?: true
+  }
+
+  export type GuardSumAggregateInputType = {
+    shortId?: true
+  }
+
   export type GuardMinAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     phone?: true
     status?: true
@@ -11990,6 +13467,7 @@ export namespace Prisma {
 
   export type GuardMaxAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     phone?: true
     status?: true
@@ -11998,6 +13476,7 @@ export namespace Prisma {
 
   export type GuardCountAggregateInputType = {
     id?: true
+    shortId?: true
     name?: true
     phone?: true
     status?: true
@@ -12043,6 +13522,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: GuardAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: GuardSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: GuardMinAggregateInputType
@@ -12073,17 +13564,22 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: GuardCountAggregateInputType | true
+    _avg?: GuardAvgAggregateInputType
+    _sum?: GuardSumAggregateInputType
     _min?: GuardMinAggregateInputType
     _max?: GuardMaxAggregateInputType
   }
 
   export type GuardGroupByOutputType = {
     id: string
+    shortId: number
     name: string
     phone: string
     status: string
     assignedVehicleId: string | null
     _count: GuardCountAggregateOutputType | null
+    _avg: GuardAvgAggregateOutputType | null
+    _sum: GuardSumAggregateOutputType | null
     _min: GuardMinAggregateOutputType | null
     _max: GuardMaxAggregateOutputType | null
   }
@@ -12104,18 +13600,20 @@ export namespace Prisma {
 
   export type GuardSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     phone?: boolean
     status?: boolean
     assignedVehicleId?: boolean
     assignedVehicle?: boolean | Guard$assignedVehicleArgs<ExtArgs>
     dispatches?: boolean | Guard$dispatchesArgs<ExtArgs>
-    obLogs?: boolean | Guard$obLogsArgs<ExtArgs>
+    OBLogs?: boolean | Guard$OBLogsArgs<ExtArgs>
     _count?: boolean | GuardCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["guard"]>
 
   export type GuardSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     phone?: boolean
     status?: boolean
@@ -12125,6 +13623,7 @@ export namespace Prisma {
 
   export type GuardSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    shortId?: boolean
     name?: boolean
     phone?: boolean
     status?: boolean
@@ -12134,17 +13633,18 @@ export namespace Prisma {
 
   export type GuardSelectScalar = {
     id?: boolean
+    shortId?: boolean
     name?: boolean
     phone?: boolean
     status?: boolean
     assignedVehicleId?: boolean
   }
 
-  export type GuardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "status" | "assignedVehicleId", ExtArgs["result"]["guard"]>
+  export type GuardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "name" | "phone" | "status" | "assignedVehicleId", ExtArgs["result"]["guard"]>
   export type GuardInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     assignedVehicle?: boolean | Guard$assignedVehicleArgs<ExtArgs>
     dispatches?: boolean | Guard$dispatchesArgs<ExtArgs>
-    obLogs?: boolean | Guard$obLogsArgs<ExtArgs>
+    OBLogs?: boolean | Guard$OBLogsArgs<ExtArgs>
     _count?: boolean | GuardCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GuardIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -12159,10 +13659,11 @@ export namespace Prisma {
     objects: {
       assignedVehicle: Prisma.$VehiclePayload<ExtArgs> | null
       dispatches: Prisma.$DispatchPayload<ExtArgs>[]
-      obLogs: Prisma.$ObLogPayload<ExtArgs>[]
+      OBLogs: Prisma.$OBLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      shortId: number
       name: string
       phone: string
       status: string
@@ -12563,7 +14064,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     assignedVehicle<T extends Guard$assignedVehicleArgs<ExtArgs> = {}>(args?: Subset<T, Guard$assignedVehicleArgs<ExtArgs>>): Prisma__VehicleClient<$Result.GetResult<Prisma.$VehiclePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     dispatches<T extends Guard$dispatchesArgs<ExtArgs> = {}>(args?: Subset<T, Guard$dispatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DispatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    obLogs<T extends Guard$obLogsArgs<ExtArgs> = {}>(args?: Subset<T, Guard$obLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ObLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    OBLogs<T extends Guard$OBLogsArgs<ExtArgs> = {}>(args?: Subset<T, Guard$OBLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OBLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12594,6 +14095,7 @@ export namespace Prisma {
    */
   interface GuardFieldRefs {
     readonly id: FieldRef<"Guard", 'String'>
+    readonly shortId: FieldRef<"Guard", 'Int'>
     readonly name: FieldRef<"Guard", 'String'>
     readonly phone: FieldRef<"Guard", 'String'>
     readonly status: FieldRef<"Guard", 'String'>
@@ -12794,6 +14296,11 @@ export namespace Prisma {
      * Skip the first `n` Guards.
      */
     skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Guards.
+     */
     distinct?: GuardScalarFieldEnum | GuardScalarFieldEnum[]
   }
 
@@ -13037,27 +14544,27 @@ export namespace Prisma {
   }
 
   /**
-   * Guard.obLogs
+   * Guard.OBLogs
    */
-  export type Guard$obLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Guard$OBLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
-     * Select specific fields to fetch from the ObLog
+     * Select specific fields to fetch from the OBLog
      */
-    select?: ObLogSelect<ExtArgs> | null
+    select?: OBLogSelect<ExtArgs> | null
     /**
-     * Omit specific fields from the ObLog
+     * Omit specific fields from the OBLog
      */
-    omit?: ObLogOmit<ExtArgs> | null
+    omit?: OBLogOmit<ExtArgs> | null
     /**
      * Choose, which related nodes to fetch as well
      */
-    include?: ObLogInclude<ExtArgs> | null
-    where?: ObLogWhereInput
-    orderBy?: ObLogOrderByWithRelationInput | ObLogOrderByWithRelationInput[]
-    cursor?: ObLogWhereUniqueInput
+    include?: OBLogInclude<ExtArgs> | null
+    where?: OBLogWhereInput
+    orderBy?: OBLogOrderByWithRelationInput | OBLogOrderByWithRelationInput[]
+    cursor?: OBLogWhereUniqueInput
     take?: number
     skip?: number
-    distinct?: ObLogScalarFieldEnum | ObLogScalarFieldEnum[]
+    distinct?: OBLogScalarFieldEnum | OBLogScalarFieldEnum[]
   }
 
   /**
@@ -13095,8 +14602,10 @@ export namespace Prisma {
 
   export const ClientScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
+    surname: 'surname',
     name: 'name',
-    contactEmail: 'contactEmail',
+    email: 'email',
     phone: 'phone',
     createdAt: 'createdAt'
   };
@@ -13106,24 +14615,31 @@ export namespace Prisma {
 
   export const SiteScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     name: 'name',
     address: 'address',
-    latitude: 'latitude',
-    longitude: 'longitude',
-    createdAt: 'createdAt',
     clientId: 'clientId'
   };
 
   export type SiteScalarFieldEnum = (typeof SiteScalarFieldEnum)[keyof typeof SiteScalarFieldEnum]
 
 
+  export const TransmitterScalarFieldEnum: {
+    id: 'id',
+    referenceCode: 'referenceCode',
+    siteId: 'siteId'
+  };
+
+  export type TransmitterScalarFieldEnum = (typeof TransmitterScalarFieldEnum)[keyof typeof TransmitterScalarFieldEnum]
+
+
   export const AlarmScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     triggeredAt: 'triggeredAt',
-    alarmType: 'alarmType',
-    priority: 'priority',
-    status: 'status',
-    siteId: 'siteId'
+    eventType: 'eventType',
+    source: 'source',
+    transmitterId: 'transmitterId'
   };
 
   export type AlarmScalarFieldEnum = (typeof AlarmScalarFieldEnum)[keyof typeof AlarmScalarFieldEnum]
@@ -13131,11 +14647,15 @@ export namespace Prisma {
 
   export const AiCallScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
+    alarmId: 'alarmId',
+    calledAt: 'calledAt',
+    callDuration: 'callDuration',
+    notes: 'notes',
     aiDecision: 'aiDecision',
     confidenceScore: 'confidenceScore',
     evaluatedAt: 'evaluatedAt',
-    notes: 'notes',
-    alarmId: 'alarmId'
+    phone: 'phone'
   };
 
   export type AiCallScalarFieldEnum = (typeof AiCallScalarFieldEnum)[keyof typeof AiCallScalarFieldEnum]
@@ -13143,6 +14663,7 @@ export namespace Prisma {
 
   export const DispatchScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     dispatchedAt: 'dispatchedAt',
     arrivalTime: 'arrivalTime',
     resolvedAt: 'resolvedAt',
@@ -13155,23 +14676,24 @@ export namespace Prisma {
   export type DispatchScalarFieldEnum = (typeof DispatchScalarFieldEnum)[keyof typeof DispatchScalarFieldEnum]
 
 
-  export const ObLogScalarFieldEnum: {
+  export const OBLogScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     logTime: 'logTime',
-    message: 'message',
-    source: 'source',
-    alarmId: 'alarmId',
+    guardId: 'guardId',
     siteId: 'siteId',
-    guardId: 'guardId'
+    actionLog: 'actionLog',
+    notes: 'notes'
   };
 
-  export type ObLogScalarFieldEnum = (typeof ObLogScalarFieldEnum)[keyof typeof ObLogScalarFieldEnum]
+  export type OBLogScalarFieldEnum = (typeof OBLogScalarFieldEnum)[keyof typeof OBLogScalarFieldEnum]
 
 
   export const UserScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     email: 'email',
-    passwordHash: 'passwordHash',
+    password: 'password',
     name: 'name',
     createdAt: 'createdAt',
     lastLogin: 'lastLogin',
@@ -13181,18 +14703,20 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-  export const UserRoleScalarFieldEnum: {
+  export const RoleScalarFieldEnum: {
     id: 'id',
     name: 'name'
   };
 
-  export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+  export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
 
 
   export const VehicleScalarFieldEnum: {
     id: 'id',
-    plateNumber: 'plateNumber',
-    description: 'description',
+    shortId: 'shortId',
+    name: 'name',
+    plate: 'plate',
+    model: 'model',
     status: 'status'
   };
 
@@ -13201,6 +14725,7 @@ export namespace Prisma {
 
   export const GuardScalarFieldEnum: {
     id: 'id',
+    shortId: 'shortId',
     name: 'name',
     phone: 'phone',
     status: 'status',
@@ -13254,6 +14779,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -13279,20 +14818,6 @@ export namespace Prisma {
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
   /**
    * Deep Input Types
    */
@@ -13303,43 +14828,53 @@ export namespace Prisma {
     OR?: ClientWhereInput[]
     NOT?: ClientWhereInput | ClientWhereInput[]
     id?: StringFilter<"Client"> | string
+    shortId?: IntFilter<"Client"> | number
+    surname?: StringFilter<"Client"> | string
     name?: StringFilter<"Client"> | string
-    contactEmail?: StringFilter<"Client"> | string
-    phone?: StringNullableFilter<"Client"> | string | null
+    email?: StringFilter<"Client"> | string
+    phone?: StringFilter<"Client"> | string
     createdAt?: DateTimeFilter<"Client"> | Date | string
     sites?: SiteListRelationFilter
   }
 
   export type ClientOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
+    surname?: SortOrder
     name?: SortOrder
-    contactEmail?: SortOrder
-    phone?: SortOrderInput | SortOrder
+    email?: SortOrder
+    phone?: SortOrder
     createdAt?: SortOrder
     sites?: SiteOrderByRelationAggregateInput
   }
 
   export type ClientWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     AND?: ClientWhereInput | ClientWhereInput[]
     OR?: ClientWhereInput[]
     NOT?: ClientWhereInput | ClientWhereInput[]
+    surname?: StringFilter<"Client"> | string
     name?: StringFilter<"Client"> | string
-    contactEmail?: StringFilter<"Client"> | string
-    phone?: StringNullableFilter<"Client"> | string | null
+    email?: StringFilter<"Client"> | string
+    phone?: StringFilter<"Client"> | string
     createdAt?: DateTimeFilter<"Client"> | Date | string
     sites?: SiteListRelationFilter
-  }, "id">
+  }, "id" | "shortId">
 
   export type ClientOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
+    surname?: SortOrder
     name?: SortOrder
-    contactEmail?: SortOrder
-    phone?: SortOrderInput | SortOrder
+    email?: SortOrder
+    phone?: SortOrder
     createdAt?: SortOrder
     _count?: ClientCountOrderByAggregateInput
+    _avg?: ClientAvgOrderByAggregateInput
     _max?: ClientMaxOrderByAggregateInput
     _min?: ClientMinOrderByAggregateInput
+    _sum?: ClientSumOrderByAggregateInput
   }
 
   export type ClientScalarWhereWithAggregatesInput = {
@@ -13347,9 +14882,11 @@ export namespace Prisma {
     OR?: ClientScalarWhereWithAggregatesInput[]
     NOT?: ClientScalarWhereWithAggregatesInput | ClientScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Client"> | string
+    shortId?: IntWithAggregatesFilter<"Client"> | number
+    surname?: StringWithAggregatesFilter<"Client"> | string
     name?: StringWithAggregatesFilter<"Client"> | string
-    contactEmail?: StringWithAggregatesFilter<"Client"> | string
-    phone?: StringNullableWithAggregatesFilter<"Client"> | string | null
+    email?: StringWithAggregatesFilter<"Client"> | string
+    phone?: StringWithAggregatesFilter<"Client"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Client"> | Date | string
   }
 
@@ -13358,53 +14895,45 @@ export namespace Prisma {
     OR?: SiteWhereInput[]
     NOT?: SiteWhereInput | SiteWhereInput[]
     id?: StringFilter<"Site"> | string
+    shortId?: IntFilter<"Site"> | number
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
-    latitude?: FloatNullableFilter<"Site"> | number | null
-    longitude?: FloatNullableFilter<"Site"> | number | null
-    createdAt?: DateTimeFilter<"Site"> | Date | string
     clientId?: StringFilter<"Site"> | string
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
-    alarms?: AlarmListRelationFilter
-    obLogs?: ObLogListRelationFilter
+    transmitters?: TransmitterListRelationFilter
+    OBLogs?: OBLogListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     address?: SortOrder
-    latitude?: SortOrderInput | SortOrder
-    longitude?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
     clientId?: SortOrder
     client?: ClientOrderByWithRelationInput
-    alarms?: AlarmOrderByRelationAggregateInput
-    obLogs?: ObLogOrderByRelationAggregateInput
+    transmitters?: TransmitterOrderByRelationAggregateInput
+    OBLogs?: OBLogOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     AND?: SiteWhereInput | SiteWhereInput[]
     OR?: SiteWhereInput[]
     NOT?: SiteWhereInput | SiteWhereInput[]
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
-    latitude?: FloatNullableFilter<"Site"> | number | null
-    longitude?: FloatNullableFilter<"Site"> | number | null
-    createdAt?: DateTimeFilter<"Site"> | Date | string
     clientId?: StringFilter<"Site"> | string
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
-    alarms?: AlarmListRelationFilter
-    obLogs?: ObLogListRelationFilter
-  }, "id">
+    transmitters?: TransmitterListRelationFilter
+    OBLogs?: OBLogListRelationFilter
+  }, "id" | "shortId">
 
   export type SiteOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     address?: SortOrder
-    latitude?: SortOrderInput | SortOrder
-    longitude?: SortOrderInput | SortOrder
-    createdAt?: SortOrder
     clientId?: SortOrder
     _count?: SiteCountOrderByAggregateInput
     _avg?: SiteAvgOrderByAggregateInput
@@ -13418,12 +14947,58 @@ export namespace Prisma {
     OR?: SiteScalarWhereWithAggregatesInput[]
     NOT?: SiteScalarWhereWithAggregatesInput | SiteScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Site"> | string
+    shortId?: IntWithAggregatesFilter<"Site"> | number
     name?: StringWithAggregatesFilter<"Site"> | string
     address?: StringWithAggregatesFilter<"Site"> | string
-    latitude?: FloatNullableWithAggregatesFilter<"Site"> | number | null
-    longitude?: FloatNullableWithAggregatesFilter<"Site"> | number | null
-    createdAt?: DateTimeWithAggregatesFilter<"Site"> | Date | string
     clientId?: StringWithAggregatesFilter<"Site"> | string
+  }
+
+  export type TransmitterWhereInput = {
+    AND?: TransmitterWhereInput | TransmitterWhereInput[]
+    OR?: TransmitterWhereInput[]
+    NOT?: TransmitterWhereInput | TransmitterWhereInput[]
+    id?: StringFilter<"Transmitter"> | string
+    referenceCode?: StringFilter<"Transmitter"> | string
+    siteId?: StringFilter<"Transmitter"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    alarms?: AlarmListRelationFilter
+  }
+
+  export type TransmitterOrderByWithRelationInput = {
+    id?: SortOrder
+    referenceCode?: SortOrder
+    siteId?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    alarms?: AlarmOrderByRelationAggregateInput
+  }
+
+  export type TransmitterWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    referenceCode?: string
+    AND?: TransmitterWhereInput | TransmitterWhereInput[]
+    OR?: TransmitterWhereInput[]
+    NOT?: TransmitterWhereInput | TransmitterWhereInput[]
+    siteId?: StringFilter<"Transmitter"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    alarms?: AlarmListRelationFilter
+  }, "id" | "referenceCode">
+
+  export type TransmitterOrderByWithAggregationInput = {
+    id?: SortOrder
+    referenceCode?: SortOrder
+    siteId?: SortOrder
+    _count?: TransmitterCountOrderByAggregateInput
+    _max?: TransmitterMaxOrderByAggregateInput
+    _min?: TransmitterMinOrderByAggregateInput
+  }
+
+  export type TransmitterScalarWhereWithAggregatesInput = {
+    AND?: TransmitterScalarWhereWithAggregatesInput | TransmitterScalarWhereWithAggregatesInput[]
+    OR?: TransmitterScalarWhereWithAggregatesInput[]
+    NOT?: TransmitterScalarWhereWithAggregatesInput | TransmitterScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Transmitter"> | string
+    referenceCode?: StringWithAggregatesFilter<"Transmitter"> | string
+    siteId?: StringWithAggregatesFilter<"Transmitter"> | string
   }
 
   export type AlarmWhereInput = {
@@ -13431,53 +15006,50 @@ export namespace Prisma {
     OR?: AlarmWhereInput[]
     NOT?: AlarmWhereInput | AlarmWhereInput[]
     id?: StringFilter<"Alarm"> | string
+    shortId?: IntFilter<"Alarm"> | number
     triggeredAt?: DateTimeFilter<"Alarm"> | Date | string
-    alarmType?: StringFilter<"Alarm"> | string
-    priority?: IntFilter<"Alarm"> | number
-    status?: StringFilter<"Alarm"> | string
-    siteId?: StringFilter<"Alarm"> | string
-    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
-    aiCall?: XOR<AiCallNullableScalarRelationFilter, AiCallWhereInput> | null
+    eventType?: StringFilter<"Alarm"> | string
+    source?: StringFilter<"Alarm"> | string
+    transmitterId?: StringFilter<"Alarm"> | string
+    transmitter?: XOR<TransmitterScalarRelationFilter, TransmitterWhereInput>
+    aiCalls?: AiCallListRelationFilter
     dispatch?: XOR<DispatchNullableScalarRelationFilter, DispatchWhereInput> | null
-    obLogs?: ObLogListRelationFilter
   }
 
   export type AlarmOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     triggeredAt?: SortOrder
-    alarmType?: SortOrder
-    priority?: SortOrder
-    status?: SortOrder
-    siteId?: SortOrder
-    site?: SiteOrderByWithRelationInput
-    aiCall?: AiCallOrderByWithRelationInput
+    eventType?: SortOrder
+    source?: SortOrder
+    transmitterId?: SortOrder
+    transmitter?: TransmitterOrderByWithRelationInput
+    aiCalls?: AiCallOrderByRelationAggregateInput
     dispatch?: DispatchOrderByWithRelationInput
-    obLogs?: ObLogOrderByRelationAggregateInput
   }
 
   export type AlarmWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     AND?: AlarmWhereInput | AlarmWhereInput[]
     OR?: AlarmWhereInput[]
     NOT?: AlarmWhereInput | AlarmWhereInput[]
     triggeredAt?: DateTimeFilter<"Alarm"> | Date | string
-    alarmType?: StringFilter<"Alarm"> | string
-    priority?: IntFilter<"Alarm"> | number
-    status?: StringFilter<"Alarm"> | string
-    siteId?: StringFilter<"Alarm"> | string
-    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
-    aiCall?: XOR<AiCallNullableScalarRelationFilter, AiCallWhereInput> | null
+    eventType?: StringFilter<"Alarm"> | string
+    source?: StringFilter<"Alarm"> | string
+    transmitterId?: StringFilter<"Alarm"> | string
+    transmitter?: XOR<TransmitterScalarRelationFilter, TransmitterWhereInput>
+    aiCalls?: AiCallListRelationFilter
     dispatch?: XOR<DispatchNullableScalarRelationFilter, DispatchWhereInput> | null
-    obLogs?: ObLogListRelationFilter
-  }, "id">
+  }, "id" | "shortId">
 
   export type AlarmOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     triggeredAt?: SortOrder
-    alarmType?: SortOrder
-    priority?: SortOrder
-    status?: SortOrder
-    siteId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    transmitterId?: SortOrder
     _count?: AlarmCountOrderByAggregateInput
     _avg?: AlarmAvgOrderByAggregateInput
     _max?: AlarmMaxOrderByAggregateInput
@@ -13490,11 +15062,11 @@ export namespace Prisma {
     OR?: AlarmScalarWhereWithAggregatesInput[]
     NOT?: AlarmScalarWhereWithAggregatesInput | AlarmScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Alarm"> | string
+    shortId?: IntWithAggregatesFilter<"Alarm"> | number
     triggeredAt?: DateTimeWithAggregatesFilter<"Alarm"> | Date | string
-    alarmType?: StringWithAggregatesFilter<"Alarm"> | string
-    priority?: IntWithAggregatesFilter<"Alarm"> | number
-    status?: StringWithAggregatesFilter<"Alarm"> | string
-    siteId?: StringWithAggregatesFilter<"Alarm"> | string
+    eventType?: StringWithAggregatesFilter<"Alarm"> | string
+    source?: StringWithAggregatesFilter<"Alarm"> | string
+    transmitterId?: StringWithAggregatesFilter<"Alarm"> | string
   }
 
   export type AiCallWhereInput = {
@@ -13502,44 +15074,60 @@ export namespace Prisma {
     OR?: AiCallWhereInput[]
     NOT?: AiCallWhereInput | AiCallWhereInput[]
     id?: StringFilter<"AiCall"> | string
-    aiDecision?: StringFilter<"AiCall"> | string
-    confidenceScore?: FloatFilter<"AiCall"> | number
-    evaluatedAt?: DateTimeFilter<"AiCall"> | Date | string
-    notes?: StringNullableFilter<"AiCall"> | string | null
+    shortId?: IntFilter<"AiCall"> | number
     alarmId?: StringFilter<"AiCall"> | string
+    calledAt?: DateTimeFilter<"AiCall"> | Date | string
+    callDuration?: StringNullableFilter<"AiCall"> | string | null
+    notes?: StringNullableFilter<"AiCall"> | string | null
+    aiDecision?: StringNullableFilter<"AiCall"> | string | null
+    confidenceScore?: FloatNullableFilter<"AiCall"> | number | null
+    evaluatedAt?: DateTimeNullableFilter<"AiCall"> | Date | string | null
+    phone?: StringNullableFilter<"AiCall"> | string | null
     alarm?: XOR<AlarmScalarRelationFilter, AlarmWhereInput>
   }
 
   export type AiCallOrderByWithRelationInput = {
     id?: SortOrder
-    aiDecision?: SortOrder
-    confidenceScore?: SortOrder
-    evaluatedAt?: SortOrder
-    notes?: SortOrderInput | SortOrder
+    shortId?: SortOrder
     alarmId?: SortOrder
+    calledAt?: SortOrder
+    callDuration?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    aiDecision?: SortOrderInput | SortOrder
+    confidenceScore?: SortOrderInput | SortOrder
+    evaluatedAt?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
     alarm?: AlarmOrderByWithRelationInput
   }
 
   export type AiCallWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    alarmId?: string
+    shortId?: number
     AND?: AiCallWhereInput | AiCallWhereInput[]
     OR?: AiCallWhereInput[]
     NOT?: AiCallWhereInput | AiCallWhereInput[]
-    aiDecision?: StringFilter<"AiCall"> | string
-    confidenceScore?: FloatFilter<"AiCall"> | number
-    evaluatedAt?: DateTimeFilter<"AiCall"> | Date | string
+    alarmId?: StringFilter<"AiCall"> | string
+    calledAt?: DateTimeFilter<"AiCall"> | Date | string
+    callDuration?: StringNullableFilter<"AiCall"> | string | null
     notes?: StringNullableFilter<"AiCall"> | string | null
+    aiDecision?: StringNullableFilter<"AiCall"> | string | null
+    confidenceScore?: FloatNullableFilter<"AiCall"> | number | null
+    evaluatedAt?: DateTimeNullableFilter<"AiCall"> | Date | string | null
+    phone?: StringNullableFilter<"AiCall"> | string | null
     alarm?: XOR<AlarmScalarRelationFilter, AlarmWhereInput>
-  }, "id" | "alarmId">
+  }, "id" | "shortId">
 
   export type AiCallOrderByWithAggregationInput = {
     id?: SortOrder
-    aiDecision?: SortOrder
-    confidenceScore?: SortOrder
-    evaluatedAt?: SortOrder
-    notes?: SortOrderInput | SortOrder
+    shortId?: SortOrder
     alarmId?: SortOrder
+    calledAt?: SortOrder
+    callDuration?: SortOrderInput | SortOrder
+    notes?: SortOrderInput | SortOrder
+    aiDecision?: SortOrderInput | SortOrder
+    confidenceScore?: SortOrderInput | SortOrder
+    evaluatedAt?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
     _count?: AiCallCountOrderByAggregateInput
     _avg?: AiCallAvgOrderByAggregateInput
     _max?: AiCallMaxOrderByAggregateInput
@@ -13552,11 +15140,15 @@ export namespace Prisma {
     OR?: AiCallScalarWhereWithAggregatesInput[]
     NOT?: AiCallScalarWhereWithAggregatesInput | AiCallScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"AiCall"> | string
-    aiDecision?: StringWithAggregatesFilter<"AiCall"> | string
-    confidenceScore?: FloatWithAggregatesFilter<"AiCall"> | number
-    evaluatedAt?: DateTimeWithAggregatesFilter<"AiCall"> | Date | string
-    notes?: StringNullableWithAggregatesFilter<"AiCall"> | string | null
+    shortId?: IntWithAggregatesFilter<"AiCall"> | number
     alarmId?: StringWithAggregatesFilter<"AiCall"> | string
+    calledAt?: DateTimeWithAggregatesFilter<"AiCall"> | Date | string
+    callDuration?: StringNullableWithAggregatesFilter<"AiCall"> | string | null
+    notes?: StringNullableWithAggregatesFilter<"AiCall"> | string | null
+    aiDecision?: StringNullableWithAggregatesFilter<"AiCall"> | string | null
+    confidenceScore?: FloatNullableWithAggregatesFilter<"AiCall"> | number | null
+    evaluatedAt?: DateTimeNullableWithAggregatesFilter<"AiCall"> | Date | string | null
+    phone?: StringNullableWithAggregatesFilter<"AiCall"> | string | null
   }
 
   export type DispatchWhereInput = {
@@ -13564,6 +15156,7 @@ export namespace Prisma {
     OR?: DispatchWhereInput[]
     NOT?: DispatchWhereInput | DispatchWhereInput[]
     id?: StringFilter<"Dispatch"> | string
+    shortId?: IntFilter<"Dispatch"> | number
     dispatchedAt?: DateTimeFilter<"Dispatch"> | Date | string
     arrivalTime?: DateTimeNullableFilter<"Dispatch"> | Date | string | null
     resolvedAt?: DateTimeNullableFilter<"Dispatch"> | Date | string | null
@@ -13578,6 +15171,7 @@ export namespace Prisma {
 
   export type DispatchOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     dispatchedAt?: SortOrder
     arrivalTime?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
@@ -13592,6 +15186,7 @@ export namespace Prisma {
 
   export type DispatchWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     alarmId?: string
     AND?: DispatchWhereInput | DispatchWhereInput[]
     OR?: DispatchWhereInput[]
@@ -13605,10 +15200,11 @@ export namespace Prisma {
     alarm?: XOR<AlarmScalarRelationFilter, AlarmWhereInput>
     guard?: XOR<GuardNullableScalarRelationFilter, GuardWhereInput> | null
     vehicle?: XOR<VehicleNullableScalarRelationFilter, VehicleWhereInput> | null
-  }, "id" | "alarmId">
+  }, "id" | "shortId" | "alarmId">
 
   export type DispatchOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     dispatchedAt?: SortOrder
     arrivalTime?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
@@ -13617,8 +15213,10 @@ export namespace Prisma {
     guardId?: SortOrderInput | SortOrder
     vehicleId?: SortOrderInput | SortOrder
     _count?: DispatchCountOrderByAggregateInput
+    _avg?: DispatchAvgOrderByAggregateInput
     _max?: DispatchMaxOrderByAggregateInput
     _min?: DispatchMinOrderByAggregateInput
+    _sum?: DispatchSumOrderByAggregateInput
   }
 
   export type DispatchScalarWhereWithAggregatesInput = {
@@ -13626,6 +15224,7 @@ export namespace Prisma {
     OR?: DispatchScalarWhereWithAggregatesInput[]
     NOT?: DispatchScalarWhereWithAggregatesInput | DispatchScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Dispatch"> | string
+    shortId?: IntWithAggregatesFilter<"Dispatch"> | number
     dispatchedAt?: DateTimeWithAggregatesFilter<"Dispatch"> | Date | string
     arrivalTime?: DateTimeNullableWithAggregatesFilter<"Dispatch"> | Date | string | null
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"Dispatch"> | Date | string | null
@@ -13635,75 +15234,74 @@ export namespace Prisma {
     vehicleId?: StringNullableWithAggregatesFilter<"Dispatch"> | string | null
   }
 
-  export type ObLogWhereInput = {
-    AND?: ObLogWhereInput | ObLogWhereInput[]
-    OR?: ObLogWhereInput[]
-    NOT?: ObLogWhereInput | ObLogWhereInput[]
-    id?: StringFilter<"ObLog"> | string
-    logTime?: DateTimeFilter<"ObLog"> | Date | string
-    message?: StringFilter<"ObLog"> | string
-    source?: StringFilter<"ObLog"> | string
-    alarmId?: StringNullableFilter<"ObLog"> | string | null
-    siteId?: StringNullableFilter<"ObLog"> | string | null
-    guardId?: StringNullableFilter<"ObLog"> | string | null
-    alarm?: XOR<AlarmNullableScalarRelationFilter, AlarmWhereInput> | null
-    site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
+  export type OBLogWhereInput = {
+    AND?: OBLogWhereInput | OBLogWhereInput[]
+    OR?: OBLogWhereInput[]
+    NOT?: OBLogWhereInput | OBLogWhereInput[]
+    id?: StringFilter<"OBLog"> | string
+    shortId?: IntFilter<"OBLog"> | number
+    logTime?: DateTimeFilter<"OBLog"> | Date | string
+    guardId?: StringNullableFilter<"OBLog"> | string | null
+    siteId?: StringNullableFilter<"OBLog"> | string | null
+    actionLog?: StringFilter<"OBLog"> | string
+    notes?: StringFilter<"OBLog"> | string
     guard?: XOR<GuardNullableScalarRelationFilter, GuardWhereInput> | null
+    site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
   }
 
-  export type ObLogOrderByWithRelationInput = {
+  export type OBLogOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     logTime?: SortOrder
-    message?: SortOrder
-    source?: SortOrder
-    alarmId?: SortOrderInput | SortOrder
-    siteId?: SortOrderInput | SortOrder
     guardId?: SortOrderInput | SortOrder
-    alarm?: AlarmOrderByWithRelationInput
-    site?: SiteOrderByWithRelationInput
+    siteId?: SortOrderInput | SortOrder
+    actionLog?: SortOrder
+    notes?: SortOrder
     guard?: GuardOrderByWithRelationInput
+    site?: SiteOrderByWithRelationInput
   }
 
-  export type ObLogWhereUniqueInput = Prisma.AtLeast<{
+  export type OBLogWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    AND?: ObLogWhereInput | ObLogWhereInput[]
-    OR?: ObLogWhereInput[]
-    NOT?: ObLogWhereInput | ObLogWhereInput[]
-    logTime?: DateTimeFilter<"ObLog"> | Date | string
-    message?: StringFilter<"ObLog"> | string
-    source?: StringFilter<"ObLog"> | string
-    alarmId?: StringNullableFilter<"ObLog"> | string | null
-    siteId?: StringNullableFilter<"ObLog"> | string | null
-    guardId?: StringNullableFilter<"ObLog"> | string | null
-    alarm?: XOR<AlarmNullableScalarRelationFilter, AlarmWhereInput> | null
-    site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
+    shortId?: number
+    AND?: OBLogWhereInput | OBLogWhereInput[]
+    OR?: OBLogWhereInput[]
+    NOT?: OBLogWhereInput | OBLogWhereInput[]
+    logTime?: DateTimeFilter<"OBLog"> | Date | string
+    guardId?: StringNullableFilter<"OBLog"> | string | null
+    siteId?: StringNullableFilter<"OBLog"> | string | null
+    actionLog?: StringFilter<"OBLog"> | string
+    notes?: StringFilter<"OBLog"> | string
     guard?: XOR<GuardNullableScalarRelationFilter, GuardWhereInput> | null
-  }, "id">
+    site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
+  }, "id" | "shortId">
 
-  export type ObLogOrderByWithAggregationInput = {
+  export type OBLogOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     logTime?: SortOrder
-    message?: SortOrder
-    source?: SortOrder
-    alarmId?: SortOrderInput | SortOrder
-    siteId?: SortOrderInput | SortOrder
     guardId?: SortOrderInput | SortOrder
-    _count?: ObLogCountOrderByAggregateInput
-    _max?: ObLogMaxOrderByAggregateInput
-    _min?: ObLogMinOrderByAggregateInput
+    siteId?: SortOrderInput | SortOrder
+    actionLog?: SortOrder
+    notes?: SortOrder
+    _count?: OBLogCountOrderByAggregateInput
+    _avg?: OBLogAvgOrderByAggregateInput
+    _max?: OBLogMaxOrderByAggregateInput
+    _min?: OBLogMinOrderByAggregateInput
+    _sum?: OBLogSumOrderByAggregateInput
   }
 
-  export type ObLogScalarWhereWithAggregatesInput = {
-    AND?: ObLogScalarWhereWithAggregatesInput | ObLogScalarWhereWithAggregatesInput[]
-    OR?: ObLogScalarWhereWithAggregatesInput[]
-    NOT?: ObLogScalarWhereWithAggregatesInput | ObLogScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ObLog"> | string
-    logTime?: DateTimeWithAggregatesFilter<"ObLog"> | Date | string
-    message?: StringWithAggregatesFilter<"ObLog"> | string
-    source?: StringWithAggregatesFilter<"ObLog"> | string
-    alarmId?: StringNullableWithAggregatesFilter<"ObLog"> | string | null
-    siteId?: StringNullableWithAggregatesFilter<"ObLog"> | string | null
-    guardId?: StringNullableWithAggregatesFilter<"ObLog"> | string | null
+  export type OBLogScalarWhereWithAggregatesInput = {
+    AND?: OBLogScalarWhereWithAggregatesInput | OBLogScalarWhereWithAggregatesInput[]
+    OR?: OBLogScalarWhereWithAggregatesInput[]
+    NOT?: OBLogScalarWhereWithAggregatesInput | OBLogScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"OBLog"> | string
+    shortId?: IntWithAggregatesFilter<"OBLog"> | number
+    logTime?: DateTimeWithAggregatesFilter<"OBLog"> | Date | string
+    guardId?: StringNullableWithAggregatesFilter<"OBLog"> | string | null
+    siteId?: StringNullableWithAggregatesFilter<"OBLog"> | string | null
+    actionLog?: StringWithAggregatesFilter<"OBLog"> | string
+    notes?: StringWithAggregatesFilter<"OBLog"> | string
   }
 
   export type UserWhereInput = {
@@ -13711,51 +15309,57 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
+    shortId?: IntFilter<"User"> | number
     email?: StringFilter<"User"> | string
-    passwordHash?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     roleId?: StringFilter<"User"> | string
-    role?: XOR<UserRoleScalarRelationFilter, UserRoleWhereInput>
+    role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     email?: SortOrder
-    passwordHash?: SortOrder
+    password?: SortOrder
     name?: SortOrder
     createdAt?: SortOrder
     lastLogin?: SortOrderInput | SortOrder
     roleId?: SortOrder
-    role?: UserRoleOrderByWithRelationInput
+    role?: RoleOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     email?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    passwordHash?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
     roleId?: StringFilter<"User"> | string
-    role?: XOR<UserRoleScalarRelationFilter, UserRoleWhereInput>
-  }, "id" | "email">
+    role?: XOR<RoleScalarRelationFilter, RoleWhereInput>
+  }, "id" | "shortId" | "email">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     email?: SortOrder
-    passwordHash?: SortOrder
+    password?: SortOrder
     name?: SortOrder
     createdAt?: SortOrder
     lastLogin?: SortOrderInput | SortOrder
     roleId?: SortOrder
     _count?: UserCountOrderByAggregateInput
+    _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
+    _sum?: UserSumOrderByAggregateInput
   }
 
   export type UserScalarWhereWithAggregatesInput = {
@@ -13763,52 +15367,53 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
+    shortId?: IntWithAggregatesFilter<"User"> | number
     email?: StringWithAggregatesFilter<"User"> | string
-    passwordHash?: StringWithAggregatesFilter<"User"> | string
+    password?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     lastLogin?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     roleId?: StringWithAggregatesFilter<"User"> | string
   }
 
-  export type UserRoleWhereInput = {
-    AND?: UserRoleWhereInput | UserRoleWhereInput[]
-    OR?: UserRoleWhereInput[]
-    NOT?: UserRoleWhereInput | UserRoleWhereInput[]
-    id?: StringFilter<"UserRole"> | string
-    name?: StringFilter<"UserRole"> | string
+  export type RoleWhereInput = {
+    AND?: RoleWhereInput | RoleWhereInput[]
+    OR?: RoleWhereInput[]
+    NOT?: RoleWhereInput | RoleWhereInput[]
+    id?: StringFilter<"Role"> | string
+    name?: StringFilter<"Role"> | string
     users?: UserListRelationFilter
   }
 
-  export type UserRoleOrderByWithRelationInput = {
+  export type RoleOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
     users?: UserOrderByRelationAggregateInput
   }
 
-  export type UserRoleWhereUniqueInput = Prisma.AtLeast<{
+  export type RoleWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     name?: string
-    AND?: UserRoleWhereInput | UserRoleWhereInput[]
-    OR?: UserRoleWhereInput[]
-    NOT?: UserRoleWhereInput | UserRoleWhereInput[]
+    AND?: RoleWhereInput | RoleWhereInput[]
+    OR?: RoleWhereInput[]
+    NOT?: RoleWhereInput | RoleWhereInput[]
     users?: UserListRelationFilter
   }, "id" | "name">
 
-  export type UserRoleOrderByWithAggregationInput = {
+  export type RoleOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    _count?: UserRoleCountOrderByAggregateInput
-    _max?: UserRoleMaxOrderByAggregateInput
-    _min?: UserRoleMinOrderByAggregateInput
+    _count?: RoleCountOrderByAggregateInput
+    _max?: RoleMaxOrderByAggregateInput
+    _min?: RoleMinOrderByAggregateInput
   }
 
-  export type UserRoleScalarWhereWithAggregatesInput = {
-    AND?: UserRoleScalarWhereWithAggregatesInput | UserRoleScalarWhereWithAggregatesInput[]
-    OR?: UserRoleScalarWhereWithAggregatesInput[]
-    NOT?: UserRoleScalarWhereWithAggregatesInput | UserRoleScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"UserRole"> | string
-    name?: StringWithAggregatesFilter<"UserRole"> | string
+  export type RoleScalarWhereWithAggregatesInput = {
+    AND?: RoleScalarWhereWithAggregatesInput | RoleScalarWhereWithAggregatesInput[]
+    OR?: RoleScalarWhereWithAggregatesInput[]
+    NOT?: RoleScalarWhereWithAggregatesInput | RoleScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Role"> | string
+    name?: StringWithAggregatesFilter<"Role"> | string
   }
 
   export type VehicleWhereInput = {
@@ -13816,8 +15421,10 @@ export namespace Prisma {
     OR?: VehicleWhereInput[]
     NOT?: VehicleWhereInput | VehicleWhereInput[]
     id?: StringFilter<"Vehicle"> | string
-    plateNumber?: StringFilter<"Vehicle"> | string
-    description?: StringNullableFilter<"Vehicle"> | string | null
+    shortId?: IntFilter<"Vehicle"> | number
+    name?: StringFilter<"Vehicle"> | string
+    plate?: StringFilter<"Vehicle"> | string
+    model?: StringFilter<"Vehicle"> | string
     status?: StringFilter<"Vehicle"> | string
     dispatches?: DispatchListRelationFilter
     guards?: GuardListRelationFilter
@@ -13825,8 +15432,10 @@ export namespace Prisma {
 
   export type VehicleOrderByWithRelationInput = {
     id?: SortOrder
-    plateNumber?: SortOrder
-    description?: SortOrderInput | SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    plate?: SortOrder
+    model?: SortOrder
     status?: SortOrder
     dispatches?: DispatchOrderByRelationAggregateInput
     guards?: GuardOrderByRelationAggregateInput
@@ -13834,24 +15443,30 @@ export namespace Prisma {
 
   export type VehicleWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    plateNumber?: string
+    shortId?: number
+    plate?: string
     AND?: VehicleWhereInput | VehicleWhereInput[]
     OR?: VehicleWhereInput[]
     NOT?: VehicleWhereInput | VehicleWhereInput[]
-    description?: StringNullableFilter<"Vehicle"> | string | null
+    name?: StringFilter<"Vehicle"> | string
+    model?: StringFilter<"Vehicle"> | string
     status?: StringFilter<"Vehicle"> | string
     dispatches?: DispatchListRelationFilter
     guards?: GuardListRelationFilter
-  }, "id" | "plateNumber">
+  }, "id" | "shortId" | "plate">
 
   export type VehicleOrderByWithAggregationInput = {
     id?: SortOrder
-    plateNumber?: SortOrder
-    description?: SortOrderInput | SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    plate?: SortOrder
+    model?: SortOrder
     status?: SortOrder
     _count?: VehicleCountOrderByAggregateInput
+    _avg?: VehicleAvgOrderByAggregateInput
     _max?: VehicleMaxOrderByAggregateInput
     _min?: VehicleMinOrderByAggregateInput
+    _sum?: VehicleSumOrderByAggregateInput
   }
 
   export type VehicleScalarWhereWithAggregatesInput = {
@@ -13859,8 +15474,10 @@ export namespace Prisma {
     OR?: VehicleScalarWhereWithAggregatesInput[]
     NOT?: VehicleScalarWhereWithAggregatesInput | VehicleScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Vehicle"> | string
-    plateNumber?: StringWithAggregatesFilter<"Vehicle"> | string
-    description?: StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+    shortId?: IntWithAggregatesFilter<"Vehicle"> | number
+    name?: StringWithAggregatesFilter<"Vehicle"> | string
+    plate?: StringWithAggregatesFilter<"Vehicle"> | string
+    model?: StringWithAggregatesFilter<"Vehicle"> | string
     status?: StringWithAggregatesFilter<"Vehicle"> | string
   }
 
@@ -13869,28 +15486,31 @@ export namespace Prisma {
     OR?: GuardWhereInput[]
     NOT?: GuardWhereInput | GuardWhereInput[]
     id?: StringFilter<"Guard"> | string
+    shortId?: IntFilter<"Guard"> | number
     name?: StringFilter<"Guard"> | string
     phone?: StringFilter<"Guard"> | string
     status?: StringFilter<"Guard"> | string
     assignedVehicleId?: StringNullableFilter<"Guard"> | string | null
     assignedVehicle?: XOR<VehicleNullableScalarRelationFilter, VehicleWhereInput> | null
     dispatches?: DispatchListRelationFilter
-    obLogs?: ObLogListRelationFilter
+    OBLogs?: OBLogListRelationFilter
   }
 
   export type GuardOrderByWithRelationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     status?: SortOrder
     assignedVehicleId?: SortOrderInput | SortOrder
     assignedVehicle?: VehicleOrderByWithRelationInput
     dispatches?: DispatchOrderByRelationAggregateInput
-    obLogs?: ObLogOrderByRelationAggregateInput
+    OBLogs?: OBLogOrderByRelationAggregateInput
   }
 
   export type GuardWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    shortId?: number
     AND?: GuardWhereInput | GuardWhereInput[]
     OR?: GuardWhereInput[]
     NOT?: GuardWhereInput | GuardWhereInput[]
@@ -13900,18 +15520,21 @@ export namespace Prisma {
     assignedVehicleId?: StringNullableFilter<"Guard"> | string | null
     assignedVehicle?: XOR<VehicleNullableScalarRelationFilter, VehicleWhereInput> | null
     dispatches?: DispatchListRelationFilter
-    obLogs?: ObLogListRelationFilter
-  }, "id">
+    OBLogs?: OBLogListRelationFilter
+  }, "id" | "shortId">
 
   export type GuardOrderByWithAggregationInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     status?: SortOrder
     assignedVehicleId?: SortOrderInput | SortOrder
     _count?: GuardCountOrderByAggregateInput
+    _avg?: GuardAvgOrderByAggregateInput
     _max?: GuardMaxOrderByAggregateInput
     _min?: GuardMinOrderByAggregateInput
+    _sum?: GuardSumOrderByAggregateInput
   }
 
   export type GuardScalarWhereWithAggregatesInput = {
@@ -13919,6 +15542,7 @@ export namespace Prisma {
     OR?: GuardScalarWhereWithAggregatesInput[]
     NOT?: GuardScalarWhereWithAggregatesInput | GuardScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Guard"> | string
+    shortId?: IntWithAggregatesFilter<"Guard"> | number
     name?: StringWithAggregatesFilter<"Guard"> | string
     phone?: StringWithAggregatesFilter<"Guard"> | string
     status?: StringWithAggregatesFilter<"Guard"> | string
@@ -13927,119 +15551,120 @@ export namespace Prisma {
 
   export type ClientCreateInput = {
     id?: string
+    shortId?: number
+    surname: string
     name: string
-    contactEmail: string
-    phone?: string | null
+    email: string
+    phone: string
     createdAt?: Date | string
     sites?: SiteCreateNestedManyWithoutClientInput
   }
 
   export type ClientUncheckedCreateInput = {
     id?: string
+    shortId?: number
+    surname: string
     name: string
-    contactEmail: string
-    phone?: string | null
+    email: string
+    phone: string
     createdAt?: Date | string
     sites?: SiteUncheckedCreateNestedManyWithoutClientInput
   }
 
   export type ClientUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sites?: SiteUpdateManyWithoutClientNestedInput
   }
 
   export type ClientUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sites?: SiteUncheckedUpdateManyWithoutClientNestedInput
   }
 
   export type ClientCreateManyInput = {
     id?: string
+    shortId?: number
+    surname: string
     name: string
-    contactEmail: string
-    phone?: string | null
+    email: string
+    phone: string
     createdAt?: Date | string
   }
 
   export type ClientUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ClientUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SiteCreateInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
     client: ClientCreateNestedOneWithoutSitesInput
-    alarms?: AlarmCreateNestedManyWithoutSiteInput
-    obLogs?: ObLogCreateNestedManyWithoutSiteInput
+    transmitters?: TransmitterCreateNestedManyWithoutSiteInput
+    OBLogs?: OBLogCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
     clientId: string
-    alarms?: AlarmUncheckedCreateNestedManyWithoutSiteInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutSiteInput
+    transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     client?: ClientUpdateOneRequiredWithoutSitesNestedInput
-    alarms?: AlarmUpdateManyWithoutSiteNestedInput
-    obLogs?: ObLogUpdateManyWithoutSiteNestedInput
+    transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
+    OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clientId?: StringFieldUpdateOperationsInput | string
-    alarms?: AlarmUncheckedUpdateManyWithoutSiteNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutSiteNestedInput
+    transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
+    OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
     clientId: string
   }
 
@@ -14047,159 +15672,220 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SiteUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     clientId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransmitterCreateInput = {
+    id?: string
+    referenceCode: string
+    site: SiteCreateNestedOneWithoutTransmittersInput
+    alarms?: AlarmCreateNestedManyWithoutTransmitterInput
+  }
+
+  export type TransmitterUncheckedCreateInput = {
+    id?: string
+    referenceCode: string
+    siteId: string
+    alarms?: AlarmUncheckedCreateNestedManyWithoutTransmitterInput
+  }
+
+  export type TransmitterUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    site?: SiteUpdateOneRequiredWithoutTransmittersNestedInput
+    alarms?: AlarmUpdateManyWithoutTransmitterNestedInput
+  }
+
+  export type TransmitterUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    alarms?: AlarmUncheckedUpdateManyWithoutTransmitterNestedInput
+  }
+
+  export type TransmitterCreateManyInput = {
+    id?: string
+    referenceCode: string
+    siteId: string
+  }
+
+  export type TransmitterUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TransmitterUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AlarmCreateInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    site: SiteCreateNestedOneWithoutAlarmsInput
-    aiCall?: AiCallCreateNestedOneWithoutAlarmInput
+    eventType: string
+    source: string
+    transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
+    aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogCreateNestedManyWithoutAlarmInput
   }
 
   export type AlarmUncheckedCreateInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
-    aiCall?: AiCallUncheckedCreateNestedOneWithoutAlarmInput
+    eventType: string
+    source: string
+    transmitterId: string
+    aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
     dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutAlarmInput
   }
 
   export type AlarmUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    site?: SiteUpdateOneRequiredWithoutAlarmsNestedInput
-    aiCall?: AiCallUpdateOneWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
+    aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUpdateManyWithoutAlarmNestedInput
   }
 
   export type AlarmUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    siteId?: StringFieldUpdateOperationsInput | string
-    aiCall?: AiCallUncheckedUpdateOneWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitterId?: StringFieldUpdateOperationsInput | string
+    aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutAlarmNestedInput
   }
 
   export type AlarmCreateManyInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
+    eventType: string
+    source: string
+    transmitterId: string
   }
 
   export type AlarmUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
   }
 
   export type AlarmUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitterId?: StringFieldUpdateOperationsInput | string
   }
 
   export type AiCallCreateInput = {
     id?: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date | string
+    shortId?: number
+    calledAt?: Date | string
+    callDuration?: string | null
     notes?: string | null
-    alarm: AlarmCreateNestedOneWithoutAiCallInput
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
+    alarm: AlarmCreateNestedOneWithoutAiCallsInput
   }
 
   export type AiCallUncheckedCreateInput = {
     id?: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date | string
-    notes?: string | null
+    shortId?: number
     alarmId: string
+    calledAt?: Date | string
+    callDuration?: string | null
+    notes?: string | null
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
   }
 
   export type AiCallUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
-    alarm?: AlarmUpdateOneRequiredWithoutAiCallNestedInput
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    alarm?: AlarmUpdateOneRequiredWithoutAiCallsNestedInput
   }
 
   export type AiCallUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
     alarmId?: StringFieldUpdateOperationsInput | string
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AiCallCreateManyInput = {
     id?: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date | string
-    notes?: string | null
+    shortId?: number
     alarmId: string
+    calledAt?: Date | string
+    callDuration?: string | null
+    notes?: string | null
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
   }
 
   export type AiCallUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AiCallUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
     alarmId?: StringFieldUpdateOperationsInput | string
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DispatchCreateInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -14211,6 +15897,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedCreateInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -14233,6 +15920,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14244,6 +15932,7 @@ export namespace Prisma {
 
   export type DispatchCreateManyInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -14263,6 +15952,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14272,87 +15962,88 @@ export namespace Prisma {
     vehicleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ObLogCreateInput = {
+  export type OBLogCreateInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarm?: AlarmCreateNestedOneWithoutObLogsInput
-    site?: SiteCreateNestedOneWithoutObLogsInput
-    guard?: GuardCreateNestedOneWithoutObLogsInput
+    actionLog: string
+    notes: string
+    guard?: GuardCreateNestedOneWithoutOBLogsInput
+    site?: SiteCreateNestedOneWithoutOBLogsInput
   }
 
-  export type ObLogUncheckedCreateInput = {
+  export type OBLogUncheckedCreateInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarmId?: string | null
-    siteId?: string | null
     guardId?: string | null
-  }
-
-  export type ObLogUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarm?: AlarmUpdateOneWithoutObLogsNestedInput
-    site?: SiteUpdateOneWithoutObLogsNestedInput
-    guard?: GuardUpdateOneWithoutObLogsNestedInput
-  }
-
-  export type ObLogUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
-    siteId?: NullableStringFieldUpdateOperationsInput | string | null
-    guardId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type ObLogCreateManyInput = {
-    id?: string
-    logTime: Date | string
-    message: string
-    source: string
-    alarmId?: string | null
     siteId?: string | null
-    guardId?: string | null
+    actionLog: string
+    notes: string
   }
 
-  export type ObLogUpdateManyMutationInput = {
+  export type OBLogUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+    guard?: GuardUpdateOneWithoutOBLogsNestedInput
+    site?: SiteUpdateOneWithoutOBLogsNestedInput
   }
 
-  export type ObLogUncheckedUpdateManyInput = {
+  export type OBLogUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
-    siteId?: NullableStringFieldUpdateOperationsInput | string | null
     guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    siteId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OBLogCreateManyInput = {
+    id?: string
+    shortId?: number
+    logTime: Date | string
+    guardId?: string | null
+    siteId?: string | null
+    actionLog: string
+    notes: string
+  }
+
+  export type OBLogUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OBLogUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    siteId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
-    role: UserRoleCreateNestedOneWithoutUsersInput
+    role: RoleCreateNestedOneWithoutUsersInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
@@ -14362,17 +16053,18 @@ export namespace Prisma {
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    role?: UserRoleUpdateOneRequiredWithoutUsersNestedInput
+    role?: RoleUpdateOneRequiredWithoutUsersNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14381,8 +16073,9 @@ export namespace Prisma {
 
   export type UserCreateManyInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
@@ -14392,7 +16085,7 @@ export namespace Prisma {
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14400,57 +16093,60 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     roleId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserRoleCreateInput = {
-    id?: string
+  export type RoleCreateInput = {
+    id: string
     name: string
     users?: UserCreateNestedManyWithoutRoleInput
   }
 
-  export type UserRoleUncheckedCreateInput = {
-    id?: string
+  export type RoleUncheckedCreateInput = {
+    id: string
     name: string
     users?: UserUncheckedCreateNestedManyWithoutRoleInput
   }
 
-  export type UserRoleUpdateInput = {
+  export type RoleUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     users?: UserUpdateManyWithoutRoleNestedInput
   }
 
-  export type UserRoleUncheckedUpdateInput = {
+  export type RoleUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     users?: UserUncheckedUpdateManyWithoutRoleNestedInput
   }
 
-  export type UserRoleCreateManyInput = {
-    id?: string
+  export type RoleCreateManyInput = {
+    id: string
     name: string
   }
 
-  export type UserRoleUpdateManyMutationInput = {
+  export type RoleUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserRoleUncheckedUpdateManyInput = {
+  export type RoleUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
   }
 
   export type VehicleCreateInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     dispatches?: DispatchCreateNestedManyWithoutVehicleInput
     guards?: GuardCreateNestedManyWithoutAssignedVehicleInput
@@ -14458,8 +16154,10 @@ export namespace Prisma {
 
   export type VehicleUncheckedCreateInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     dispatches?: DispatchUncheckedCreateNestedManyWithoutVehicleInput
     guards?: GuardUncheckedCreateNestedManyWithoutAssignedVehicleInput
@@ -14467,8 +16165,9 @@ export namespace Prisma {
 
   export type VehicleUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUpdateManyWithoutVehicleNestedInput
     guards?: GuardUpdateManyWithoutAssignedVehicleNestedInput
@@ -14476,8 +16175,10 @@ export namespace Prisma {
 
   export type VehicleUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUncheckedUpdateManyWithoutVehicleNestedInput
     guards?: GuardUncheckedUpdateManyWithoutAssignedVehicleNestedInput
@@ -14485,43 +16186,50 @@ export namespace Prisma {
 
   export type VehicleCreateManyInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
   }
 
   export type VehicleUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
   }
 
   export type VehicleUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
   }
 
   export type GuardCreateInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     assignedVehicle?: VehicleCreateNestedOneWithoutGuardsInput
     dispatches?: DispatchCreateNestedManyWithoutGuardInput
-    obLogs?: ObLogCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogCreateNestedManyWithoutGuardInput
   }
 
   export type GuardUncheckedCreateInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     assignedVehicleId?: string | null
     dispatches?: DispatchUncheckedCreateNestedManyWithoutGuardInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutGuardInput
   }
 
   export type GuardUpdateInput = {
@@ -14531,21 +16239,23 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     assignedVehicle?: VehicleUpdateOneWithoutGuardsNestedInput
     dispatches?: DispatchUpdateManyWithoutGuardNestedInput
-    obLogs?: ObLogUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUpdateManyWithoutGuardNestedInput
   }
 
   export type GuardUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     assignedVehicleId?: NullableStringFieldUpdateOperationsInput | string | null
     dispatches?: DispatchUncheckedUpdateManyWithoutGuardNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUncheckedUpdateManyWithoutGuardNestedInput
   }
 
   export type GuardCreateManyInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
@@ -14561,6 +16271,7 @@ export namespace Prisma {
 
   export type GuardUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -14582,19 +16293,15 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -14614,37 +16321,46 @@ export namespace Prisma {
     none?: SiteWhereInput
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
-  }
-
   export type SiteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type ClientCountOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
+    surname?: SortOrder
     name?: SortOrder
-    contactEmail?: SortOrder
+    email?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
   }
 
+  export type ClientAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
   export type ClientMaxOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
+    surname?: SortOrder
     name?: SortOrder
-    contactEmail?: SortOrder
+    email?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
   }
 
   export type ClientMinOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
+    surname?: SortOrder
     name?: SortOrder
-    contactEmail?: SortOrder
+    email?: SortOrder
     phone?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type ClientSumOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -14665,6 +16381,277 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type ClientScalarRelationFilter = {
+    is?: ClientWhereInput
+    isNot?: ClientWhereInput
+  }
+
+  export type TransmitterListRelationFilter = {
+    every?: TransmitterWhereInput
+    some?: TransmitterWhereInput
+    none?: TransmitterWhereInput
+  }
+
+  export type OBLogListRelationFilter = {
+    every?: OBLogWhereInput
+    some?: OBLogWhereInput
+    none?: OBLogWhereInput
+  }
+
+  export type TransmitterOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type OBLogOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteCountOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    address?: SortOrder
+    clientId?: SortOrder
+  }
+
+  export type SiteAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type SiteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    address?: SortOrder
+    clientId?: SortOrder
+  }
+
+  export type SiteMinOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    address?: SortOrder
+    clientId?: SortOrder
+  }
+
+  export type SiteSumOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type SiteScalarRelationFilter = {
+    is?: SiteWhereInput
+    isNot?: SiteWhereInput
+  }
+
+  export type AlarmListRelationFilter = {
+    every?: AlarmWhereInput
+    some?: AlarmWhereInput
+    none?: AlarmWhereInput
+  }
+
+  export type AlarmOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TransmitterCountOrderByAggregateInput = {
+    id?: SortOrder
+    referenceCode?: SortOrder
+    siteId?: SortOrder
+  }
+
+  export type TransmitterMaxOrderByAggregateInput = {
+    id?: SortOrder
+    referenceCode?: SortOrder
+    siteId?: SortOrder
+  }
+
+  export type TransmitterMinOrderByAggregateInput = {
+    id?: SortOrder
+    referenceCode?: SortOrder
+    siteId?: SortOrder
+  }
+
+  export type TransmitterScalarRelationFilter = {
+    is?: TransmitterWhereInput
+    isNot?: TransmitterWhereInput
+  }
+
+  export type AiCallListRelationFilter = {
+    every?: AiCallWhereInput
+    some?: AiCallWhereInput
+    none?: AiCallWhereInput
+  }
+
+  export type DispatchNullableScalarRelationFilter = {
+    is?: DispatchWhereInput | null
+    isNot?: DispatchWhereInput | null
+  }
+
+  export type AiCallOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type AlarmCountOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    triggeredAt?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    transmitterId?: SortOrder
+  }
+
+  export type AlarmAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type AlarmMaxOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    triggeredAt?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    transmitterId?: SortOrder
+  }
+
+  export type AlarmMinOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    triggeredAt?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    transmitterId?: SortOrder
+  }
+
+  export type AlarmSumOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type AlarmScalarRelationFilter = {
+    is?: AlarmWhereInput
+    isNot?: AlarmWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type AiCallCountOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    alarmId?: SortOrder
+    calledAt?: SortOrder
+    callDuration?: SortOrder
+    notes?: SortOrder
+    aiDecision?: SortOrder
+    confidenceScore?: SortOrder
+    evaluatedAt?: SortOrder
+    phone?: SortOrder
+  }
+
+  export type AiCallAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+    confidenceScore?: SortOrder
+  }
+
+  export type AiCallMaxOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    alarmId?: SortOrder
+    calledAt?: SortOrder
+    callDuration?: SortOrder
+    notes?: SortOrder
+    aiDecision?: SortOrder
+    confidenceScore?: SortOrder
+    evaluatedAt?: SortOrder
+    phone?: SortOrder
+  }
+
+  export type AiCallMinOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    alarmId?: SortOrder
+    calledAt?: SortOrder
+    callDuration?: SortOrder
+    notes?: SortOrder
+    aiDecision?: SortOrder
+    confidenceScore?: SortOrder
+    evaluatedAt?: SortOrder
+    phone?: SortOrder
+  }
+
+  export type AiCallSumOrderByAggregateInput = {
+    shortId?: SortOrder
+    confidenceScore?: SortOrder
+  }
+
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -14683,96 +16670,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type ClientScalarRelationFilter = {
-    is?: ClientWhereInput
-    isNot?: ClientWhereInput
-  }
-
-  export type AlarmListRelationFilter = {
-    every?: AlarmWhereInput
-    some?: AlarmWhereInput
-    none?: AlarmWhereInput
-  }
-
-  export type ObLogListRelationFilter = {
-    every?: ObLogWhereInput
-    some?: ObLogWhereInput
-    none?: ObLogWhereInput
-  }
-
-  export type AlarmOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type ObLogOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type SiteCountOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    address?: SortOrder
-    latitude?: SortOrder
-    longitude?: SortOrder
-    createdAt?: SortOrder
-    clientId?: SortOrder
-  }
-
-  export type SiteAvgOrderByAggregateInput = {
-    latitude?: SortOrder
-    longitude?: SortOrder
-  }
-
-  export type SiteMaxOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    address?: SortOrder
-    latitude?: SortOrder
-    longitude?: SortOrder
-    createdAt?: SortOrder
-    clientId?: SortOrder
-  }
-
-  export type SiteMinOrderByAggregateInput = {
-    id?: SortOrder
-    name?: SortOrder
-    address?: SortOrder
-    latitude?: SortOrder
-    longitude?: SortOrder
-    createdAt?: SortOrder
-    clientId?: SortOrder
-  }
-
-  export type SiteSumOrderByAggregateInput = {
-    latitude?: SortOrder
-    longitude?: SortOrder
-  }
-
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -14789,204 +16686,6 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
-  export type SiteScalarRelationFilter = {
-    is?: SiteWhereInput
-    isNot?: SiteWhereInput
-  }
-
-  export type AiCallNullableScalarRelationFilter = {
-    is?: AiCallWhereInput | null
-    isNot?: AiCallWhereInput | null
-  }
-
-  export type DispatchNullableScalarRelationFilter = {
-    is?: DispatchWhereInput | null
-    isNot?: DispatchWhereInput | null
-  }
-
-  export type AlarmCountOrderByAggregateInput = {
-    id?: SortOrder
-    triggeredAt?: SortOrder
-    alarmType?: SortOrder
-    priority?: SortOrder
-    status?: SortOrder
-    siteId?: SortOrder
-  }
-
-  export type AlarmAvgOrderByAggregateInput = {
-    priority?: SortOrder
-  }
-
-  export type AlarmMaxOrderByAggregateInput = {
-    id?: SortOrder
-    triggeredAt?: SortOrder
-    alarmType?: SortOrder
-    priority?: SortOrder
-    status?: SortOrder
-    siteId?: SortOrder
-  }
-
-  export type AlarmMinOrderByAggregateInput = {
-    id?: SortOrder
-    triggeredAt?: SortOrder
-    alarmType?: SortOrder
-    priority?: SortOrder
-    status?: SortOrder
-    siteId?: SortOrder
-  }
-
-  export type AlarmSumOrderByAggregateInput = {
-    priority?: SortOrder
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type FloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type AlarmScalarRelationFilter = {
-    is?: AlarmWhereInput
-    isNot?: AlarmWhereInput
-  }
-
-  export type AiCallCountOrderByAggregateInput = {
-    id?: SortOrder
-    aiDecision?: SortOrder
-    confidenceScore?: SortOrder
-    evaluatedAt?: SortOrder
-    notes?: SortOrder
-    alarmId?: SortOrder
-  }
-
-  export type AiCallAvgOrderByAggregateInput = {
-    confidenceScore?: SortOrder
-  }
-
-  export type AiCallMaxOrderByAggregateInput = {
-    id?: SortOrder
-    aiDecision?: SortOrder
-    confidenceScore?: SortOrder
-    evaluatedAt?: SortOrder
-    notes?: SortOrder
-    alarmId?: SortOrder
-  }
-
-  export type AiCallMinOrderByAggregateInput = {
-    id?: SortOrder
-    aiDecision?: SortOrder
-    confidenceScore?: SortOrder
-    evaluatedAt?: SortOrder
-    notes?: SortOrder
-    alarmId?: SortOrder
-  }
-
-  export type AiCallSumOrderByAggregateInput = {
-    confidenceScore?: SortOrder
-  }
-
-  export type FloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type GuardNullableScalarRelationFilter = {
-    is?: GuardWhereInput | null
-    isNot?: GuardWhereInput | null
-  }
-
-  export type VehicleNullableScalarRelationFilter = {
-    is?: VehicleWhereInput | null
-    isNot?: VehicleWhereInput | null
-  }
-
-  export type DispatchCountOrderByAggregateInput = {
-    id?: SortOrder
-    dispatchedAt?: SortOrder
-    arrivalTime?: SortOrder
-    resolvedAt?: SortOrder
-    responseNotes?: SortOrder
-    alarmId?: SortOrder
-    guardId?: SortOrder
-    vehicleId?: SortOrder
-  }
-
-  export type DispatchMaxOrderByAggregateInput = {
-    id?: SortOrder
-    dispatchedAt?: SortOrder
-    arrivalTime?: SortOrder
-    resolvedAt?: SortOrder
-    responseNotes?: SortOrder
-    alarmId?: SortOrder
-    guardId?: SortOrder
-    vehicleId?: SortOrder
-  }
-
-  export type DispatchMinOrderByAggregateInput = {
-    id?: SortOrder
-    dispatchedAt?: SortOrder
-    arrivalTime?: SortOrder
-    resolvedAt?: SortOrder
-    responseNotes?: SortOrder
-    alarmId?: SortOrder
-    guardId?: SortOrder
-    vehicleId?: SortOrder
-  }
-
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -15001,9 +16700,58 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
-  export type AlarmNullableScalarRelationFilter = {
-    is?: AlarmWhereInput | null
-    isNot?: AlarmWhereInput | null
+  export type GuardNullableScalarRelationFilter = {
+    is?: GuardWhereInput | null
+    isNot?: GuardWhereInput | null
+  }
+
+  export type VehicleNullableScalarRelationFilter = {
+    is?: VehicleWhereInput | null
+    isNot?: VehicleWhereInput | null
+  }
+
+  export type DispatchCountOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    dispatchedAt?: SortOrder
+    arrivalTime?: SortOrder
+    resolvedAt?: SortOrder
+    responseNotes?: SortOrder
+    alarmId?: SortOrder
+    guardId?: SortOrder
+    vehicleId?: SortOrder
+  }
+
+  export type DispatchAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type DispatchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    dispatchedAt?: SortOrder
+    arrivalTime?: SortOrder
+    resolvedAt?: SortOrder
+    responseNotes?: SortOrder
+    alarmId?: SortOrder
+    guardId?: SortOrder
+    vehicleId?: SortOrder
+  }
+
+  export type DispatchMinOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    dispatchedAt?: SortOrder
+    arrivalTime?: SortOrder
+    resolvedAt?: SortOrder
+    responseNotes?: SortOrder
+    alarmId?: SortOrder
+    guardId?: SortOrder
+    vehicleId?: SortOrder
+  }
+
+  export type DispatchSumOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type SiteNullableScalarRelationFilter = {
@@ -15011,55 +16759,69 @@ export namespace Prisma {
     isNot?: SiteWhereInput | null
   }
 
-  export type ObLogCountOrderByAggregateInput = {
+  export type OBLogCountOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     logTime?: SortOrder
-    message?: SortOrder
-    source?: SortOrder
-    alarmId?: SortOrder
-    siteId?: SortOrder
     guardId?: SortOrder
+    siteId?: SortOrder
+    actionLog?: SortOrder
+    notes?: SortOrder
   }
 
-  export type ObLogMaxOrderByAggregateInput = {
-    id?: SortOrder
-    logTime?: SortOrder
-    message?: SortOrder
-    source?: SortOrder
-    alarmId?: SortOrder
-    siteId?: SortOrder
-    guardId?: SortOrder
+  export type OBLogAvgOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
-  export type ObLogMinOrderByAggregateInput = {
+  export type OBLogMaxOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     logTime?: SortOrder
-    message?: SortOrder
-    source?: SortOrder
-    alarmId?: SortOrder
-    siteId?: SortOrder
     guardId?: SortOrder
+    siteId?: SortOrder
+    actionLog?: SortOrder
+    notes?: SortOrder
   }
 
-  export type UserRoleScalarRelationFilter = {
-    is?: UserRoleWhereInput
-    isNot?: UserRoleWhereInput
+  export type OBLogMinOrderByAggregateInput = {
+    id?: SortOrder
+    shortId?: SortOrder
+    logTime?: SortOrder
+    guardId?: SortOrder
+    siteId?: SortOrder
+    actionLog?: SortOrder
+    notes?: SortOrder
+  }
+
+  export type OBLogSumOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
+  export type RoleScalarRelationFilter = {
+    is?: RoleWhereInput
+    isNot?: RoleWhereInput
   }
 
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     email?: SortOrder
-    passwordHash?: SortOrder
+    password?: SortOrder
     name?: SortOrder
     createdAt?: SortOrder
     lastLogin?: SortOrder
     roleId?: SortOrder
   }
 
+  export type UserAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     email?: SortOrder
-    passwordHash?: SortOrder
+    password?: SortOrder
     name?: SortOrder
     createdAt?: SortOrder
     lastLogin?: SortOrder
@@ -15068,12 +16830,17 @@ export namespace Prisma {
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     email?: SortOrder
-    passwordHash?: SortOrder
+    password?: SortOrder
     name?: SortOrder
     createdAt?: SortOrder
     lastLogin?: SortOrder
     roleId?: SortOrder
+  }
+
+  export type UserSumOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type UserListRelationFilter = {
@@ -15086,17 +16853,17 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type UserRoleCountOrderByAggregateInput = {
+  export type RoleCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
   }
 
-  export type UserRoleMaxOrderByAggregateInput = {
+  export type RoleMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
   }
 
-  export type UserRoleMinOrderByAggregateInput = {
+  export type RoleMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
   }
@@ -15123,35 +16890,55 @@ export namespace Prisma {
 
   export type VehicleCountOrderByAggregateInput = {
     id?: SortOrder
-    plateNumber?: SortOrder
-    description?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    plate?: SortOrder
+    model?: SortOrder
     status?: SortOrder
+  }
+
+  export type VehicleAvgOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type VehicleMaxOrderByAggregateInput = {
     id?: SortOrder
-    plateNumber?: SortOrder
-    description?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    plate?: SortOrder
+    model?: SortOrder
     status?: SortOrder
   }
 
   export type VehicleMinOrderByAggregateInput = {
     id?: SortOrder
-    plateNumber?: SortOrder
-    description?: SortOrder
+    shortId?: SortOrder
+    name?: SortOrder
+    plate?: SortOrder
+    model?: SortOrder
     status?: SortOrder
+  }
+
+  export type VehicleSumOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type GuardCountOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     status?: SortOrder
     assignedVehicleId?: SortOrder
   }
 
+  export type GuardAvgOrderByAggregateInput = {
+    shortId?: SortOrder
+  }
+
   export type GuardMaxOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     status?: SortOrder
@@ -15160,10 +16947,15 @@ export namespace Prisma {
 
   export type GuardMinOrderByAggregateInput = {
     id?: SortOrder
+    shortId?: SortOrder
     name?: SortOrder
     phone?: SortOrder
     status?: SortOrder
     assignedVehicleId?: SortOrder
+  }
+
+  export type GuardSumOrderByAggregateInput = {
+    shortId?: SortOrder
   }
 
   export type SiteCreateNestedManyWithoutClientInput = {
@@ -15184,10 +16976,6 @@ export namespace Prisma {
     set?: string
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -15204,6 +16992,14 @@ export namespace Prisma {
     update?: SiteUpdateWithWhereUniqueWithoutClientInput | SiteUpdateWithWhereUniqueWithoutClientInput[]
     updateMany?: SiteUpdateManyWithWhereWithoutClientInput | SiteUpdateManyWithWhereWithoutClientInput[]
     deleteMany?: SiteScalarWhereInput | SiteScalarWhereInput[]
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type SiteUncheckedUpdateManyWithoutClientNestedInput = {
@@ -15226,40 +17022,32 @@ export namespace Prisma {
     connect?: ClientWhereUniqueInput
   }
 
-  export type AlarmCreateNestedManyWithoutSiteInput = {
-    create?: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput> | AlarmCreateWithoutSiteInput[] | AlarmUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: AlarmCreateOrConnectWithoutSiteInput | AlarmCreateOrConnectWithoutSiteInput[]
-    createMany?: AlarmCreateManySiteInputEnvelope
-    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+  export type TransmitterCreateNestedManyWithoutSiteInput = {
+    create?: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput> | TransmitterCreateWithoutSiteInput[] | TransmitterUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: TransmitterCreateOrConnectWithoutSiteInput | TransmitterCreateOrConnectWithoutSiteInput[]
+    createMany?: TransmitterCreateManySiteInputEnvelope
+    connect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
   }
 
-  export type ObLogCreateNestedManyWithoutSiteInput = {
-    create?: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput> | ObLogCreateWithoutSiteInput[] | ObLogUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutSiteInput | ObLogCreateOrConnectWithoutSiteInput[]
-    createMany?: ObLogCreateManySiteInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
+  export type OBLogCreateNestedManyWithoutSiteInput = {
+    create?: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput> | OBLogCreateWithoutSiteInput[] | OBLogUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutSiteInput | OBLogCreateOrConnectWithoutSiteInput[]
+    createMany?: OBLogCreateManySiteInputEnvelope
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
   }
 
-  export type AlarmUncheckedCreateNestedManyWithoutSiteInput = {
-    create?: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput> | AlarmCreateWithoutSiteInput[] | AlarmUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: AlarmCreateOrConnectWithoutSiteInput | AlarmCreateOrConnectWithoutSiteInput[]
-    createMany?: AlarmCreateManySiteInputEnvelope
-    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+  export type TransmitterUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput> | TransmitterCreateWithoutSiteInput[] | TransmitterUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: TransmitterCreateOrConnectWithoutSiteInput | TransmitterCreateOrConnectWithoutSiteInput[]
+    createMany?: TransmitterCreateManySiteInputEnvelope
+    connect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
   }
 
-  export type ObLogUncheckedCreateNestedManyWithoutSiteInput = {
-    create?: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput> | ObLogCreateWithoutSiteInput[] | ObLogUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutSiteInput | ObLogCreateOrConnectWithoutSiteInput[]
-    createMany?: ObLogCreateManySiteInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-  }
-
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type OBLogUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput> | OBLogCreateWithoutSiteInput[] | OBLogUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutSiteInput | OBLogCreateOrConnectWithoutSiteInput[]
+    createMany?: OBLogCreateManySiteInputEnvelope
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
   }
 
   export type ClientUpdateOneRequiredWithoutSitesNestedInput = {
@@ -15270,72 +17058,129 @@ export namespace Prisma {
     update?: XOR<XOR<ClientUpdateToOneWithWhereWithoutSitesInput, ClientUpdateWithoutSitesInput>, ClientUncheckedUpdateWithoutSitesInput>
   }
 
-  export type AlarmUpdateManyWithoutSiteNestedInput = {
-    create?: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput> | AlarmCreateWithoutSiteInput[] | AlarmUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: AlarmCreateOrConnectWithoutSiteInput | AlarmCreateOrConnectWithoutSiteInput[]
-    upsert?: AlarmUpsertWithWhereUniqueWithoutSiteInput | AlarmUpsertWithWhereUniqueWithoutSiteInput[]
-    createMany?: AlarmCreateManySiteInputEnvelope
-    set?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    disconnect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    delete?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    update?: AlarmUpdateWithWhereUniqueWithoutSiteInput | AlarmUpdateWithWhereUniqueWithoutSiteInput[]
-    updateMany?: AlarmUpdateManyWithWhereWithoutSiteInput | AlarmUpdateManyWithWhereWithoutSiteInput[]
-    deleteMany?: AlarmScalarWhereInput | AlarmScalarWhereInput[]
+  export type TransmitterUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput> | TransmitterCreateWithoutSiteInput[] | TransmitterUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: TransmitterCreateOrConnectWithoutSiteInput | TransmitterCreateOrConnectWithoutSiteInput[]
+    upsert?: TransmitterUpsertWithWhereUniqueWithoutSiteInput | TransmitterUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: TransmitterCreateManySiteInputEnvelope
+    set?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    disconnect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    delete?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    connect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    update?: TransmitterUpdateWithWhereUniqueWithoutSiteInput | TransmitterUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: TransmitterUpdateManyWithWhereWithoutSiteInput | TransmitterUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: TransmitterScalarWhereInput | TransmitterScalarWhereInput[]
   }
 
-  export type ObLogUpdateManyWithoutSiteNestedInput = {
-    create?: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput> | ObLogCreateWithoutSiteInput[] | ObLogUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutSiteInput | ObLogCreateOrConnectWithoutSiteInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutSiteInput | ObLogUpsertWithWhereUniqueWithoutSiteInput[]
-    createMany?: ObLogCreateManySiteInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutSiteInput | ObLogUpdateWithWhereUniqueWithoutSiteInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutSiteInput | ObLogUpdateManyWithWhereWithoutSiteInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
+  export type OBLogUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput> | OBLogCreateWithoutSiteInput[] | OBLogUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutSiteInput | OBLogCreateOrConnectWithoutSiteInput[]
+    upsert?: OBLogUpsertWithWhereUniqueWithoutSiteInput | OBLogUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: OBLogCreateManySiteInputEnvelope
+    set?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    disconnect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    delete?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    update?: OBLogUpdateWithWhereUniqueWithoutSiteInput | OBLogUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: OBLogUpdateManyWithWhereWithoutSiteInput | OBLogUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
   }
 
-  export type AlarmUncheckedUpdateManyWithoutSiteNestedInput = {
-    create?: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput> | AlarmCreateWithoutSiteInput[] | AlarmUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: AlarmCreateOrConnectWithoutSiteInput | AlarmCreateOrConnectWithoutSiteInput[]
-    upsert?: AlarmUpsertWithWhereUniqueWithoutSiteInput | AlarmUpsertWithWhereUniqueWithoutSiteInput[]
-    createMany?: AlarmCreateManySiteInputEnvelope
-    set?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    disconnect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    delete?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
-    update?: AlarmUpdateWithWhereUniqueWithoutSiteInput | AlarmUpdateWithWhereUniqueWithoutSiteInput[]
-    updateMany?: AlarmUpdateManyWithWhereWithoutSiteInput | AlarmUpdateManyWithWhereWithoutSiteInput[]
-    deleteMany?: AlarmScalarWhereInput | AlarmScalarWhereInput[]
+  export type TransmitterUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput> | TransmitterCreateWithoutSiteInput[] | TransmitterUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: TransmitterCreateOrConnectWithoutSiteInput | TransmitterCreateOrConnectWithoutSiteInput[]
+    upsert?: TransmitterUpsertWithWhereUniqueWithoutSiteInput | TransmitterUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: TransmitterCreateManySiteInputEnvelope
+    set?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    disconnect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    delete?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    connect?: TransmitterWhereUniqueInput | TransmitterWhereUniqueInput[]
+    update?: TransmitterUpdateWithWhereUniqueWithoutSiteInput | TransmitterUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: TransmitterUpdateManyWithWhereWithoutSiteInput | TransmitterUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: TransmitterScalarWhereInput | TransmitterScalarWhereInput[]
   }
 
-  export type ObLogUncheckedUpdateManyWithoutSiteNestedInput = {
-    create?: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput> | ObLogCreateWithoutSiteInput[] | ObLogUncheckedCreateWithoutSiteInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutSiteInput | ObLogCreateOrConnectWithoutSiteInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutSiteInput | ObLogUpsertWithWhereUniqueWithoutSiteInput[]
-    createMany?: ObLogCreateManySiteInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutSiteInput | ObLogUpdateWithWhereUniqueWithoutSiteInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutSiteInput | ObLogUpdateManyWithWhereWithoutSiteInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
+  export type OBLogUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput> | OBLogCreateWithoutSiteInput[] | OBLogUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutSiteInput | OBLogCreateOrConnectWithoutSiteInput[]
+    upsert?: OBLogUpsertWithWhereUniqueWithoutSiteInput | OBLogUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: OBLogCreateManySiteInputEnvelope
+    set?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    disconnect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    delete?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    update?: OBLogUpdateWithWhereUniqueWithoutSiteInput | OBLogUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: OBLogUpdateManyWithWhereWithoutSiteInput | OBLogUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
   }
 
-  export type SiteCreateNestedOneWithoutAlarmsInput = {
-    create?: XOR<SiteCreateWithoutAlarmsInput, SiteUncheckedCreateWithoutAlarmsInput>
-    connectOrCreate?: SiteCreateOrConnectWithoutAlarmsInput
+  export type SiteCreateNestedOneWithoutTransmittersInput = {
+    create?: XOR<SiteCreateWithoutTransmittersInput, SiteUncheckedCreateWithoutTransmittersInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutTransmittersInput
     connect?: SiteWhereUniqueInput
   }
 
-  export type AiCallCreateNestedOneWithoutAlarmInput = {
-    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
-    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput
-    connect?: AiCallWhereUniqueInput
+  export type AlarmCreateNestedManyWithoutTransmitterInput = {
+    create?: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput> | AlarmCreateWithoutTransmitterInput[] | AlarmUncheckedCreateWithoutTransmitterInput[]
+    connectOrCreate?: AlarmCreateOrConnectWithoutTransmitterInput | AlarmCreateOrConnectWithoutTransmitterInput[]
+    createMany?: AlarmCreateManyTransmitterInputEnvelope
+    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+  }
+
+  export type AlarmUncheckedCreateNestedManyWithoutTransmitterInput = {
+    create?: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput> | AlarmCreateWithoutTransmitterInput[] | AlarmUncheckedCreateWithoutTransmitterInput[]
+    connectOrCreate?: AlarmCreateOrConnectWithoutTransmitterInput | AlarmCreateOrConnectWithoutTransmitterInput[]
+    createMany?: AlarmCreateManyTransmitterInputEnvelope
+    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutTransmittersNestedInput = {
+    create?: XOR<SiteCreateWithoutTransmittersInput, SiteUncheckedCreateWithoutTransmittersInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutTransmittersInput
+    upsert?: SiteUpsertWithoutTransmittersInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutTransmittersInput, SiteUpdateWithoutTransmittersInput>, SiteUncheckedUpdateWithoutTransmittersInput>
+  }
+
+  export type AlarmUpdateManyWithoutTransmitterNestedInput = {
+    create?: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput> | AlarmCreateWithoutTransmitterInput[] | AlarmUncheckedCreateWithoutTransmitterInput[]
+    connectOrCreate?: AlarmCreateOrConnectWithoutTransmitterInput | AlarmCreateOrConnectWithoutTransmitterInput[]
+    upsert?: AlarmUpsertWithWhereUniqueWithoutTransmitterInput | AlarmUpsertWithWhereUniqueWithoutTransmitterInput[]
+    createMany?: AlarmCreateManyTransmitterInputEnvelope
+    set?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    disconnect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    delete?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    update?: AlarmUpdateWithWhereUniqueWithoutTransmitterInput | AlarmUpdateWithWhereUniqueWithoutTransmitterInput[]
+    updateMany?: AlarmUpdateManyWithWhereWithoutTransmitterInput | AlarmUpdateManyWithWhereWithoutTransmitterInput[]
+    deleteMany?: AlarmScalarWhereInput | AlarmScalarWhereInput[]
+  }
+
+  export type AlarmUncheckedUpdateManyWithoutTransmitterNestedInput = {
+    create?: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput> | AlarmCreateWithoutTransmitterInput[] | AlarmUncheckedCreateWithoutTransmitterInput[]
+    connectOrCreate?: AlarmCreateOrConnectWithoutTransmitterInput | AlarmCreateOrConnectWithoutTransmitterInput[]
+    upsert?: AlarmUpsertWithWhereUniqueWithoutTransmitterInput | AlarmUpsertWithWhereUniqueWithoutTransmitterInput[]
+    createMany?: AlarmCreateManyTransmitterInputEnvelope
+    set?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    disconnect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    delete?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    connect?: AlarmWhereUniqueInput | AlarmWhereUniqueInput[]
+    update?: AlarmUpdateWithWhereUniqueWithoutTransmitterInput | AlarmUpdateWithWhereUniqueWithoutTransmitterInput[]
+    updateMany?: AlarmUpdateManyWithWhereWithoutTransmitterInput | AlarmUpdateManyWithWhereWithoutTransmitterInput[]
+    deleteMany?: AlarmScalarWhereInput | AlarmScalarWhereInput[]
+  }
+
+  export type TransmitterCreateNestedOneWithoutAlarmsInput = {
+    create?: XOR<TransmitterCreateWithoutAlarmsInput, TransmitterUncheckedCreateWithoutAlarmsInput>
+    connectOrCreate?: TransmitterCreateOrConnectWithoutAlarmsInput
+    connect?: TransmitterWhereUniqueInput
+  }
+
+  export type AiCallCreateNestedManyWithoutAlarmInput = {
+    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput> | AiCallCreateWithoutAlarmInput[] | AiCallUncheckedCreateWithoutAlarmInput[]
+    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput | AiCallCreateOrConnectWithoutAlarmInput[]
+    createMany?: AiCallCreateManyAlarmInputEnvelope
+    connect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
   }
 
   export type DispatchCreateNestedOneWithoutAlarmInput = {
@@ -15344,17 +17189,11 @@ export namespace Prisma {
     connect?: DispatchWhereUniqueInput
   }
 
-  export type ObLogCreateNestedManyWithoutAlarmInput = {
-    create?: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput> | ObLogCreateWithoutAlarmInput[] | ObLogUncheckedCreateWithoutAlarmInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutAlarmInput | ObLogCreateOrConnectWithoutAlarmInput[]
-    createMany?: ObLogCreateManyAlarmInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-  }
-
-  export type AiCallUncheckedCreateNestedOneWithoutAlarmInput = {
-    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
-    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput
-    connect?: AiCallWhereUniqueInput
+  export type AiCallUncheckedCreateNestedManyWithoutAlarmInput = {
+    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput> | AiCallCreateWithoutAlarmInput[] | AiCallUncheckedCreateWithoutAlarmInput[]
+    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput | AiCallCreateOrConnectWithoutAlarmInput[]
+    createMany?: AiCallCreateManyAlarmInputEnvelope
+    connect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
   }
 
   export type DispatchUncheckedCreateNestedOneWithoutAlarmInput = {
@@ -15363,37 +17202,26 @@ export namespace Prisma {
     connect?: DispatchWhereUniqueInput
   }
 
-  export type ObLogUncheckedCreateNestedManyWithoutAlarmInput = {
-    create?: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput> | ObLogCreateWithoutAlarmInput[] | ObLogUncheckedCreateWithoutAlarmInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutAlarmInput | ObLogCreateOrConnectWithoutAlarmInput[]
-    createMany?: ObLogCreateManyAlarmInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
+  export type TransmitterUpdateOneRequiredWithoutAlarmsNestedInput = {
+    create?: XOR<TransmitterCreateWithoutAlarmsInput, TransmitterUncheckedCreateWithoutAlarmsInput>
+    connectOrCreate?: TransmitterCreateOrConnectWithoutAlarmsInput
+    upsert?: TransmitterUpsertWithoutAlarmsInput
+    connect?: TransmitterWhereUniqueInput
+    update?: XOR<XOR<TransmitterUpdateToOneWithWhereWithoutAlarmsInput, TransmitterUpdateWithoutAlarmsInput>, TransmitterUncheckedUpdateWithoutAlarmsInput>
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type SiteUpdateOneRequiredWithoutAlarmsNestedInput = {
-    create?: XOR<SiteCreateWithoutAlarmsInput, SiteUncheckedCreateWithoutAlarmsInput>
-    connectOrCreate?: SiteCreateOrConnectWithoutAlarmsInput
-    upsert?: SiteUpsertWithoutAlarmsInput
-    connect?: SiteWhereUniqueInput
-    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutAlarmsInput, SiteUpdateWithoutAlarmsInput>, SiteUncheckedUpdateWithoutAlarmsInput>
-  }
-
-  export type AiCallUpdateOneWithoutAlarmNestedInput = {
-    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
-    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput
-    upsert?: AiCallUpsertWithoutAlarmInput
-    disconnect?: AiCallWhereInput | boolean
-    delete?: AiCallWhereInput | boolean
-    connect?: AiCallWhereUniqueInput
-    update?: XOR<XOR<AiCallUpdateToOneWithWhereWithoutAlarmInput, AiCallUpdateWithoutAlarmInput>, AiCallUncheckedUpdateWithoutAlarmInput>
+  export type AiCallUpdateManyWithoutAlarmNestedInput = {
+    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput> | AiCallCreateWithoutAlarmInput[] | AiCallUncheckedCreateWithoutAlarmInput[]
+    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput | AiCallCreateOrConnectWithoutAlarmInput[]
+    upsert?: AiCallUpsertWithWhereUniqueWithoutAlarmInput | AiCallUpsertWithWhereUniqueWithoutAlarmInput[]
+    createMany?: AiCallCreateManyAlarmInputEnvelope
+    set?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    disconnect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    delete?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    connect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    update?: AiCallUpdateWithWhereUniqueWithoutAlarmInput | AiCallUpdateWithWhereUniqueWithoutAlarmInput[]
+    updateMany?: AiCallUpdateManyWithWhereWithoutAlarmInput | AiCallUpdateManyWithWhereWithoutAlarmInput[]
+    deleteMany?: AiCallScalarWhereInput | AiCallScalarWhereInput[]
   }
 
   export type DispatchUpdateOneWithoutAlarmNestedInput = {
@@ -15406,28 +17234,18 @@ export namespace Prisma {
     update?: XOR<XOR<DispatchUpdateToOneWithWhereWithoutAlarmInput, DispatchUpdateWithoutAlarmInput>, DispatchUncheckedUpdateWithoutAlarmInput>
   }
 
-  export type ObLogUpdateManyWithoutAlarmNestedInput = {
-    create?: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput> | ObLogCreateWithoutAlarmInput[] | ObLogUncheckedCreateWithoutAlarmInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutAlarmInput | ObLogCreateOrConnectWithoutAlarmInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutAlarmInput | ObLogUpsertWithWhereUniqueWithoutAlarmInput[]
-    createMany?: ObLogCreateManyAlarmInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutAlarmInput | ObLogUpdateWithWhereUniqueWithoutAlarmInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutAlarmInput | ObLogUpdateManyWithWhereWithoutAlarmInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
-  }
-
-  export type AiCallUncheckedUpdateOneWithoutAlarmNestedInput = {
-    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
-    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput
-    upsert?: AiCallUpsertWithoutAlarmInput
-    disconnect?: AiCallWhereInput | boolean
-    delete?: AiCallWhereInput | boolean
-    connect?: AiCallWhereUniqueInput
-    update?: XOR<XOR<AiCallUpdateToOneWithWhereWithoutAlarmInput, AiCallUpdateWithoutAlarmInput>, AiCallUncheckedUpdateWithoutAlarmInput>
+  export type AiCallUncheckedUpdateManyWithoutAlarmNestedInput = {
+    create?: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput> | AiCallCreateWithoutAlarmInput[] | AiCallUncheckedCreateWithoutAlarmInput[]
+    connectOrCreate?: AiCallCreateOrConnectWithoutAlarmInput | AiCallCreateOrConnectWithoutAlarmInput[]
+    upsert?: AiCallUpsertWithWhereUniqueWithoutAlarmInput | AiCallUpsertWithWhereUniqueWithoutAlarmInput[]
+    createMany?: AiCallCreateManyAlarmInputEnvelope
+    set?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    disconnect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    delete?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    connect?: AiCallWhereUniqueInput | AiCallWhereUniqueInput[]
+    update?: AiCallUpdateWithWhereUniqueWithoutAlarmInput | AiCallUpdateWithWhereUniqueWithoutAlarmInput[]
+    updateMany?: AiCallUpdateManyWithWhereWithoutAlarmInput | AiCallUpdateManyWithWhereWithoutAlarmInput[]
+    deleteMany?: AiCallScalarWhereInput | AiCallScalarWhereInput[]
   }
 
   export type DispatchUncheckedUpdateOneWithoutAlarmNestedInput = {
@@ -15440,40 +17258,34 @@ export namespace Prisma {
     update?: XOR<XOR<DispatchUpdateToOneWithWhereWithoutAlarmInput, DispatchUpdateWithoutAlarmInput>, DispatchUncheckedUpdateWithoutAlarmInput>
   }
 
-  export type ObLogUncheckedUpdateManyWithoutAlarmNestedInput = {
-    create?: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput> | ObLogCreateWithoutAlarmInput[] | ObLogUncheckedCreateWithoutAlarmInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutAlarmInput | ObLogCreateOrConnectWithoutAlarmInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutAlarmInput | ObLogUpsertWithWhereUniqueWithoutAlarmInput[]
-    createMany?: ObLogCreateManyAlarmInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutAlarmInput | ObLogUpdateWithWhereUniqueWithoutAlarmInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutAlarmInput | ObLogUpdateManyWithWhereWithoutAlarmInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
-  }
-
-  export type AlarmCreateNestedOneWithoutAiCallInput = {
-    create?: XOR<AlarmCreateWithoutAiCallInput, AlarmUncheckedCreateWithoutAiCallInput>
-    connectOrCreate?: AlarmCreateOrConnectWithoutAiCallInput
+  export type AlarmCreateNestedOneWithoutAiCallsInput = {
+    create?: XOR<AlarmCreateWithoutAiCallsInput, AlarmUncheckedCreateWithoutAiCallsInput>
+    connectOrCreate?: AlarmCreateOrConnectWithoutAiCallsInput
     connect?: AlarmWhereUniqueInput
   }
 
-  export type FloatFieldUpdateOperationsInput = {
-    set?: number
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
   }
 
-  export type AlarmUpdateOneRequiredWithoutAiCallNestedInput = {
-    create?: XOR<AlarmCreateWithoutAiCallInput, AlarmUncheckedCreateWithoutAiCallInput>
-    connectOrCreate?: AlarmCreateOrConnectWithoutAiCallInput
-    upsert?: AlarmUpsertWithoutAiCallInput
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type AlarmUpdateOneRequiredWithoutAiCallsNestedInput = {
+    create?: XOR<AlarmCreateWithoutAiCallsInput, AlarmUncheckedCreateWithoutAiCallsInput>
+    connectOrCreate?: AlarmCreateOrConnectWithoutAiCallsInput
+    upsert?: AlarmUpsertWithoutAiCallsInput
     connect?: AlarmWhereUniqueInput
-    update?: XOR<XOR<AlarmUpdateToOneWithWhereWithoutAiCallInput, AlarmUpdateWithoutAiCallInput>, AlarmUncheckedUpdateWithoutAiCallInput>
+    update?: XOR<XOR<AlarmUpdateToOneWithWhereWithoutAiCallsInput, AlarmUpdateWithoutAiCallsInput>, AlarmUncheckedUpdateWithoutAiCallsInput>
   }
 
   export type AlarmCreateNestedOneWithoutDispatchInput = {
@@ -15492,10 +17304,6 @@ export namespace Prisma {
     create?: XOR<VehicleCreateWithoutDispatchesInput, VehicleUncheckedCreateWithoutDispatchesInput>
     connectOrCreate?: VehicleCreateOrConnectWithoutDispatchesInput
     connect?: VehicleWhereUniqueInput
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type AlarmUpdateOneRequiredWithoutDispatchNestedInput = {
@@ -15526,66 +17334,50 @@ export namespace Prisma {
     update?: XOR<XOR<VehicleUpdateToOneWithWhereWithoutDispatchesInput, VehicleUpdateWithoutDispatchesInput>, VehicleUncheckedUpdateWithoutDispatchesInput>
   }
 
-  export type AlarmCreateNestedOneWithoutObLogsInput = {
-    create?: XOR<AlarmCreateWithoutObLogsInput, AlarmUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: AlarmCreateOrConnectWithoutObLogsInput
-    connect?: AlarmWhereUniqueInput
-  }
-
-  export type SiteCreateNestedOneWithoutObLogsInput = {
-    create?: XOR<SiteCreateWithoutObLogsInput, SiteUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: SiteCreateOrConnectWithoutObLogsInput
-    connect?: SiteWhereUniqueInput
-  }
-
-  export type GuardCreateNestedOneWithoutObLogsInput = {
-    create?: XOR<GuardCreateWithoutObLogsInput, GuardUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: GuardCreateOrConnectWithoutObLogsInput
+  export type GuardCreateNestedOneWithoutOBLogsInput = {
+    create?: XOR<GuardCreateWithoutOBLogsInput, GuardUncheckedCreateWithoutOBLogsInput>
+    connectOrCreate?: GuardCreateOrConnectWithoutOBLogsInput
     connect?: GuardWhereUniqueInput
   }
 
-  export type AlarmUpdateOneWithoutObLogsNestedInput = {
-    create?: XOR<AlarmCreateWithoutObLogsInput, AlarmUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: AlarmCreateOrConnectWithoutObLogsInput
-    upsert?: AlarmUpsertWithoutObLogsInput
-    disconnect?: AlarmWhereInput | boolean
-    delete?: AlarmWhereInput | boolean
-    connect?: AlarmWhereUniqueInput
-    update?: XOR<XOR<AlarmUpdateToOneWithWhereWithoutObLogsInput, AlarmUpdateWithoutObLogsInput>, AlarmUncheckedUpdateWithoutObLogsInput>
-  }
-
-  export type SiteUpdateOneWithoutObLogsNestedInput = {
-    create?: XOR<SiteCreateWithoutObLogsInput, SiteUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: SiteCreateOrConnectWithoutObLogsInput
-    upsert?: SiteUpsertWithoutObLogsInput
-    disconnect?: SiteWhereInput | boolean
-    delete?: SiteWhereInput | boolean
+  export type SiteCreateNestedOneWithoutOBLogsInput = {
+    create?: XOR<SiteCreateWithoutOBLogsInput, SiteUncheckedCreateWithoutOBLogsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutOBLogsInput
     connect?: SiteWhereUniqueInput
-    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutObLogsInput, SiteUpdateWithoutObLogsInput>, SiteUncheckedUpdateWithoutObLogsInput>
   }
 
-  export type GuardUpdateOneWithoutObLogsNestedInput = {
-    create?: XOR<GuardCreateWithoutObLogsInput, GuardUncheckedCreateWithoutObLogsInput>
-    connectOrCreate?: GuardCreateOrConnectWithoutObLogsInput
-    upsert?: GuardUpsertWithoutObLogsInput
+  export type GuardUpdateOneWithoutOBLogsNestedInput = {
+    create?: XOR<GuardCreateWithoutOBLogsInput, GuardUncheckedCreateWithoutOBLogsInput>
+    connectOrCreate?: GuardCreateOrConnectWithoutOBLogsInput
+    upsert?: GuardUpsertWithoutOBLogsInput
     disconnect?: GuardWhereInput | boolean
     delete?: GuardWhereInput | boolean
     connect?: GuardWhereUniqueInput
-    update?: XOR<XOR<GuardUpdateToOneWithWhereWithoutObLogsInput, GuardUpdateWithoutObLogsInput>, GuardUncheckedUpdateWithoutObLogsInput>
+    update?: XOR<XOR<GuardUpdateToOneWithWhereWithoutOBLogsInput, GuardUpdateWithoutOBLogsInput>, GuardUncheckedUpdateWithoutOBLogsInput>
   }
 
-  export type UserRoleCreateNestedOneWithoutUsersInput = {
-    create?: XOR<UserRoleCreateWithoutUsersInput, UserRoleUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: UserRoleCreateOrConnectWithoutUsersInput
-    connect?: UserRoleWhereUniqueInput
+  export type SiteUpdateOneWithoutOBLogsNestedInput = {
+    create?: XOR<SiteCreateWithoutOBLogsInput, SiteUncheckedCreateWithoutOBLogsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutOBLogsInput
+    upsert?: SiteUpsertWithoutOBLogsInput
+    disconnect?: SiteWhereInput | boolean
+    delete?: SiteWhereInput | boolean
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutOBLogsInput, SiteUpdateWithoutOBLogsInput>, SiteUncheckedUpdateWithoutOBLogsInput>
   }
 
-  export type UserRoleUpdateOneRequiredWithoutUsersNestedInput = {
-    create?: XOR<UserRoleCreateWithoutUsersInput, UserRoleUncheckedCreateWithoutUsersInput>
-    connectOrCreate?: UserRoleCreateOrConnectWithoutUsersInput
-    upsert?: UserRoleUpsertWithoutUsersInput
-    connect?: UserRoleWhereUniqueInput
-    update?: XOR<XOR<UserRoleUpdateToOneWithWhereWithoutUsersInput, UserRoleUpdateWithoutUsersInput>, UserRoleUncheckedUpdateWithoutUsersInput>
+  export type RoleCreateNestedOneWithoutUsersInput = {
+    create?: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: RoleCreateOrConnectWithoutUsersInput
+    connect?: RoleWhereUniqueInput
+  }
+
+  export type RoleUpdateOneRequiredWithoutUsersNestedInput = {
+    create?: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
+    connectOrCreate?: RoleCreateOrConnectWithoutUsersInput
+    upsert?: RoleUpsertWithoutUsersInput
+    connect?: RoleWhereUniqueInput
+    update?: XOR<XOR<RoleUpdateToOneWithWhereWithoutUsersInput, RoleUpdateWithoutUsersInput>, RoleUncheckedUpdateWithoutUsersInput>
   }
 
   export type UserCreateNestedManyWithoutRoleInput = {
@@ -15727,11 +17519,11 @@ export namespace Prisma {
     connect?: DispatchWhereUniqueInput | DispatchWhereUniqueInput[]
   }
 
-  export type ObLogCreateNestedManyWithoutGuardInput = {
-    create?: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput> | ObLogCreateWithoutGuardInput[] | ObLogUncheckedCreateWithoutGuardInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutGuardInput | ObLogCreateOrConnectWithoutGuardInput[]
-    createMany?: ObLogCreateManyGuardInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
+  export type OBLogCreateNestedManyWithoutGuardInput = {
+    create?: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput> | OBLogCreateWithoutGuardInput[] | OBLogUncheckedCreateWithoutGuardInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutGuardInput | OBLogCreateOrConnectWithoutGuardInput[]
+    createMany?: OBLogCreateManyGuardInputEnvelope
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
   }
 
   export type DispatchUncheckedCreateNestedManyWithoutGuardInput = {
@@ -15741,11 +17533,11 @@ export namespace Prisma {
     connect?: DispatchWhereUniqueInput | DispatchWhereUniqueInput[]
   }
 
-  export type ObLogUncheckedCreateNestedManyWithoutGuardInput = {
-    create?: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput> | ObLogCreateWithoutGuardInput[] | ObLogUncheckedCreateWithoutGuardInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutGuardInput | ObLogCreateOrConnectWithoutGuardInput[]
-    createMany?: ObLogCreateManyGuardInputEnvelope
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
+  export type OBLogUncheckedCreateNestedManyWithoutGuardInput = {
+    create?: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput> | OBLogCreateWithoutGuardInput[] | OBLogUncheckedCreateWithoutGuardInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutGuardInput | OBLogCreateOrConnectWithoutGuardInput[]
+    createMany?: OBLogCreateManyGuardInputEnvelope
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
   }
 
   export type VehicleUpdateOneWithoutGuardsNestedInput = {
@@ -15772,18 +17564,18 @@ export namespace Prisma {
     deleteMany?: DispatchScalarWhereInput | DispatchScalarWhereInput[]
   }
 
-  export type ObLogUpdateManyWithoutGuardNestedInput = {
-    create?: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput> | ObLogCreateWithoutGuardInput[] | ObLogUncheckedCreateWithoutGuardInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutGuardInput | ObLogCreateOrConnectWithoutGuardInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutGuardInput | ObLogUpsertWithWhereUniqueWithoutGuardInput[]
-    createMany?: ObLogCreateManyGuardInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutGuardInput | ObLogUpdateWithWhereUniqueWithoutGuardInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutGuardInput | ObLogUpdateManyWithWhereWithoutGuardInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
+  export type OBLogUpdateManyWithoutGuardNestedInput = {
+    create?: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput> | OBLogCreateWithoutGuardInput[] | OBLogUncheckedCreateWithoutGuardInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutGuardInput | OBLogCreateOrConnectWithoutGuardInput[]
+    upsert?: OBLogUpsertWithWhereUniqueWithoutGuardInput | OBLogUpsertWithWhereUniqueWithoutGuardInput[]
+    createMany?: OBLogCreateManyGuardInputEnvelope
+    set?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    disconnect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    delete?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    update?: OBLogUpdateWithWhereUniqueWithoutGuardInput | OBLogUpdateWithWhereUniqueWithoutGuardInput[]
+    updateMany?: OBLogUpdateManyWithWhereWithoutGuardInput | OBLogUpdateManyWithWhereWithoutGuardInput[]
+    deleteMany?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
   }
 
   export type DispatchUncheckedUpdateManyWithoutGuardNestedInput = {
@@ -15800,18 +17592,18 @@ export namespace Prisma {
     deleteMany?: DispatchScalarWhereInput | DispatchScalarWhereInput[]
   }
 
-  export type ObLogUncheckedUpdateManyWithoutGuardNestedInput = {
-    create?: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput> | ObLogCreateWithoutGuardInput[] | ObLogUncheckedCreateWithoutGuardInput[]
-    connectOrCreate?: ObLogCreateOrConnectWithoutGuardInput | ObLogCreateOrConnectWithoutGuardInput[]
-    upsert?: ObLogUpsertWithWhereUniqueWithoutGuardInput | ObLogUpsertWithWhereUniqueWithoutGuardInput[]
-    createMany?: ObLogCreateManyGuardInputEnvelope
-    set?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    disconnect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    delete?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    connect?: ObLogWhereUniqueInput | ObLogWhereUniqueInput[]
-    update?: ObLogUpdateWithWhereUniqueWithoutGuardInput | ObLogUpdateWithWhereUniqueWithoutGuardInput[]
-    updateMany?: ObLogUpdateManyWithWhereWithoutGuardInput | ObLogUpdateManyWithWhereWithoutGuardInput[]
-    deleteMany?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
+  export type OBLogUncheckedUpdateManyWithoutGuardNestedInput = {
+    create?: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput> | OBLogCreateWithoutGuardInput[] | OBLogUncheckedCreateWithoutGuardInput[]
+    connectOrCreate?: OBLogCreateOrConnectWithoutGuardInput | OBLogCreateOrConnectWithoutGuardInput[]
+    upsert?: OBLogUpsertWithWhereUniqueWithoutGuardInput | OBLogUpsertWithWhereUniqueWithoutGuardInput[]
+    createMany?: OBLogCreateManyGuardInputEnvelope
+    set?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    disconnect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    delete?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
+    update?: OBLogUpdateWithWhereUniqueWithoutGuardInput | OBLogUpdateWithWhereUniqueWithoutGuardInput[]
+    updateMany?: OBLogUpdateManyWithWhereWithoutGuardInput | OBLogUpdateManyWithWhereWithoutGuardInput[]
+    deleteMany?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -15828,18 +17620,15 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  export type NestedIntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -15870,7 +17659,7 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedIntFilter<$PrismaModel = never> = {
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
     notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -15878,7 +17667,73 @@ export namespace Prisma {
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -15909,31 +17764,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -15948,60 +17778,6 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedFloatFilter<$PrismaModel>
-    _min?: NestedFloatFilter<$PrismaModel>
-    _max?: NestedFloatFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16020,24 +17796,20 @@ export namespace Prisma {
 
   export type SiteCreateWithoutClientInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    alarms?: AlarmCreateNestedManyWithoutSiteInput
-    obLogs?: ObLogCreateNestedManyWithoutSiteInput
+    transmitters?: TransmitterCreateNestedManyWithoutSiteInput
+    OBLogs?: OBLogCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutClientInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    alarms?: AlarmUncheckedCreateNestedManyWithoutSiteInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutSiteInput
+    transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutClientInput = {
@@ -16071,27 +17843,29 @@ export namespace Prisma {
     OR?: SiteScalarWhereInput[]
     NOT?: SiteScalarWhereInput | SiteScalarWhereInput[]
     id?: StringFilter<"Site"> | string
+    shortId?: IntFilter<"Site"> | number
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
-    latitude?: FloatNullableFilter<"Site"> | number | null
-    longitude?: FloatNullableFilter<"Site"> | number | null
-    createdAt?: DateTimeFilter<"Site"> | Date | string
     clientId?: StringFilter<"Site"> | string
   }
 
   export type ClientCreateWithoutSitesInput = {
     id?: string
+    shortId?: number
+    surname: string
     name: string
-    contactEmail: string
-    phone?: string | null
+    email: string
+    phone: string
     createdAt?: Date | string
   }
 
   export type ClientUncheckedCreateWithoutSitesInput = {
     id?: string
+    shortId?: number
+    surname: string
     name: string
-    contactEmail: string
-    phone?: string | null
+    email: string
+    phone: string
     createdAt?: Date | string
   }
 
@@ -16100,63 +17874,53 @@ export namespace Prisma {
     create: XOR<ClientCreateWithoutSitesInput, ClientUncheckedCreateWithoutSitesInput>
   }
 
-  export type AlarmCreateWithoutSiteInput = {
+  export type TransmitterCreateWithoutSiteInput = {
     id?: string
-    triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    aiCall?: AiCallCreateNestedOneWithoutAlarmInput
-    dispatch?: DispatchCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogCreateNestedManyWithoutAlarmInput
+    referenceCode: string
+    alarms?: AlarmCreateNestedManyWithoutTransmitterInput
   }
 
-  export type AlarmUncheckedCreateWithoutSiteInput = {
+  export type TransmitterUncheckedCreateWithoutSiteInput = {
     id?: string
-    triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    aiCall?: AiCallUncheckedCreateNestedOneWithoutAlarmInput
-    dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutAlarmInput
+    referenceCode: string
+    alarms?: AlarmUncheckedCreateNestedManyWithoutTransmitterInput
   }
 
-  export type AlarmCreateOrConnectWithoutSiteInput = {
-    where: AlarmWhereUniqueInput
-    create: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput>
+  export type TransmitterCreateOrConnectWithoutSiteInput = {
+    where: TransmitterWhereUniqueInput
+    create: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput>
   }
 
-  export type AlarmCreateManySiteInputEnvelope = {
-    data: AlarmCreateManySiteInput | AlarmCreateManySiteInput[]
+  export type TransmitterCreateManySiteInputEnvelope = {
+    data: TransmitterCreateManySiteInput | TransmitterCreateManySiteInput[]
     skipDuplicates?: boolean
   }
 
-  export type ObLogCreateWithoutSiteInput = {
+  export type OBLogCreateWithoutSiteInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarm?: AlarmCreateNestedOneWithoutObLogsInput
-    guard?: GuardCreateNestedOneWithoutObLogsInput
+    actionLog: string
+    notes: string
+    guard?: GuardCreateNestedOneWithoutOBLogsInput
   }
 
-  export type ObLogUncheckedCreateWithoutSiteInput = {
+  export type OBLogUncheckedCreateWithoutSiteInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarmId?: string | null
     guardId?: string | null
+    actionLog: string
+    notes: string
   }
 
-  export type ObLogCreateOrConnectWithoutSiteInput = {
-    where: ObLogWhereUniqueInput
-    create: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput>
+  export type OBLogCreateOrConnectWithoutSiteInput = {
+    where: OBLogWhereUniqueInput
+    create: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput>
   }
 
-  export type ObLogCreateManySiteInputEnvelope = {
-    data: ObLogCreateManySiteInput | ObLogCreateManySiteInput[]
+  export type OBLogCreateManySiteInputEnvelope = {
+    data: OBLogCreateManySiteInput | OBLogCreateManySiteInput[]
     skipDuplicates?: boolean
   }
 
@@ -16173,34 +17937,172 @@ export namespace Prisma {
 
   export type ClientUpdateWithoutSitesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ClientUncheckedUpdateWithoutSitesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    surname?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
-    contactEmail?: StringFieldUpdateOperationsInput | string
-    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    phone?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type AlarmUpsertWithWhereUniqueWithoutSiteInput = {
-    where: AlarmWhereUniqueInput
-    update: XOR<AlarmUpdateWithoutSiteInput, AlarmUncheckedUpdateWithoutSiteInput>
-    create: XOR<AlarmCreateWithoutSiteInput, AlarmUncheckedCreateWithoutSiteInput>
+  export type TransmitterUpsertWithWhereUniqueWithoutSiteInput = {
+    where: TransmitterWhereUniqueInput
+    update: XOR<TransmitterUpdateWithoutSiteInput, TransmitterUncheckedUpdateWithoutSiteInput>
+    create: XOR<TransmitterCreateWithoutSiteInput, TransmitterUncheckedCreateWithoutSiteInput>
   }
 
-  export type AlarmUpdateWithWhereUniqueWithoutSiteInput = {
-    where: AlarmWhereUniqueInput
-    data: XOR<AlarmUpdateWithoutSiteInput, AlarmUncheckedUpdateWithoutSiteInput>
+  export type TransmitterUpdateWithWhereUniqueWithoutSiteInput = {
+    where: TransmitterWhereUniqueInput
+    data: XOR<TransmitterUpdateWithoutSiteInput, TransmitterUncheckedUpdateWithoutSiteInput>
   }
 
-  export type AlarmUpdateManyWithWhereWithoutSiteInput = {
+  export type TransmitterUpdateManyWithWhereWithoutSiteInput = {
+    where: TransmitterScalarWhereInput
+    data: XOR<TransmitterUpdateManyMutationInput, TransmitterUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type TransmitterScalarWhereInput = {
+    AND?: TransmitterScalarWhereInput | TransmitterScalarWhereInput[]
+    OR?: TransmitterScalarWhereInput[]
+    NOT?: TransmitterScalarWhereInput | TransmitterScalarWhereInput[]
+    id?: StringFilter<"Transmitter"> | string
+    referenceCode?: StringFilter<"Transmitter"> | string
+    siteId?: StringFilter<"Transmitter"> | string
+  }
+
+  export type OBLogUpsertWithWhereUniqueWithoutSiteInput = {
+    where: OBLogWhereUniqueInput
+    update: XOR<OBLogUpdateWithoutSiteInput, OBLogUncheckedUpdateWithoutSiteInput>
+    create: XOR<OBLogCreateWithoutSiteInput, OBLogUncheckedCreateWithoutSiteInput>
+  }
+
+  export type OBLogUpdateWithWhereUniqueWithoutSiteInput = {
+    where: OBLogWhereUniqueInput
+    data: XOR<OBLogUpdateWithoutSiteInput, OBLogUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type OBLogUpdateManyWithWhereWithoutSiteInput = {
+    where: OBLogScalarWhereInput
+    data: XOR<OBLogUpdateManyMutationInput, OBLogUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type OBLogScalarWhereInput = {
+    AND?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
+    OR?: OBLogScalarWhereInput[]
+    NOT?: OBLogScalarWhereInput | OBLogScalarWhereInput[]
+    id?: StringFilter<"OBLog"> | string
+    shortId?: IntFilter<"OBLog"> | number
+    logTime?: DateTimeFilter<"OBLog"> | Date | string
+    guardId?: StringNullableFilter<"OBLog"> | string | null
+    siteId?: StringNullableFilter<"OBLog"> | string | null
+    actionLog?: StringFilter<"OBLog"> | string
+    notes?: StringFilter<"OBLog"> | string
+  }
+
+  export type SiteCreateWithoutTransmittersInput = {
+    id?: string
+    shortId?: number
+    name: string
+    address: string
+    client: ClientCreateNestedOneWithoutSitesInput
+    OBLogs?: OBLogCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutTransmittersInput = {
+    id?: string
+    shortId?: number
+    name: string
+    address: string
+    clientId: string
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutTransmittersInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutTransmittersInput, SiteUncheckedCreateWithoutTransmittersInput>
+  }
+
+  export type AlarmCreateWithoutTransmitterInput = {
+    id?: string
+    shortId?: number
+    triggeredAt: Date | string
+    eventType: string
+    source: string
+    aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
+    dispatch?: DispatchCreateNestedOneWithoutAlarmInput
+  }
+
+  export type AlarmUncheckedCreateWithoutTransmitterInput = {
+    id?: string
+    shortId?: number
+    triggeredAt: Date | string
+    eventType: string
+    source: string
+    aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
+    dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
+  }
+
+  export type AlarmCreateOrConnectWithoutTransmitterInput = {
+    where: AlarmWhereUniqueInput
+    create: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput>
+  }
+
+  export type AlarmCreateManyTransmitterInputEnvelope = {
+    data: AlarmCreateManyTransmitterInput | AlarmCreateManyTransmitterInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteUpsertWithoutTransmittersInput = {
+    update: XOR<SiteUpdateWithoutTransmittersInput, SiteUncheckedUpdateWithoutTransmittersInput>
+    create: XOR<SiteCreateWithoutTransmittersInput, SiteUncheckedCreateWithoutTransmittersInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutTransmittersInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutTransmittersInput, SiteUncheckedUpdateWithoutTransmittersInput>
+  }
+
+  export type SiteUpdateWithoutTransmittersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    client?: ClientUpdateOneRequiredWithoutSitesNestedInput
+    OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutTransmittersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type AlarmUpsertWithWhereUniqueWithoutTransmitterInput = {
+    where: AlarmWhereUniqueInput
+    update: XOR<AlarmUpdateWithoutTransmitterInput, AlarmUncheckedUpdateWithoutTransmitterInput>
+    create: XOR<AlarmCreateWithoutTransmitterInput, AlarmUncheckedCreateWithoutTransmitterInput>
+  }
+
+  export type AlarmUpdateWithWhereUniqueWithoutTransmitterInput = {
+    where: AlarmWhereUniqueInput
+    data: XOR<AlarmUpdateWithoutTransmitterInput, AlarmUncheckedUpdateWithoutTransmitterInput>
+  }
+
+  export type AlarmUpdateManyWithWhereWithoutTransmitterInput = {
     where: AlarmScalarWhereInput
-    data: XOR<AlarmUpdateManyMutationInput, AlarmUncheckedUpdateManyWithoutSiteInput>
+    data: XOR<AlarmUpdateManyMutationInput, AlarmUncheckedUpdateManyWithoutTransmitterInput>
   }
 
   export type AlarmScalarWhereInput = {
@@ -16208,83 +18110,52 @@ export namespace Prisma {
     OR?: AlarmScalarWhereInput[]
     NOT?: AlarmScalarWhereInput | AlarmScalarWhereInput[]
     id?: StringFilter<"Alarm"> | string
+    shortId?: IntFilter<"Alarm"> | number
     triggeredAt?: DateTimeFilter<"Alarm"> | Date | string
-    alarmType?: StringFilter<"Alarm"> | string
-    priority?: IntFilter<"Alarm"> | number
-    status?: StringFilter<"Alarm"> | string
-    siteId?: StringFilter<"Alarm"> | string
+    eventType?: StringFilter<"Alarm"> | string
+    source?: StringFilter<"Alarm"> | string
+    transmitterId?: StringFilter<"Alarm"> | string
   }
 
-  export type ObLogUpsertWithWhereUniqueWithoutSiteInput = {
-    where: ObLogWhereUniqueInput
-    update: XOR<ObLogUpdateWithoutSiteInput, ObLogUncheckedUpdateWithoutSiteInput>
-    create: XOR<ObLogCreateWithoutSiteInput, ObLogUncheckedCreateWithoutSiteInput>
-  }
-
-  export type ObLogUpdateWithWhereUniqueWithoutSiteInput = {
-    where: ObLogWhereUniqueInput
-    data: XOR<ObLogUpdateWithoutSiteInput, ObLogUncheckedUpdateWithoutSiteInput>
-  }
-
-  export type ObLogUpdateManyWithWhereWithoutSiteInput = {
-    where: ObLogScalarWhereInput
-    data: XOR<ObLogUpdateManyMutationInput, ObLogUncheckedUpdateManyWithoutSiteInput>
-  }
-
-  export type ObLogScalarWhereInput = {
-    AND?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
-    OR?: ObLogScalarWhereInput[]
-    NOT?: ObLogScalarWhereInput | ObLogScalarWhereInput[]
-    id?: StringFilter<"ObLog"> | string
-    logTime?: DateTimeFilter<"ObLog"> | Date | string
-    message?: StringFilter<"ObLog"> | string
-    source?: StringFilter<"ObLog"> | string
-    alarmId?: StringNullableFilter<"ObLog"> | string | null
-    siteId?: StringNullableFilter<"ObLog"> | string | null
-    guardId?: StringNullableFilter<"ObLog"> | string | null
-  }
-
-  export type SiteCreateWithoutAlarmsInput = {
+  export type TransmitterCreateWithoutAlarmsInput = {
     id?: string
-    name: string
-    address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    client: ClientCreateNestedOneWithoutSitesInput
-    obLogs?: ObLogCreateNestedManyWithoutSiteInput
+    referenceCode: string
+    site: SiteCreateNestedOneWithoutTransmittersInput
   }
 
-  export type SiteUncheckedCreateWithoutAlarmsInput = {
+  export type TransmitterUncheckedCreateWithoutAlarmsInput = {
     id?: string
-    name: string
-    address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    clientId: string
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutSiteInput
+    referenceCode: string
+    siteId: string
   }
 
-  export type SiteCreateOrConnectWithoutAlarmsInput = {
-    where: SiteWhereUniqueInput
-    create: XOR<SiteCreateWithoutAlarmsInput, SiteUncheckedCreateWithoutAlarmsInput>
+  export type TransmitterCreateOrConnectWithoutAlarmsInput = {
+    where: TransmitterWhereUniqueInput
+    create: XOR<TransmitterCreateWithoutAlarmsInput, TransmitterUncheckedCreateWithoutAlarmsInput>
   }
 
   export type AiCallCreateWithoutAlarmInput = {
     id?: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date | string
+    shortId?: number
+    calledAt?: Date | string
+    callDuration?: string | null
     notes?: string | null
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
   }
 
   export type AiCallUncheckedCreateWithoutAlarmInput = {
     id?: string
-    aiDecision: string
-    confidenceScore: number
-    evaluatedAt: Date | string
+    shortId?: number
+    calledAt?: Date | string
+    callDuration?: string | null
     notes?: string | null
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
   }
 
   export type AiCallCreateOrConnectWithoutAlarmInput = {
@@ -16292,8 +18163,14 @@ export namespace Prisma {
     create: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
   }
 
+  export type AiCallCreateManyAlarmInputEnvelope = {
+    data: AiCallCreateManyAlarmInput | AiCallCreateManyAlarmInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DispatchCreateWithoutAlarmInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -16304,6 +18181,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedCreateWithoutAlarmInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -16317,92 +18195,59 @@ export namespace Prisma {
     create: XOR<DispatchCreateWithoutAlarmInput, DispatchUncheckedCreateWithoutAlarmInput>
   }
 
-  export type ObLogCreateWithoutAlarmInput = {
-    id?: string
-    logTime: Date | string
-    message: string
-    source: string
-    site?: SiteCreateNestedOneWithoutObLogsInput
-    guard?: GuardCreateNestedOneWithoutObLogsInput
+  export type TransmitterUpsertWithoutAlarmsInput = {
+    update: XOR<TransmitterUpdateWithoutAlarmsInput, TransmitterUncheckedUpdateWithoutAlarmsInput>
+    create: XOR<TransmitterCreateWithoutAlarmsInput, TransmitterUncheckedCreateWithoutAlarmsInput>
+    where?: TransmitterWhereInput
   }
 
-  export type ObLogUncheckedCreateWithoutAlarmInput = {
-    id?: string
-    logTime: Date | string
-    message: string
-    source: string
-    siteId?: string | null
-    guardId?: string | null
+  export type TransmitterUpdateToOneWithWhereWithoutAlarmsInput = {
+    where?: TransmitterWhereInput
+    data: XOR<TransmitterUpdateWithoutAlarmsInput, TransmitterUncheckedUpdateWithoutAlarmsInput>
   }
 
-  export type ObLogCreateOrConnectWithoutAlarmInput = {
-    where: ObLogWhereUniqueInput
-    create: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput>
-  }
-
-  export type ObLogCreateManyAlarmInputEnvelope = {
-    data: ObLogCreateManyAlarmInput | ObLogCreateManyAlarmInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type SiteUpsertWithoutAlarmsInput = {
-    update: XOR<SiteUpdateWithoutAlarmsInput, SiteUncheckedUpdateWithoutAlarmsInput>
-    create: XOR<SiteCreateWithoutAlarmsInput, SiteUncheckedCreateWithoutAlarmsInput>
-    where?: SiteWhereInput
-  }
-
-  export type SiteUpdateToOneWithWhereWithoutAlarmsInput = {
-    where?: SiteWhereInput
-    data: XOR<SiteUpdateWithoutAlarmsInput, SiteUncheckedUpdateWithoutAlarmsInput>
-  }
-
-  export type SiteUpdateWithoutAlarmsInput = {
+  export type TransmitterUpdateWithoutAlarmsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    client?: ClientUpdateOneRequiredWithoutSitesNestedInput
-    obLogs?: ObLogUpdateManyWithoutSiteNestedInput
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    site?: SiteUpdateOneRequiredWithoutTransmittersNestedInput
   }
 
-  export type SiteUncheckedUpdateWithoutAlarmsInput = {
+  export type TransmitterUncheckedUpdateWithoutAlarmsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    obLogs?: ObLogUncheckedUpdateManyWithoutSiteNestedInput
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
   }
 
-  export type AiCallUpsertWithoutAlarmInput = {
+  export type AiCallUpsertWithWhereUniqueWithoutAlarmInput = {
+    where: AiCallWhereUniqueInput
     update: XOR<AiCallUpdateWithoutAlarmInput, AiCallUncheckedUpdateWithoutAlarmInput>
     create: XOR<AiCallCreateWithoutAlarmInput, AiCallUncheckedCreateWithoutAlarmInput>
-    where?: AiCallWhereInput
   }
 
-  export type AiCallUpdateToOneWithWhereWithoutAlarmInput = {
-    where?: AiCallWhereInput
+  export type AiCallUpdateWithWhereUniqueWithoutAlarmInput = {
+    where: AiCallWhereUniqueInput
     data: XOR<AiCallUpdateWithoutAlarmInput, AiCallUncheckedUpdateWithoutAlarmInput>
   }
 
-  export type AiCallUpdateWithoutAlarmInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  export type AiCallUpdateManyWithWhereWithoutAlarmInput = {
+    where: AiCallScalarWhereInput
+    data: XOR<AiCallUpdateManyMutationInput, AiCallUncheckedUpdateManyWithoutAlarmInput>
   }
 
-  export type AiCallUncheckedUpdateWithoutAlarmInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    aiDecision?: StringFieldUpdateOperationsInput | string
-    confidenceScore?: FloatFieldUpdateOperationsInput | number
-    evaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    notes?: NullableStringFieldUpdateOperationsInput | string | null
+  export type AiCallScalarWhereInput = {
+    AND?: AiCallScalarWhereInput | AiCallScalarWhereInput[]
+    OR?: AiCallScalarWhereInput[]
+    NOT?: AiCallScalarWhereInput | AiCallScalarWhereInput[]
+    id?: StringFilter<"AiCall"> | string
+    shortId?: IntFilter<"AiCall"> | number
+    alarmId?: StringFilter<"AiCall"> | string
+    calledAt?: DateTimeFilter<"AiCall"> | Date | string
+    callDuration?: StringNullableFilter<"AiCall"> | string | null
+    notes?: StringNullableFilter<"AiCall"> | string | null
+    aiDecision?: StringNullableFilter<"AiCall"> | string | null
+    confidenceScore?: FloatNullableFilter<"AiCall"> | number | null
+    evaluatedAt?: DateTimeNullableFilter<"AiCall"> | Date | string | null
+    phone?: StringNullableFilter<"AiCall"> | string | null
   }
 
   export type DispatchUpsertWithoutAlarmInput = {
@@ -16428,6 +18273,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateWithoutAlarmInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16436,102 +18282,79 @@ export namespace Prisma {
     vehicleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ObLogUpsertWithWhereUniqueWithoutAlarmInput = {
-    where: ObLogWhereUniqueInput
-    update: XOR<ObLogUpdateWithoutAlarmInput, ObLogUncheckedUpdateWithoutAlarmInput>
-    create: XOR<ObLogCreateWithoutAlarmInput, ObLogUncheckedCreateWithoutAlarmInput>
-  }
-
-  export type ObLogUpdateWithWhereUniqueWithoutAlarmInput = {
-    where: ObLogWhereUniqueInput
-    data: XOR<ObLogUpdateWithoutAlarmInput, ObLogUncheckedUpdateWithoutAlarmInput>
-  }
-
-  export type ObLogUpdateManyWithWhereWithoutAlarmInput = {
-    where: ObLogScalarWhereInput
-    data: XOR<ObLogUpdateManyMutationInput, ObLogUncheckedUpdateManyWithoutAlarmInput>
-  }
-
-  export type AlarmCreateWithoutAiCallInput = {
+  export type AlarmCreateWithoutAiCallsInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    site: SiteCreateNestedOneWithoutAlarmsInput
+    eventType: string
+    source: string
+    transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
     dispatch?: DispatchCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogCreateNestedManyWithoutAlarmInput
   }
 
-  export type AlarmUncheckedCreateWithoutAiCallInput = {
+  export type AlarmUncheckedCreateWithoutAiCallsInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
+    eventType: string
+    source: string
+    transmitterId: string
     dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutAlarmInput
   }
 
-  export type AlarmCreateOrConnectWithoutAiCallInput = {
+  export type AlarmCreateOrConnectWithoutAiCallsInput = {
     where: AlarmWhereUniqueInput
-    create: XOR<AlarmCreateWithoutAiCallInput, AlarmUncheckedCreateWithoutAiCallInput>
+    create: XOR<AlarmCreateWithoutAiCallsInput, AlarmUncheckedCreateWithoutAiCallsInput>
   }
 
-  export type AlarmUpsertWithoutAiCallInput = {
-    update: XOR<AlarmUpdateWithoutAiCallInput, AlarmUncheckedUpdateWithoutAiCallInput>
-    create: XOR<AlarmCreateWithoutAiCallInput, AlarmUncheckedCreateWithoutAiCallInput>
+  export type AlarmUpsertWithoutAiCallsInput = {
+    update: XOR<AlarmUpdateWithoutAiCallsInput, AlarmUncheckedUpdateWithoutAiCallsInput>
+    create: XOR<AlarmCreateWithoutAiCallsInput, AlarmUncheckedCreateWithoutAiCallsInput>
     where?: AlarmWhereInput
   }
 
-  export type AlarmUpdateToOneWithWhereWithoutAiCallInput = {
+  export type AlarmUpdateToOneWithWhereWithoutAiCallsInput = {
     where?: AlarmWhereInput
-    data: XOR<AlarmUpdateWithoutAiCallInput, AlarmUncheckedUpdateWithoutAiCallInput>
+    data: XOR<AlarmUpdateWithoutAiCallsInput, AlarmUncheckedUpdateWithoutAiCallsInput>
   }
 
-  export type AlarmUpdateWithoutAiCallInput = {
+  export type AlarmUpdateWithoutAiCallsInput = {
     id?: StringFieldUpdateOperationsInput | string
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    site?: SiteUpdateOneRequiredWithoutAlarmsNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUpdateManyWithoutAlarmNestedInput
   }
 
-  export type AlarmUncheckedUpdateWithoutAiCallInput = {
+  export type AlarmUncheckedUpdateWithoutAiCallsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    siteId?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitterId?: StringFieldUpdateOperationsInput | string
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutAlarmNestedInput
   }
 
   export type AlarmCreateWithoutDispatchInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    site: SiteCreateNestedOneWithoutAlarmsInput
-    aiCall?: AiCallCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogCreateNestedManyWithoutAlarmInput
+    eventType: string
+    source: string
+    transmitter: TransmitterCreateNestedOneWithoutAlarmsInput
+    aiCalls?: AiCallCreateNestedManyWithoutAlarmInput
   }
 
   export type AlarmUncheckedCreateWithoutDispatchInput = {
     id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
-    aiCall?: AiCallUncheckedCreateNestedOneWithoutAlarmInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutAlarmInput
+    eventType: string
+    source: string
+    transmitterId: string
+    aiCalls?: AiCallUncheckedCreateNestedManyWithoutAlarmInput
   }
 
   export type AlarmCreateOrConnectWithoutDispatchInput = {
@@ -16541,20 +18364,22 @@ export namespace Prisma {
 
   export type GuardCreateWithoutDispatchesInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     assignedVehicle?: VehicleCreateNestedOneWithoutGuardsInput
-    obLogs?: ObLogCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogCreateNestedManyWithoutGuardInput
   }
 
   export type GuardUncheckedCreateWithoutDispatchesInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     assignedVehicleId?: string | null
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutGuardInput
   }
 
   export type GuardCreateOrConnectWithoutDispatchesInput = {
@@ -16564,16 +18389,20 @@ export namespace Prisma {
 
   export type VehicleCreateWithoutDispatchesInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     guards?: GuardCreateNestedManyWithoutAssignedVehicleInput
   }
 
   export type VehicleUncheckedCreateWithoutDispatchesInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     guards?: GuardUncheckedCreateNestedManyWithoutAssignedVehicleInput
   }
@@ -16597,23 +18426,20 @@ export namespace Prisma {
   export type AlarmUpdateWithoutDispatchInput = {
     id?: StringFieldUpdateOperationsInput | string
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    site?: SiteUpdateOneRequiredWithoutAlarmsNestedInput
-    aiCall?: AiCallUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUpdateManyWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitter?: TransmitterUpdateOneRequiredWithoutAlarmsNestedInput
+    aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
   }
 
   export type AlarmUncheckedUpdateWithoutDispatchInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    siteId?: StringFieldUpdateOperationsInput | string
-    aiCall?: AiCallUncheckedUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    transmitterId?: StringFieldUpdateOperationsInput | string
+    aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
   }
 
   export type GuardUpsertWithoutDispatchesInput = {
@@ -16633,16 +18459,17 @@ export namespace Prisma {
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     assignedVehicle?: VehicleUpdateOneWithoutGuardsNestedInput
-    obLogs?: ObLogUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUpdateManyWithoutGuardNestedInput
   }
 
   export type GuardUncheckedUpdateWithoutDispatchesInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     assignedVehicleId?: NullableStringFieldUpdateOperationsInput | string | null
-    obLogs?: ObLogUncheckedUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUncheckedUpdateManyWithoutGuardNestedInput
   }
 
   export type VehicleUpsertWithoutDispatchesInput = {
@@ -16658,76 +18485,26 @@ export namespace Prisma {
 
   export type VehicleUpdateWithoutDispatchesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     guards?: GuardUpdateManyWithoutAssignedVehicleNestedInput
   }
 
   export type VehicleUncheckedUpdateWithoutDispatchesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     guards?: GuardUncheckedUpdateManyWithoutAssignedVehicleNestedInput
   }
 
-  export type AlarmCreateWithoutObLogsInput = {
+  export type GuardCreateWithoutOBLogsInput = {
     id?: string
-    triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    site: SiteCreateNestedOneWithoutAlarmsInput
-    aiCall?: AiCallCreateNestedOneWithoutAlarmInput
-    dispatch?: DispatchCreateNestedOneWithoutAlarmInput
-  }
-
-  export type AlarmUncheckedCreateWithoutObLogsInput = {
-    id?: string
-    triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-    siteId: string
-    aiCall?: AiCallUncheckedCreateNestedOneWithoutAlarmInput
-    dispatch?: DispatchUncheckedCreateNestedOneWithoutAlarmInput
-  }
-
-  export type AlarmCreateOrConnectWithoutObLogsInput = {
-    where: AlarmWhereUniqueInput
-    create: XOR<AlarmCreateWithoutObLogsInput, AlarmUncheckedCreateWithoutObLogsInput>
-  }
-
-  export type SiteCreateWithoutObLogsInput = {
-    id?: string
-    name: string
-    address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    client: ClientCreateNestedOneWithoutSitesInput
-    alarms?: AlarmCreateNestedManyWithoutSiteInput
-  }
-
-  export type SiteUncheckedCreateWithoutObLogsInput = {
-    id?: string
-    name: string
-    address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
-    clientId: string
-    alarms?: AlarmUncheckedCreateNestedManyWithoutSiteInput
-  }
-
-  export type SiteCreateOrConnectWithoutObLogsInput = {
-    where: SiteWhereUniqueInput
-    create: XOR<SiteCreateWithoutObLogsInput, SiteUncheckedCreateWithoutObLogsInput>
-  }
-
-  export type GuardCreateWithoutObLogsInput = {
-    id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
@@ -16735,8 +18512,9 @@ export namespace Prisma {
     dispatches?: DispatchCreateNestedManyWithoutGuardInput
   }
 
-  export type GuardUncheckedCreateWithoutObLogsInput = {
+  export type GuardUncheckedCreateWithoutOBLogsInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
@@ -16744,89 +18522,46 @@ export namespace Prisma {
     dispatches?: DispatchUncheckedCreateNestedManyWithoutGuardInput
   }
 
-  export type GuardCreateOrConnectWithoutObLogsInput = {
+  export type GuardCreateOrConnectWithoutOBLogsInput = {
     where: GuardWhereUniqueInput
-    create: XOR<GuardCreateWithoutObLogsInput, GuardUncheckedCreateWithoutObLogsInput>
+    create: XOR<GuardCreateWithoutOBLogsInput, GuardUncheckedCreateWithoutOBLogsInput>
   }
 
-  export type AlarmUpsertWithoutObLogsInput = {
-    update: XOR<AlarmUpdateWithoutObLogsInput, AlarmUncheckedUpdateWithoutObLogsInput>
-    create: XOR<AlarmCreateWithoutObLogsInput, AlarmUncheckedCreateWithoutObLogsInput>
-    where?: AlarmWhereInput
+  export type SiteCreateWithoutOBLogsInput = {
+    id?: string
+    shortId?: number
+    name: string
+    address: string
+    client: ClientCreateNestedOneWithoutSitesInput
+    transmitters?: TransmitterCreateNestedManyWithoutSiteInput
   }
 
-  export type AlarmUpdateToOneWithWhereWithoutObLogsInput = {
-    where?: AlarmWhereInput
-    data: XOR<AlarmUpdateWithoutObLogsInput, AlarmUncheckedUpdateWithoutObLogsInput>
+  export type SiteUncheckedCreateWithoutOBLogsInput = {
+    id?: string
+    shortId?: number
+    name: string
+    address: string
+    clientId: string
+    transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
   }
 
-  export type AlarmUpdateWithoutObLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    site?: SiteUpdateOneRequiredWithoutAlarmsNestedInput
-    aiCall?: AiCallUpdateOneWithoutAlarmNestedInput
-    dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
+  export type SiteCreateOrConnectWithoutOBLogsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutOBLogsInput, SiteUncheckedCreateWithoutOBLogsInput>
   }
 
-  export type AlarmUncheckedUpdateWithoutObLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    siteId?: StringFieldUpdateOperationsInput | string
-    aiCall?: AiCallUncheckedUpdateOneWithoutAlarmNestedInput
-    dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
-  }
-
-  export type SiteUpsertWithoutObLogsInput = {
-    update: XOR<SiteUpdateWithoutObLogsInput, SiteUncheckedUpdateWithoutObLogsInput>
-    create: XOR<SiteCreateWithoutObLogsInput, SiteUncheckedCreateWithoutObLogsInput>
-    where?: SiteWhereInput
-  }
-
-  export type SiteUpdateToOneWithWhereWithoutObLogsInput = {
-    where?: SiteWhereInput
-    data: XOR<SiteUpdateWithoutObLogsInput, SiteUncheckedUpdateWithoutObLogsInput>
-  }
-
-  export type SiteUpdateWithoutObLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    client?: ClientUpdateOneRequiredWithoutSitesNestedInput
-    alarms?: AlarmUpdateManyWithoutSiteNestedInput
-  }
-
-  export type SiteUncheckedUpdateWithoutObLogsInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    alarms?: AlarmUncheckedUpdateManyWithoutSiteNestedInput
-  }
-
-  export type GuardUpsertWithoutObLogsInput = {
-    update: XOR<GuardUpdateWithoutObLogsInput, GuardUncheckedUpdateWithoutObLogsInput>
-    create: XOR<GuardCreateWithoutObLogsInput, GuardUncheckedCreateWithoutObLogsInput>
+  export type GuardUpsertWithoutOBLogsInput = {
+    update: XOR<GuardUpdateWithoutOBLogsInput, GuardUncheckedUpdateWithoutOBLogsInput>
+    create: XOR<GuardCreateWithoutOBLogsInput, GuardUncheckedCreateWithoutOBLogsInput>
     where?: GuardWhereInput
   }
 
-  export type GuardUpdateToOneWithWhereWithoutObLogsInput = {
+  export type GuardUpdateToOneWithWhereWithoutOBLogsInput = {
     where?: GuardWhereInput
-    data: XOR<GuardUpdateWithoutObLogsInput, GuardUncheckedUpdateWithoutObLogsInput>
+    data: XOR<GuardUpdateWithoutOBLogsInput, GuardUncheckedUpdateWithoutOBLogsInput>
   }
 
-  export type GuardUpdateWithoutObLogsInput = {
+  export type GuardUpdateWithoutOBLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
@@ -16835,8 +18570,9 @@ export namespace Prisma {
     dispatches?: DispatchUpdateManyWithoutGuardNestedInput
   }
 
-  export type GuardUncheckedUpdateWithoutObLogsInput = {
+  export type GuardUncheckedUpdateWithoutOBLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -16844,46 +18580,75 @@ export namespace Prisma {
     dispatches?: DispatchUncheckedUpdateManyWithoutGuardNestedInput
   }
 
-  export type UserRoleCreateWithoutUsersInput = {
-    id?: string
+  export type SiteUpsertWithoutOBLogsInput = {
+    update: XOR<SiteUpdateWithoutOBLogsInput, SiteUncheckedUpdateWithoutOBLogsInput>
+    create: XOR<SiteCreateWithoutOBLogsInput, SiteUncheckedCreateWithoutOBLogsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutOBLogsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutOBLogsInput, SiteUncheckedUpdateWithoutOBLogsInput>
+  }
+
+  export type SiteUpdateWithoutOBLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    client?: ClientUpdateOneRequiredWithoutSitesNestedInput
+    transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutOBLogsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    address?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type RoleCreateWithoutUsersInput = {
+    id: string
     name: string
   }
 
-  export type UserRoleUncheckedCreateWithoutUsersInput = {
-    id?: string
+  export type RoleUncheckedCreateWithoutUsersInput = {
+    id: string
     name: string
   }
 
-  export type UserRoleCreateOrConnectWithoutUsersInput = {
-    where: UserRoleWhereUniqueInput
-    create: XOR<UserRoleCreateWithoutUsersInput, UserRoleUncheckedCreateWithoutUsersInput>
+  export type RoleCreateOrConnectWithoutUsersInput = {
+    where: RoleWhereUniqueInput
+    create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
   }
 
-  export type UserRoleUpsertWithoutUsersInput = {
-    update: XOR<UserRoleUpdateWithoutUsersInput, UserRoleUncheckedUpdateWithoutUsersInput>
-    create: XOR<UserRoleCreateWithoutUsersInput, UserRoleUncheckedCreateWithoutUsersInput>
-    where?: UserRoleWhereInput
+  export type RoleUpsertWithoutUsersInput = {
+    update: XOR<RoleUpdateWithoutUsersInput, RoleUncheckedUpdateWithoutUsersInput>
+    create: XOR<RoleCreateWithoutUsersInput, RoleUncheckedCreateWithoutUsersInput>
+    where?: RoleWhereInput
   }
 
-  export type UserRoleUpdateToOneWithWhereWithoutUsersInput = {
-    where?: UserRoleWhereInput
-    data: XOR<UserRoleUpdateWithoutUsersInput, UserRoleUncheckedUpdateWithoutUsersInput>
+  export type RoleUpdateToOneWithWhereWithoutUsersInput = {
+    where?: RoleWhereInput
+    data: XOR<RoleUpdateWithoutUsersInput, RoleUncheckedUpdateWithoutUsersInput>
   }
 
-  export type UserRoleUpdateWithoutUsersInput = {
+  export type RoleUpdateWithoutUsersInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
   }
 
-  export type UserRoleUncheckedUpdateWithoutUsersInput = {
+  export type RoleUncheckedUpdateWithoutUsersInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserCreateWithoutRoleInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
@@ -16891,8 +18656,9 @@ export namespace Prisma {
 
   export type UserUncheckedCreateWithoutRoleInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
@@ -16929,8 +18695,9 @@ export namespace Prisma {
     OR?: UserScalarWhereInput[]
     NOT?: UserScalarWhereInput | UserScalarWhereInput[]
     id?: StringFilter<"User"> | string
+    shortId?: IntFilter<"User"> | number
     email?: StringFilter<"User"> | string
-    passwordHash?: StringFilter<"User"> | string
+    password?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     lastLogin?: DateTimeNullableFilter<"User"> | Date | string | null
@@ -16939,6 +18706,7 @@ export namespace Prisma {
 
   export type DispatchCreateWithoutVehicleInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -16949,6 +18717,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedCreateWithoutVehicleInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -16969,20 +18738,22 @@ export namespace Prisma {
 
   export type GuardCreateWithoutAssignedVehicleInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     dispatches?: DispatchCreateNestedManyWithoutGuardInput
-    obLogs?: ObLogCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogCreateNestedManyWithoutGuardInput
   }
 
   export type GuardUncheckedCreateWithoutAssignedVehicleInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
     dispatches?: DispatchUncheckedCreateNestedManyWithoutGuardInput
-    obLogs?: ObLogUncheckedCreateNestedManyWithoutGuardInput
+    OBLogs?: OBLogUncheckedCreateNestedManyWithoutGuardInput
   }
 
   export type GuardCreateOrConnectWithoutAssignedVehicleInput = {
@@ -17016,6 +18787,7 @@ export namespace Prisma {
     OR?: DispatchScalarWhereInput[]
     NOT?: DispatchScalarWhereInput | DispatchScalarWhereInput[]
     id?: StringFilter<"Dispatch"> | string
+    shortId?: IntFilter<"Dispatch"> | number
     dispatchedAt?: DateTimeFilter<"Dispatch"> | Date | string
     arrivalTime?: DateTimeNullableFilter<"Dispatch"> | Date | string | null
     resolvedAt?: DateTimeNullableFilter<"Dispatch"> | Date | string | null
@@ -17046,6 +18818,7 @@ export namespace Prisma {
     OR?: GuardScalarWhereInput[]
     NOT?: GuardScalarWhereInput | GuardScalarWhereInput[]
     id?: StringFilter<"Guard"> | string
+    shortId?: IntFilter<"Guard"> | number
     name?: StringFilter<"Guard"> | string
     phone?: StringFilter<"Guard"> | string
     status?: StringFilter<"Guard"> | string
@@ -17054,16 +18827,20 @@ export namespace Prisma {
 
   export type VehicleCreateWithoutGuardsInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     dispatches?: DispatchCreateNestedManyWithoutVehicleInput
   }
 
   export type VehicleUncheckedCreateWithoutGuardsInput = {
     id?: string
-    plateNumber: string
-    description?: string | null
+    shortId?: number
+    name: string
+    plate: string
+    model: string
     status: string
     dispatches?: DispatchUncheckedCreateNestedManyWithoutVehicleInput
   }
@@ -17075,6 +18852,7 @@ export namespace Prisma {
 
   export type DispatchCreateWithoutGuardInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -17085,6 +18863,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedCreateWithoutGuardInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -17103,31 +18882,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type ObLogCreateWithoutGuardInput = {
+  export type OBLogCreateWithoutGuardInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarm?: AlarmCreateNestedOneWithoutObLogsInput
-    site?: SiteCreateNestedOneWithoutObLogsInput
+    actionLog: string
+    notes: string
+    site?: SiteCreateNestedOneWithoutOBLogsInput
   }
 
-  export type ObLogUncheckedCreateWithoutGuardInput = {
+  export type OBLogUncheckedCreateWithoutGuardInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarmId?: string | null
     siteId?: string | null
+    actionLog: string
+    notes: string
   }
 
-  export type ObLogCreateOrConnectWithoutGuardInput = {
-    where: ObLogWhereUniqueInput
-    create: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput>
+  export type OBLogCreateOrConnectWithoutGuardInput = {
+    where: OBLogWhereUniqueInput
+    create: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput>
   }
 
-  export type ObLogCreateManyGuardInputEnvelope = {
-    data: ObLogCreateManyGuardInput | ObLogCreateManyGuardInput[]
+  export type OBLogCreateManyGuardInputEnvelope = {
+    data: OBLogCreateManyGuardInput | OBLogCreateManyGuardInput[]
     skipDuplicates?: boolean
   }
 
@@ -17144,16 +18923,19 @@ export namespace Prisma {
 
   export type VehicleUpdateWithoutGuardsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUpdateManyWithoutVehicleNestedInput
   }
 
   export type VehicleUncheckedUpdateWithoutGuardsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    plateNumber?: StringFieldUpdateOperationsInput | string
-    description?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    model?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUncheckedUpdateManyWithoutVehicleNestedInput
   }
@@ -17174,176 +18956,197 @@ export namespace Prisma {
     data: XOR<DispatchUpdateManyMutationInput, DispatchUncheckedUpdateManyWithoutGuardInput>
   }
 
-  export type ObLogUpsertWithWhereUniqueWithoutGuardInput = {
-    where: ObLogWhereUniqueInput
-    update: XOR<ObLogUpdateWithoutGuardInput, ObLogUncheckedUpdateWithoutGuardInput>
-    create: XOR<ObLogCreateWithoutGuardInput, ObLogUncheckedCreateWithoutGuardInput>
+  export type OBLogUpsertWithWhereUniqueWithoutGuardInput = {
+    where: OBLogWhereUniqueInput
+    update: XOR<OBLogUpdateWithoutGuardInput, OBLogUncheckedUpdateWithoutGuardInput>
+    create: XOR<OBLogCreateWithoutGuardInput, OBLogUncheckedCreateWithoutGuardInput>
   }
 
-  export type ObLogUpdateWithWhereUniqueWithoutGuardInput = {
-    where: ObLogWhereUniqueInput
-    data: XOR<ObLogUpdateWithoutGuardInput, ObLogUncheckedUpdateWithoutGuardInput>
+  export type OBLogUpdateWithWhereUniqueWithoutGuardInput = {
+    where: OBLogWhereUniqueInput
+    data: XOR<OBLogUpdateWithoutGuardInput, OBLogUncheckedUpdateWithoutGuardInput>
   }
 
-  export type ObLogUpdateManyWithWhereWithoutGuardInput = {
-    where: ObLogScalarWhereInput
-    data: XOR<ObLogUpdateManyMutationInput, ObLogUncheckedUpdateManyWithoutGuardInput>
+  export type OBLogUpdateManyWithWhereWithoutGuardInput = {
+    where: OBLogScalarWhereInput
+    data: XOR<OBLogUpdateManyMutationInput, OBLogUncheckedUpdateManyWithoutGuardInput>
   }
 
   export type SiteCreateManyClientInput = {
     id?: string
+    shortId?: number
     name: string
     address: string
-    latitude?: number | null
-    longitude?: number | null
-    createdAt?: Date | string
   }
 
   export type SiteUpdateWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarms?: AlarmUpdateManyWithoutSiteNestedInput
-    obLogs?: ObLogUpdateManyWithoutSiteNestedInput
+    transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
+    OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarms?: AlarmUncheckedUpdateManyWithoutSiteNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutSiteNestedInput
+    transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
+    OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
-    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type AlarmCreateManySiteInput = {
+  export type TransmitterCreateManySiteInput = {
     id?: string
+    referenceCode: string
+  }
+
+  export type OBLogCreateManySiteInput = {
+    id?: string
+    shortId?: number
+    logTime: Date | string
+    guardId?: string | null
+    actionLog: string
+    notes: string
+  }
+
+  export type TransmitterUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    alarms?: AlarmUpdateManyWithoutTransmitterNestedInput
+  }
+
+  export type TransmitterUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+    alarms?: AlarmUncheckedUpdateManyWithoutTransmitterNestedInput
+  }
+
+  export type TransmitterUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    referenceCode?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OBLogUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+    guard?: GuardUpdateOneWithoutOBLogsNestedInput
+  }
+
+  export type OBLogUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OBLogUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
+    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
+    guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AlarmCreateManyTransmitterInput = {
+    id?: string
+    shortId?: number
     triggeredAt: Date | string
-    alarmType: string
-    priority: number
-    status: string
-  }
-
-  export type ObLogCreateManySiteInput = {
-    id?: string
-    logTime: Date | string
-    message: string
+    eventType: string
     source: string
-    alarmId?: string | null
-    guardId?: string | null
   }
 
-  export type AlarmUpdateWithoutSiteInput = {
+  export type AlarmUpdateWithoutTransmitterInput = {
     id?: StringFieldUpdateOperationsInput | string
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    aiCall?: AiCallUpdateOneWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    aiCalls?: AiCallUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUpdateManyWithoutAlarmNestedInput
   }
 
-  export type AlarmUncheckedUpdateWithoutSiteInput = {
+  export type AlarmUncheckedUpdateWithoutTransmitterInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-    aiCall?: AiCallUncheckedUpdateOneWithoutAlarmNestedInput
+    eventType?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    aiCalls?: AiCallUncheckedUpdateManyWithoutAlarmNestedInput
     dispatch?: DispatchUncheckedUpdateOneWithoutAlarmNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutAlarmNestedInput
   }
 
-  export type AlarmUncheckedUpdateManyWithoutSiteInput = {
+  export type AlarmUncheckedUpdateManyWithoutTransmitterInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     triggeredAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    alarmType?: StringFieldUpdateOperationsInput | string
-    priority?: IntFieldUpdateOperationsInput | number
-    status?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type ObLogUpdateWithoutSiteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
+    eventType?: StringFieldUpdateOperationsInput | string
     source?: StringFieldUpdateOperationsInput | string
-    alarm?: AlarmUpdateOneWithoutObLogsNestedInput
-    guard?: GuardUpdateOneWithoutObLogsNestedInput
   }
 
-  export type ObLogUncheckedUpdateWithoutSiteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
-    guardId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type ObLogUncheckedUpdateManyWithoutSiteInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
-    guardId?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type ObLogCreateManyAlarmInput = {
+  export type AiCallCreateManyAlarmInput = {
     id?: string
-    logTime: Date | string
-    message: string
-    source: string
-    siteId?: string | null
-    guardId?: string | null
+    shortId?: number
+    calledAt?: Date | string
+    callDuration?: string | null
+    notes?: string | null
+    aiDecision?: string | null
+    confidenceScore?: number | null
+    evaluatedAt?: Date | string | null
+    phone?: string | null
   }
 
-  export type ObLogUpdateWithoutAlarmInput = {
+  export type AiCallUpdateWithoutAlarmInput = {
     id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    site?: SiteUpdateOneWithoutObLogsNestedInput
-    guard?: GuardUpdateOneWithoutObLogsNestedInput
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ObLogUncheckedUpdateWithoutAlarmInput = {
+  export type AiCallUncheckedUpdateWithoutAlarmInput = {
     id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    siteId?: NullableStringFieldUpdateOperationsInput | string | null
-    guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ObLogUncheckedUpdateManyWithoutAlarmInput = {
+  export type AiCallUncheckedUpdateManyWithoutAlarmInput = {
     id?: StringFieldUpdateOperationsInput | string
-    logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    siteId?: NullableStringFieldUpdateOperationsInput | string | null
-    guardId?: NullableStringFieldUpdateOperationsInput | string | null
+    shortId?: IntFieldUpdateOperationsInput | number
+    calledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    callDuration?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    aiDecision?: NullableStringFieldUpdateOperationsInput | string | null
+    confidenceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    evaluatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserCreateManyRoleInput = {
     id?: string
+    shortId?: number
     email: string
-    passwordHash: string
+    password: string
     name: string
     createdAt?: Date | string
     lastLogin?: Date | string | null
@@ -17352,7 +19155,7 @@ export namespace Prisma {
   export type UserUpdateWithoutRoleInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17360,8 +19163,9 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateWithoutRoleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17369,8 +19173,9 @@ export namespace Prisma {
 
   export type UserUncheckedUpdateManyWithoutRoleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
-    passwordHash?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     lastLogin?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17378,6 +19183,7 @@ export namespace Prisma {
 
   export type DispatchCreateManyVehicleInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -17388,6 +19194,7 @@ export namespace Prisma {
 
   export type GuardCreateManyAssignedVehicleInput = {
     id?: string
+    shortId?: number
     name: string
     phone: string
     status: string
@@ -17405,6 +19212,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateWithoutVehicleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17415,6 +19223,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateManyWithoutVehicleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17429,20 +19238,22 @@ export namespace Prisma {
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUpdateManyWithoutGuardNestedInput
-    obLogs?: ObLogUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUpdateManyWithoutGuardNestedInput
   }
 
   export type GuardUncheckedUpdateWithoutAssignedVehicleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     dispatches?: DispatchUncheckedUpdateManyWithoutGuardNestedInput
-    obLogs?: ObLogUncheckedUpdateManyWithoutGuardNestedInput
+    OBLogs?: OBLogUncheckedUpdateManyWithoutGuardNestedInput
   }
 
   export type GuardUncheckedUpdateManyWithoutAssignedVehicleInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -17450,6 +19261,7 @@ export namespace Prisma {
 
   export type DispatchCreateManyGuardInput = {
     id?: string
+    shortId?: number
     dispatchedAt: Date | string
     arrivalTime?: Date | string | null
     resolvedAt?: Date | string | null
@@ -17458,13 +19270,13 @@ export namespace Prisma {
     vehicleId?: string | null
   }
 
-  export type ObLogCreateManyGuardInput = {
+  export type OBLogCreateManyGuardInput = {
     id?: string
+    shortId?: number
     logTime: Date | string
-    message: string
-    source: string
-    alarmId?: string | null
     siteId?: string | null
+    actionLog: string
+    notes: string
   }
 
   export type DispatchUpdateWithoutGuardInput = {
@@ -17479,6 +19291,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateWithoutGuardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17489,6 +19302,7 @@ export namespace Prisma {
 
   export type DispatchUncheckedUpdateManyWithoutGuardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     dispatchedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     arrivalTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17497,31 +19311,30 @@ export namespace Prisma {
     vehicleId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
-  export type ObLogUpdateWithoutGuardInput = {
+  export type OBLogUpdateWithoutGuardInput = {
     id?: StringFieldUpdateOperationsInput | string
     logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarm?: AlarmUpdateOneWithoutObLogsNestedInput
-    site?: SiteUpdateOneWithoutObLogsNestedInput
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
+    site?: SiteUpdateOneWithoutOBLogsNestedInput
   }
 
-  export type ObLogUncheckedUpdateWithoutGuardInput = {
+  export type OBLogUncheckedUpdateWithoutGuardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
-  export type ObLogUncheckedUpdateManyWithoutGuardInput = {
+  export type OBLogUncheckedUpdateManyWithoutGuardInput = {
     id?: StringFieldUpdateOperationsInput | string
+    shortId?: IntFieldUpdateOperationsInput | number
     logTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    message?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    alarmId?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: NullableStringFieldUpdateOperationsInput | string | null
+    actionLog?: StringFieldUpdateOperationsInput | string
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
 

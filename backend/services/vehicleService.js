@@ -1,59 +1,33 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require('../utils/prisma');
 
 async function createVehicle(data) {
-  try {
-    return await prisma.vehicle.create({ data });
-  } catch (error) {
-    console.error("Failed to create vehicle:", error.message);
-    return null;
-  }
+  return await prisma.vehicle.create({ data });
 }
 
 async function getAllVehicles() {
-  try {
-    return await prisma.vehicle.findMany({
-      include: { guards: true },
-    });
-  } catch (error) {
-    console.error("Failed to fetch vehicles:", error.message);
-    return [];
-  }
+  return await prisma.vehicle.findMany({
+    include: { guards: true },
+  });
 }
 
 async function getVehicleById(id) {
-  try {
-    return await prisma.vehicle.findUnique({
-      where: { id },
-      include: { guards: true },
-    });
-  } catch (error) {
-    console.error(`Failed to fetch vehicle ${id}:`, error.message);
-    return null;
-  }
+  return await prisma.vehicle.findUnique({
+    where: { id },
+    include: { guards: true },
+  });
 }
 
 async function updateVehicle(id, data) {
-  try {
-    const { guards, ...safeData } = data; // ignore nested guards updates here
-    return await prisma.vehicle.update({
-      where: { id },
-      data: safeData,
-    });
-  } catch (error) {
-    console.error(`Failed to update vehicle ${id}:`, error.message);
-    return null;
-  }
+  // Strip nested guards — cannot update relations this way
+  const { guards, ...safeData } = data;
+  return await prisma.vehicle.update({
+    where: { id },
+    data: safeData,
+  });
 }
 
 async function deleteVehicle(id) {
-  try {
-    await prisma.vehicle.delete({ where: { id } });
-    return true;
-  } catch (error) {
-    console.error(`Failed to delete vehicle ${id}:`, error.message);
-    return false;
-  }
+  return await prisma.vehicle.delete({ where: { id } });
 }
 
 module.exports = {

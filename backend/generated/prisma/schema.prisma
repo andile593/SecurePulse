@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -11,130 +5,137 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Client {
-  id           String   @id @default(uuid())
-  name         String
-  contactEmail String
-  phone        String?
-  createdAt    DateTime @default(now())
-
-  sites Site[]
+  id        String   @id @default(uuid())
+  shortId   Int      @unique @default(autoincrement())
+  surname   String
+  name      String
+  email     String
+  phone     String
+  createdAt DateTime @default(now())
+  sites     Site[]
 }
 
 model Site {
-  id        String   @id @default(uuid())
-  name      String
-  address   String
-  latitude  Float?
-  longitude Float?
-  createdAt DateTime @default(now())
-
+  id       String @id @default(uuid())
+  shortId  Int    @unique @default(autoincrement())
+  name     String
+  address  String
   clientId String
-  client   Client @relation(fields: [clientId], references: [id])
 
+  client       Client        @relation(fields: [clientId], references: [id])
+  transmitters Transmitter[]
+  OBLogs       OBLog[]
+}
+
+model Transmitter {
+  id            String @id @default(uuid())
+  referenceCode String @unique
+  siteId        String
+
+  site   Site    @relation(fields: [siteId], references: [id])
   alarms Alarm[]
-  obLogs ObLog[] // ← ADD THIS LINE
 }
 
 model Alarm {
-  id          String   @id @default(uuid())
-  triggeredAt DateTime
-  alarmType   String
-  priority    Int
-  status      String
+  id            String   @id @default(uuid())
+  shortId       Int      @unique @default(autoincrement())
+  triggeredAt   DateTime
+  eventType     String
+  source        String
+  transmitterId String
 
-  siteId String
-  site   Site   @relation(fields: [siteId], references: [id])
-
-  aiCall   AiCall?
-  dispatch Dispatch?
-  obLogs   ObLog[]
+  transmitter Transmitter @relation(fields: [transmitterId], references: [id])
+  aiCalls     AiCall[]
+  dispatch    Dispatch?
 }
 
 model AiCall {
-  id              String   @id @default(uuid())
-  aiDecision      String
-  confidenceScore Float
-  evaluatedAt     DateTime
+  id              String    @id @default(uuid())
+  shortId         Int       @unique @default(autoincrement())
+  alarmId         String
+  calledAt        DateTime  @default(now())
+  callDuration    String?
   notes           String?
-
-  alarmId String @unique
-  alarm   Alarm  @relation(fields: [alarmId], references: [id])
+  aiDecision      String?
+  confidenceScore Float?
+  evaluatedAt     DateTime?
+  phone           String?
+  alarm           Alarm     @relation(fields: [alarmId], references: [id])
 }
 
 model Dispatch {
   id            String    @id @default(uuid())
+  shortId       Int       @unique @default(autoincrement())
   dispatchedAt  DateTime
   arrivalTime   DateTime?
   resolvedAt    DateTime?
   responseNotes String?
+  alarmId       String    @unique
+  guardId       String?
+  vehicleId     String?
 
-  alarmId String @unique
-  alarm   Alarm  @relation(fields: [alarmId], references: [id])
-
-  guardId String?
-  guard   Guard?  @relation(fields: [guardId], references: [id])
-
-  vehicleId String?
-  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+  alarm   Alarm    @relation(fields: [alarmId], references: [id])
+  guard   Guard?   @relation(fields: [guardId], references: [id])
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id])
 }
 
-model ObLog {
-  id      String   @id @default(uuid())
-  logTime DateTime
-  message String
-  source  String // e.g., "system", "guard", "ai"
+model OBLog {
+  id        String   @id @default(uuid())
+  shortId   Int      @unique @default(autoincrement())
+  logTime   DateTime
+  guardId   String?
+  siteId    String?
+  actionLog String
+  notes     String
 
-  alarmId String? // Optional
-  alarm   Alarm?  @relation(fields: [alarmId], references: [id])
-
-  siteId String?
-  site   Site?   @relation(fields: [siteId], references: [id])
-
-  guardId String?
-  guard   Guard?  @relation(fields: [guardId], references: [id])
+  guard Guard? @relation(fields: [guardId], references: [id])
+  site  Site?  @relation(fields: [siteId], references: [id])
 }
 
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime  @default(now())
-  lastLogin    DateTime?
+  id        String    @id @default(uuid())
+  shortId   Int       @unique @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  createdAt DateTime  @default(now())
+  lastLogin DateTime?
+  roleId    String
 
-  roleId String
-  role   UserRole @relation(fields: [roleId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
 }
 
-model UserRole {
-  id    String @id @default(uuid())
-  name  String @unique // e.g., "admin", "controller", "supervisor"
+model Role {
+  id   String @id
+  name String @unique
+
   users User[]
 }
 
 model Vehicle {
-  id          String  @id @default(uuid())
-  plateNumber String  @unique
-  description String?
-  status      String // e.g., "active", "maintenance", "out_of_service"
+  id      String @id @default(uuid())
+  shortId Int    @unique @default(autoincrement())
+  name    String
+  plate   String @unique
+  model   String
+  status  String
 
   dispatches Dispatch[]
   guards     Guard[]
 }
 
 model Guard {
-  id     String @id @default(uuid())
-  name   String
-  phone  String
-  status String
-
+  id                String  @id @default(uuid())
+  shortId           Int     @unique @default(autoincrement())
+  name              String
+  phone             String
+  status            String
   assignedVehicleId String?
-  assignedVehicle   Vehicle? @relation(fields: [assignedVehicleId], references: [id])
 
-  dispatches Dispatch[]
-  obLogs     ObLog[] // ← ADD THIS LINE
+  assignedVehicle Vehicle?   @relation(fields: [assignedVehicleId], references: [id])
+  dispatches      Dispatch[]
+  OBLogs          OBLog[]
 }

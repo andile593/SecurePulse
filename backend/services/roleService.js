@@ -1,9 +1,8 @@
-const { PrismaClient  } = require('@prisma/client');
+const prisma = require('../utils/prisma');
 
-const prisma = new PrismaClient();
-
+// FIXED: was prisma.userRole — schema model is 'Role'
 async function getAllRoles() {
-  return prisma.userRole.findMany();
+  return await prisma.role.findMany();
 }
 
 module.exports = {

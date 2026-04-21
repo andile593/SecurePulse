@@ -1,8 +1,11 @@
-const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
+const { PrismaPg } = require('@prisma/adapter-pg');
+const { PrismaClient } = require('../generated/prisma');
 
-// Single shared Prisma instance for the entire application.
-// Import this wherever you need database access instead of
-// creating a new PrismaClient() each time.
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const prisma = new PrismaClient({ adapter });
 
 module.exports = prisma;
