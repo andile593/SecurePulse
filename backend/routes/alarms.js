@@ -8,4 +8,6 @@ router.get('/:id', alarmController.getAlarmById);
 router.put('/:id', alarmController.updateAlarm);
 router.delete('/:id', alarmController.deleteAlarm);
 
+router.post('/simulate', alarmController.simulateAlarm);
+
 module.exports = router;

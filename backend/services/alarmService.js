@@ -87,6 +87,55 @@ async function deleteAlarm(id) {
   });
 }
 
+function randomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+async function simulateAlarm() {
+  
+  const transmitters = await prisma.transmitter.findMany({
+    include: {
+      site: {
+        include: { client: true },
+      },
+    },
+  });
+
+  if (transmitters.length === 0) {
+    throw new Error('No transmitters found. Add a client, site and transmitter first.');
+  }
+
+  const transmitter = randomItem(transmitters);
+
+  const EVENT_TYPES = [
+    'Burglary Alarm',
+    'Intrusion Alarm',
+    'Panic Alarm',
+    'Fire Alarm',
+    'Perimeter Breach',
+  ];
+
+  const data = {
+    triggeredAt: new Date().toISOString(),
+    eventType: randomItem(EVENT_TYPES),
+    source: transmitter.referenceCode,
+    transmitterId: transmitter.id,
+  };
+
+  return await prisma.alarm.create({
+    data,
+    include: {
+      transmitter: {
+        include: {
+          site: {
+            include: { client: true },
+          },
+        },
+      },
+    },
+  });
+}
+
 module.exports = {
   createAlarm,
   getAllAlarms,
@@ -94,4 +143,5 @@ module.exports = {
   updateAlarm,
   updateAlarmStatus,
   deleteAlarm,
+  simulateAlarm
 };

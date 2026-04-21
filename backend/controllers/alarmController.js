@@ -68,10 +68,27 @@ async function deleteAlarm(req, res, next) {
   }
 }
 
+async function simulateAlarm(req, res, next) {
+  try {
+    const alarm = await alarmService.simulateAlarm()
+    
+    emitAlarmEvent(alarm);
+    
+    orchestrator.handleNewAlarm(alarm).catch((err) => {
+      console.error('Orchestrator failed on simulated alarm:', err);
+    });
+
+    res.status(201).json(alarm);
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createAlarm,
   getAlarms,
   getAlarmById,
   updateAlarm,
   deleteAlarm,
+  simulateAlarm
 };
