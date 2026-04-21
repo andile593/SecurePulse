@@ -4,11 +4,12 @@ import type { Dispatch } from '@/types';
 
 export interface Alarm {
   id?: string;
-  shortId?: number;   
-  source: string;          
-  eventType: string;      
-  triggeredAt: string;      
-  transmitterId: string;   
+  shortId?: number;
+  source: string;
+  eventType: string;
+  triggeredAt: string;
+  transmitterId: string;
+  status?: string;
   transmitter?: Transmitter;
   aiCalls?: AiCall[];
   dispatch?: Dispatch;

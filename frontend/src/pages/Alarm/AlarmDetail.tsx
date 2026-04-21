@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useAlarm, useUpdateAlarm, useDeleteAlarm } from "@/hooks/useAlarms";
+import { useAlarm, useUpdateAlarm, useDeleteAlarm, useUpdateAlarmStatus } from "@/hooks/useAlarms";
+import { useCreateOBLog } from "@/hooks/useOBLogs";
 import { useSites } from "@/hooks/useSites";
 import { useClients } from "@/hooks/useClients";
 import AlarmForm from "@/components/forms/AlarmForm";
@@ -7,6 +8,12 @@ import { useState } from "react";
 import type { Alarm } from "@/types/alarm";
 import CallIcon from '@mui/icons-material/Call';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+
+const STATUS_COLORS: Record<string, string> = {
+  active: 'bg-red-100 text-red-700',
+  dispatched: 'bg-yellow-100 text-yellow-700',
+  resolved: 'bg-green-100 text-green-700',
+};
 
 const AlarmDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,14 +24,16 @@ const AlarmDetail = () => {
   const { data: alarm, isLoading, error, refetch } = useAlarm(id);
   const { mutate: updateAlarm } = useUpdateAlarm();
   const { mutate: deleteAlarm } = useDeleteAlarm();
+  const { mutate: updateAlarmStatus } = useUpdateAlarmStatus();
+  const { mutate: createOBLog } = useCreateOBLog();
   const { data: sites = [] } = useSites();
   const { data: clients = [] } = useClients();
 
   const [editing, setEditing] = useState(false);
+  const [dispatching, setDispatching] = useState(false);
 
   const handleSubmit = (data: Partial<Alarm>) => {
     if (!alarm) return;
-
     const updatedAlarm = { ...alarm, ...data };
     updateAlarm(
       { id: alarm.id!, alarm: updatedAlarm },
@@ -39,28 +48,61 @@ const AlarmDetail = () => {
 
   const handleDelete = () => {
     if (!alarm) return;
-
     if (confirm("Are you sure you want to delete this alarm?")) {
       deleteAlarm(
         { id: alarm.id! },
-        {
-          onSuccess: () => navigate("/alarms"),
-        }
+        { onSuccess: () => navigate("/alarms") }
       );
     }
+  };
+
+  // CHANGED: Dispatch handler — updates alarm status to dispatched
+  // and writes a timestamped entry to the OB log automatically.
+  const handleDispatch = () => {
+    if (!alarm) return;
+    if (!confirm("Dispatch a response unit to this alarm?")) return;
+
+    setDispatching(true);
+
+    updateAlarmStatus(
+      { id: alarm.id!, status: 'dispatched' },
+      {
+        onSuccess: () => {
+          // Write OB log entry automatically on dispatch.
+          createOBLog(
+            {
+              logTime: new Date().toISOString(),
+              actionLog: 'DISPATCH',
+              notes: `Response unit dispatched for alarm #${alarm.shortId} — ${alarm.eventType} at ${alarm.transmitter?.site?.name ?? 'Unknown Site'}`,
+              siteId: alarm.transmitter?.siteId ?? undefined,
+            },
+            {
+              onSuccess: () => {
+                refetch();
+                setDispatching(false);
+              },
+              onError: () => setDispatching(false),
+            }
+          );
+        },
+        onError: () => setDispatching(false),
+      }
+    );
   };
 
   if (isLoading) return <div className="p-4">Loading alarm details...</div>;
   if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
   if (!alarm) return <div className="p-4">Alarm not found.</div>;
 
-  // Find transmitter, then site and client via transmitter
   const transmitter = sites
     .flatMap((site) => site.transmitters?.map(t => ({ ...t, site })) ?? [])
     .find((t) => t.id === alarm.transmitterId);
 
   const site = transmitter?.site;
   const client = clients.find((c) => c.id === site?.clientId);
+  const currentStatus = alarm.status ?? 'active';
+  const isDispatched = currentStatus === 'dispatched';
+  const isResolved = currentStatus === 'resolved';
 
   return (
     <div className="p-6 h-fit">
@@ -73,9 +115,15 @@ const AlarmDetail = () => {
       ) : (
         <>
           <div className="flex justify-between items-center w-full flex-wrap">
-            <h2 className="text-3xl font-semibold mb-4">
-              Event - {alarm.transmitter?.site?.name} 
-            </h2>
+            <div className="flex items-center gap-4 mb-4">
+              <h2 className="text-3xl font-semibold">
+                Event - {alarm.transmitter?.site?.name}
+              </h2>
+              {/* Status badge */}
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${STATUS_COLORS[currentStatus] ?? 'bg-gray-100 text-gray-700'}`}>
+                {currentStatus}
+              </span>
+            </div>
             <p className="text-base pr-45">Source Code: {alarm.transmitter?.referenceCode}</p>
             <div className="w-full bg-gray h-px mb-4"></div>
           </div>
@@ -87,6 +135,9 @@ const AlarmDetail = () => {
 
               <p className="text-base">Type</p>
               <p className="text-base font-medium">{alarm.eventType}</p>
+
+              <p className="text-base">Status</p>
+              <p className="text-base font-medium capitalize">{currentStatus}</p>
 
               <p className="text-base">Site Number</p>
               <p className="text-base font-medium">{site?.shortId ?? "N/A"}</p>
@@ -104,8 +155,6 @@ const AlarmDetail = () => {
               <p className="text-base font-medium">
                 {new Date(alarm.triggeredAt).toLocaleString()}
               </p>
-
-           
             </div>
 
             {/* Decision Log */}
@@ -125,7 +174,6 @@ const AlarmDetail = () => {
                 AI Call Transcript
               </h2>
               <div className="bg-light_gray rounded-lg border border-gray p-4">
-                {/* Transcript */}
                 <div className="space-y-3 text-sm leading-relaxed text-gray-800">
                   <p>
                     <span className="font-semibold text-gray-600">AI:</span> Hello, This is
@@ -142,7 +190,7 @@ const AlarmDetail = () => {
                     Security Verification, Can You Please Provide Your Cancellation Code?
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">Client:</span> Sure, It’s 4912.
+                    <span className="font-semibold text-gray-600">Client:</span> Sure, It's 4912.
                   </p>
                   <p>
                     <span className="font-semibold text-gray-600">AI:</span> Thank You. Code 4912
@@ -157,7 +205,6 @@ const AlarmDetail = () => {
                   </p>
                 </div>
 
-                {/* Footer */}
                 <div className="flex items-center justify-between mt-4 border-t pt-3 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
                     <PlayCircleOutlineIcon className="text-gray-600" />
@@ -174,6 +221,17 @@ const AlarmDetail = () => {
 
           {/* Actions */}
           <div className="flex gap-4 mt-8 justify-end">
+            {/* Dispatch button — only show when alarm is active */}
+            {!isDispatched && !isResolved && (
+              <button
+                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:opacity-50"
+                onClick={handleDispatch}
+                disabled={dispatching}
+              >
+                {dispatching ? 'Dispatching...' : '🚨 Dispatch Unit'}
+              </button>
+            )}
+
             <button
               className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700"
               onClick={() => setEditing(true)}
