@@ -1,20 +1,50 @@
 import { useAlarms, useDeleteAlarm } from "@/hooks/useAlarms";
 import { useSites } from "@/hooks/useSites";
 import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useAlarmSocket } from "@/hooks/useAlarmSocket";
+import type { Alarm } from "@/types/alarm";
 
 export default function AlarmList() {
   const navigate = useNavigate();
-  const { data: alarms = [], isLoading, error } = useAlarms();
+  const { data: fetchedAlarms = [], isLoading, error } = useAlarms();
   const { data: sites = [] } = useSites();
   const { mutate: deleteAlarm } = useDeleteAlarm();
 
-  console.log(sites);
-  
- 
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+
+  useEffect(() => {
+    if (fetchedAlarms.length > 0) {
+      setAlarms(fetchedAlarms);
+    }
+  }, [fetchedAlarms]);
+
+  const handleNewAlarm = useCallback((alarm: Alarm) => {
+    setAlarms((prev) => {
+      if (prev.some((a) => a.id === alarm.id)) return prev;
+      return [alarm, ...prev];
+    });
+  }, []);
+
+  const handleAlarmUpdated = useCallback((updated: Alarm) => {
+    setAlarms((prev) =>
+      prev.map((a) => (a.id === updated.id ? updated : a))
+    );
+  }, []);
+
+  useAlarmSocket({
+    onNewAlarm: handleNewAlarm,
+    onAlarmUpdated: handleAlarmUpdated,
+  });
 
   const handleDelete = (id: string) => {
     if (!confirm("Are you sure you want to delete this alarm?")) return;
-    deleteAlarm({ id });
+    deleteAlarm(
+      { id },
+      {
+        onSuccess: () => setAlarms((prev) => prev.filter((a) => a.id !== id)),
+      }
+    );
   };
 
   if (isLoading) return <div className="p-4">Loading alarms...</div>;
@@ -37,8 +67,9 @@ export default function AlarmList() {
       ) : (
         <ul className="space-y-4">
           {alarms.map((alarm) => {
-            // Find the site via the transmitterId
-            const site = sites.find((s) => s.transmitters?.some(t => t.id === alarm.transmitterId));
+            const site = sites.find((s) =>
+              s.transmitters?.some((t) => t.id === alarm.transmitterId)
+            );
 
             return (
               <li
@@ -55,26 +86,6 @@ export default function AlarmList() {
                       Site: <span className="font-medium">{site?.name || "—"}</span>
                     </p>
                   </div>
-
-                  {/* <div className="text-right space-y-1">
-                    <p>
-                      <span className="text-sm text-gray-600">Priority:</span>{" "}
-                      <span
-                        className={`font-bold ${
-                          alarm.priority >= 4 ? "text-red-600" : alarm.priority === 3 ? "text-yellow-600" : "text-green-600"
-                        }`}
-                      >
-                        {alarm.priority}
-                      </span>
-                    </p>
-                    <p>
-                      <span className="text-sm text-gray-600">Status:</span>{" "}
-                      <span className="font-medium">{alarm.status}</span>
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Triggered: {new Date(alarm.triggeredAt).toLocaleString()}
-                    </p>
-                  </div> */}
                 </div>
 
                 <div className="flex justify-end mt-3">
