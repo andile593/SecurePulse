@@ -1,5 +1,15 @@
 const roleService = require('../services/roleService');
 
+async function createRole (req, res, next) {
+  try {
+    const role = await roleService.createRole(req.body)
+    res.status(201).json(role)
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 async function getRoles(req, res, next) {
   try {
     const roles = await roleService.getAllRoles();
@@ -9,5 +19,6 @@ async function getRoles(req, res, next) {
   }
 }
 module.exports = {
-  getRoles,
+  createRole,
+  getRoles
 };

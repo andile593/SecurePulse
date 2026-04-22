@@ -42,6 +42,7 @@ app.use('/api/ai-calls', require('./routes/aiCall'));
 app.use('/api/users', require('./routes/user'));
 app.use('/api/dispatches', require('./routes/dispatch'));
 app.use('/api/roles', require('./routes/roles'));
+app.use('/api/auth', require('./routes/auth'));
 
 // Error handler — must stay last
 app.use(errorHandler);
