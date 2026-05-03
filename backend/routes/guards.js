@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const guardController = require('../controllers/guardController');
+const { authorize } = require('../middlewares/authMiddleware');
 
-router.post('/', guardController.createGuard);
 router.get('/', guardController.getGuards);
 router.get('/:id', guardController.getGuardById);
-router.put('/:id', guardController.updateGuard);
-router.delete('/:id', guardController.deleteGuard);
+router.post('/', authorize('admin', 'operator'), guardController.createGuard);
+router.put('/:id', authorize('admin', 'operator'), guardController.updateGuard);
+router.delete('/:id', authorize('admin'), guardController.deleteGuard);
 
 module.exports = router;

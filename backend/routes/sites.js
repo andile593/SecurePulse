@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const siteController = require('../controllers/siteController');
+const { authorize } = require('../middlewares/authMiddleware');
 
-router.post('/', siteController.createSite);
 router.get('/', siteController.getSites);
 router.get('/:id', siteController.getSiteById);
-router.put('/:id', siteController.updateSite);
-router.delete('/:id', siteController.deleteSite);
+router.post('/', authorize('admin', 'operator'), siteController.createSite);
+router.put('/:id', authorize('admin', 'operator'), siteController.updateSite);
+router.delete('/:id', authorize('admin'), siteController.deleteSite);
 
 module.exports = router;
