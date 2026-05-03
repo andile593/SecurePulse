@@ -3,7 +3,10 @@ import { useAuth } from '@/context/AuthContext';
 import type { ReactNode } from 'react';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { token } = useAuth();
+  const { token, isLoading } = useAuth();
+
+  if (isLoading) return null;
+
   return token ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
