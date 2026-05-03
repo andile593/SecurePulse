@@ -1,271 +1,98 @@
 import { Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import ProtectedRoute from './ProtectedRoute';
-
+import type { ReactNode } from 'react';
 
 import Login from "../pages/Common/Login";
 import Dashboard from "../pages/Common/Dashboard";
 import NotFound from "../pages/Common/NotFound";
 
-// Clients
 import Clients from "../pages/Clients/Clients";
 import ClientDetail from "../pages/Clients/ClientDetail";
 import NewClient from "../pages/Clients/newClient";
 
-// Alarms
 import Alarms from "../pages/Alarm/Alarms";
 import AlarmDetail from "../pages/Alarm/AlarmDetail";
 import NewAlarm from "../pages/Alarm/newAlarm";
 
-// OB Logs
 import OBLogs from "../pages/OBLogs/OBLogs";
 import OBLogDetail from "../pages/OBLogs/OBLogDetail";
 import NewOBLog from "../pages/OBLogs/newOBLog";
 
-// Sites
 import Sites from "../pages/Sites/Sites";
 import SiteDetail from "../pages/Sites/SiteDetail";
 import NewSite from "../pages/Sites/newSite";
 
-// Guards
 import Guards from "../pages/Guards/Guards";
 import GuardDetail from "../pages/Guards/GuardDetail";
 import NewGuard from "../pages/Guards/newGuard";
 
-// Vehicles
 import Vehicles from "../pages/Vehicles/Vehicles";
 import VehicleDetail from "../pages/Vehicles/VehicleDetail";
 import NewVehicle from "../pages/Vehicles/newVehicle";
 
-// AI Calls
 import AiCalls from "../pages/AiCalls/AiCalls";
 import AiCallDetail from "../pages/AiCalls/AiCallDetail";
 import NewAiCall from "../pages/AiCalls/newAiCall";
 
-// Users
 import Users from "../pages/Users/Users";
 import UserDetail from "../pages/Users/UserDetail";
 import NewUser from "../pages/Users/newUser";
 
-// Dispatches
 import Dispatches from "../pages/Dispatches/Dispatches";
 import DispatchDetail from "../pages/Dispatches/DispatchDetail";
 import NewDispatch from "../pages/Dispatches/newDispatch";
 
+const Protected = ({ children }: { children: ReactNode }) => (
+  <ProtectedRoute>
+    <AppLayout>{children}</AppLayout>
+  </ProtectedRoute>
+);
 export default function AppRoutes() {
   return (
-     <Routes>
+    <Routes>
       {/* Public */}
       <Route path="/login" element={<Login />} />
       <Route path="*" element={<NotFound />} />
 
-      <Route
-        path="/"
-        element={
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/clients"
-        element={
-          <AppLayout>
-            <Clients />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/clients/:id"
-        element={
-          <AppLayout>
-            <ClientDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/clients/new" element={
-        <AppLayout>
-          <NewClient />
-        </AppLayout>
-       } />
+      {/* Protected */}
+      <Route path="/" element={<Protected><Dashboard /></Protected>} />
 
-      <Route
-        path="/alarms"
-        element={
-          <AppLayout>
-            <Alarms />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/alarms/:id"
-        element={
-          <AppLayout>
-            <AlarmDetail />
-          </AppLayout>
-        }
-      />
+      <Route path="/clients" element={<Protected><Clients /></Protected>} />
+      <Route path="/clients/new" element={<Protected><NewClient /></Protected>} />
+      <Route path="/clients/:id" element={<Protected><ClientDetail /></Protected>} />
 
-       <Route path="/alarms/new" element={
-        <AppLayout>
-          <NewAlarm />
-        </AppLayout>
-       } />
-       
-      <Route
-        path="/OBlogs"
-        element={
-          <AppLayout>
-            <OBLogs />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/OBlogs/:id"
-        element={
-          <AppLayout>
-            <OBLogDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/OBlogs/new" element={
-        <AppLayout>
-          <NewOBLog />
-        </AppLayout>
-       } />
+      <Route path="/alarms" element={<Protected><Alarms /></Protected>} />
+      <Route path="/alarms/new" element={<Protected><NewAlarm /></Protected>} />
+      <Route path="/alarms/:id" element={<Protected><AlarmDetail /></Protected>} />
 
-      <Route
-        path="/sites"
-        element={
-          <AppLayout>
-            <Sites />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/sites/:id"
-        element={
-          <AppLayout>
-            <SiteDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/sites/new" element={
-        <AppLayout>
-          <NewSite />
-        </AppLayout>
-       } />
+      <Route path="/OBlogs" element={<Protected><OBLogs /></Protected>} />
+      <Route path="/OBlogs/new" element={<Protected><NewOBLog /></Protected>} />
+      <Route path="/OBlogs/:id" element={<Protected><OBLogDetail /></Protected>} />
 
-      <Route
-        path="/guards"
-        element={
-          <AppLayout>
-            <Guards />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/guards/:id"
-        element={
-          <AppLayout>
-            <GuardDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/guards/new" element={
-        <AppLayout>
-          <NewGuard />
-        </AppLayout>
-       } />
+      <Route path="/sites" element={<Protected><Sites /></Protected>} />
+      <Route path="/sites/new" element={<Protected><NewSite /></Protected>} />
+      <Route path="/sites/:id" element={<Protected><SiteDetail /></Protected>} />
 
+      <Route path="/guards" element={<Protected><Guards /></Protected>} />
+      <Route path="/guards/new" element={<Protected><NewGuard /></Protected>} />
+      <Route path="/guards/:id" element={<Protected><GuardDetail /></Protected>} />
 
-      <Route
-        path="/vehicles"
-        element={
-          <AppLayout>
-            <Vehicles />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/vehicles/:id"
-        element={
-          <AppLayout>
-            <VehicleDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/vehicles/new" element={
-        <AppLayout>
-          <NewVehicle />
-        </AppLayout>
-       } />
+      <Route path="/vehicles" element={<Protected><Vehicles /></Protected>} />
+      <Route path="/vehicles/new" element={<Protected><NewVehicle /></Protected>} />
+      <Route path="/vehicles/:id" element={<Protected><VehicleDetail /></Protected>} />
 
-      <Route
-        path="/ai-calls"
-        element={
-          <AppLayout>
-            <AiCalls />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/ai-calls/:id"
-        element={
-          <AppLayout>
-            <AiCallDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/ai-calls/new" element={
-        <AppLayout>
-          <NewAiCall />
-        </AppLayout>
-       } />
+      <Route path="/ai-calls" element={<Protected><AiCalls /></Protected>} />
+      <Route path="/ai-calls/new" element={<Protected><NewAiCall /></Protected>} />
+      <Route path="/ai-calls/:id" element={<Protected><AiCallDetail /></Protected>} />
 
-      <Route
-        path="/users"
-        element={
-          <AppLayout>
-            <Users />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/users/:id"
-        element={
-          <AppLayout>
-            <UserDetail />
-          </AppLayout>
-        }
-      />
-      <Route path="/users/new" element={
-        <AppLayout>
-          <NewUser />
-        </AppLayout>
-      } />
+      <Route path="/users" element={<Protected><Users /></Protected>} />
+      <Route path="/users/new" element={<Protected><NewUser /></Protected>} />
+      <Route path="/users/:id" element={<Protected><UserDetail /></Protected>} />
 
-      <Route
-        path="/dispatches"
-        element={
-          <AppLayout>
-            <Dispatches />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/dispatches/:id"
-        element={
-          <AppLayout>
-            <DispatchDetail />
-          </AppLayout>
-        }
-      />
-       <Route path="/dispatches/new" element={
-        <AppLayout>
-          <NewDispatch />
-        </AppLayout>
-       } />
+      <Route path="/dispatches" element={<Protected><Dispatches /></Protected>} />
+      <Route path="/dispatches/new" element={<Protected><NewDispatch /></Protected>} />
+      <Route path="/dispatches/:id" element={<Protected><DispatchDetail /></Protected>} />
     </Routes>
   );
 }
