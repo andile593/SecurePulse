@@ -6,6 +6,7 @@ import { useClients } from "@/hooks/useClients";
 import AlarmForm from "@/components/forms/AlarmForm";
 import { useState } from "react";
 import type { Alarm } from "@/types/alarm";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CallIcon from '@mui/icons-material/Call';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
@@ -35,32 +36,22 @@ const AlarmDetail = () => {
 
   const handleSubmit = (data: Partial<Alarm>) => {
     if (!alarm) return;
-    const updatedAlarm = { ...alarm, ...data };
     updateAlarm(
-      { id: alarm.id!, alarm: updatedAlarm },
-      {
-        onSuccess: () => {
-          refetch();
-          setEditing(false);
-        },
-      }
+      { id: alarm.id!, alarm: { ...alarm, ...data } },
+      { onSuccess: () => { refetch(); setEditing(false); } }
     );
   };
 
   const handleDelete = () => {
     if (!alarm) return;
     if (confirm("Are you sure you want to delete this alarm?")) {
-      deleteAlarm(
-        { id: alarm.id! },
-        { onSuccess: () => navigate("/alarms") }
-      );
+      deleteAlarm({ id: alarm.id! }, { onSuccess: () => navigate("/alarms") });
     }
   };
 
   const handleDispatch = () => {
     if (!alarm) return;
     if (!confirm("Dispatch a response unit to this alarm?")) return;
-
     setDispatching(true);
     updateAlarmStatus(
       { id: alarm.id!, status: 'dispatched' },
@@ -74,10 +65,7 @@ const AlarmDetail = () => {
               siteId: alarm.transmitter?.siteId ?? undefined,
             },
             {
-              onSuccess: () => {
-                refetch();
-                setDispatching(false);
-              },
+              onSuccess: () => { refetch(); setDispatching(false); },
               onError: () => setDispatching(false),
             }
           );
@@ -86,11 +74,10 @@ const AlarmDetail = () => {
       }
     );
   };
-  
+
   const handleResolve = () => {
     if (!alarm) return;
     if (!confirm("Mark this alarm as resolved and close the incident?")) return;
-
     setResolving(true);
     updateAlarmStatus(
       { id: alarm.id!, status: 'resolved' },
@@ -104,10 +91,7 @@ const AlarmDetail = () => {
               siteId: alarm.transmitter?.siteId ?? undefined,
             },
             {
-              onSuccess: () => {
-                refetch();
-                setResolving(false);
-              },
+              onSuccess: () => { refetch(); setResolving(false); },
               onError: () => setResolving(false),
             }
           );
@@ -117,9 +101,9 @@ const AlarmDetail = () => {
     );
   };
 
-  if (isLoading) return <div className="p-4">Loading alarm details...</div>;
-  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
-  if (!alarm) return <div className="p-4">Alarm not found.</div>;
+  if (isLoading) return <div className="p-6">Loading alarm details...</div>;
+  if (error) return <div className="p-6 text-red-600">{(error as Error).message}</div>;
+  if (!alarm) return <div className="p-6">Alarm not found.</div>;
 
   const transmitter = sites
     .flatMap((site) => site.transmitters?.map(t => ({ ...t, site })) ?? [])
@@ -130,10 +114,10 @@ const AlarmDetail = () => {
   const currentStatus = alarm.status ?? 'active';
   const isActive = currentStatus === 'active';
   const isDispatched = currentStatus === 'dispatched';
-  const isResolved = currentStatus === 'resolved';
+  const hasAiCall = alarm.aiCalls && alarm.aiCalls.length > 0;
 
   return (
-    <div className="p-6 h-fit">
+    <div className="p-6">
       {editing ? (
         <AlarmForm
           initialData={{ ...alarm }}
@@ -142,127 +126,205 @@ const AlarmDetail = () => {
         />
       ) : (
         <>
-          <div className="flex justify-between items-center w-full flex-wrap">
-            <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-3xl font-semibold">
-                Event - {alarm.transmitter?.site?.name}
+          {/* Back link */}
+          <button
+            onClick={() => navigate("/alarms")}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 mb-5 transition"
+          >
+            <ArrowBackIcon fontSize="small" />
+            Back to Dashboard
+          </button>
+
+          {/* Title row */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Event - {alarm.transmitter?.site?.name ?? 'Unknown Site'}
               </h2>
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold capitalize ${STATUS_COLORS[currentStatus] ?? 'bg-gray-100 text-gray-700'}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${STATUS_COLORS[currentStatus] ?? 'bg-gray-100 text-gray-700'}`}>
                 {currentStatus}
               </span>
             </div>
-            <p className="text-base pr-45">Source Code: {alarm.transmitter?.referenceCode}</p>
-            <div className="w-full bg-gray h-px mb-4"></div>
+            <p className="text-sm text-gray-500">
+              Source Code: {alarm.transmitter?.referenceCode ?? '—'}
+            </p>
           </div>
+          <div className="w-full border-b border-gray-200 mb-6" />
 
-          <div className="grid grid-cols-4 gap-5">
-            <div className="grid grid-cols-2 col-start-1 col-end-3 gap-2">
-              <p className="text-base">Alarm ID</p>
-              <p className="text-base font-medium">#{alarm.shortId}</p>
+          {/* Main grid */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
 
-              <p className="text-base">Type</p>
-              <p className="text-base font-medium">{alarm.eventType}</p>
+            {/* Left — alarm info */}
+            <div className="bg-white rounded-xl border border-gray-100 p-6">
+              <div className="grid grid-cols-2 gap-y-4">
+                <p className="text-sm text-gray-500">Alarm ID</p>
+                <p className="text-sm font-semibold text-gray-900">#{alarm.shortId}</p>
 
-              <p className="text-base">Status</p>
-              <p className="text-base font-medium capitalize">{currentStatus}</p>
+                <p className="text-sm text-gray-500">Type</p>
+                <p className="text-sm font-semibold text-gray-900">{alarm.eventType}</p>
 
-              <p className="text-base">Site Number</p>
-              <p className="text-base font-medium">{site?.shortId ?? "N/A"}</p>
+                <p className="text-sm text-gray-500">Site Number</p>
+                <p className="text-sm font-semibold text-gray-900">{site?.shortId ?? 'N/A'}</p>
 
-              <p className="text-base">Site Name</p>
-              <p className="text-base font-medium">{site?.name ?? "Unknown"}</p>
+                <p className="text-sm text-gray-500">Site Name</p>
+                <p className="text-sm font-semibold text-gray-900">{site?.name ?? 'Unknown'}</p>
 
-              <p className="text-base">Site Address</p>
-              <p className="text-base font-medium">{site?.address ?? "N/A"}</p>
+                <p className="text-sm text-gray-500">Site Address</p>
+                <p className="text-sm font-semibold text-gray-900">{site?.address ?? 'N/A'}</p>
 
-              <p className="text-base">Transmitter Code</p>
-              <p className="text-base font-medium">{transmitter?.referenceCode ?? "N/A"}</p>
+                <p className="text-sm text-gray-500">Transmitter Code</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {transmitter?.referenceCode ?? 'N/A'}
+                </p>
 
-              <p className="text-base">Time & Date</p>
-              <p className="text-base font-medium">
-                {new Date(alarm.triggeredAt).toLocaleString()}
-              </p>
-            </div>
+                <p className="text-sm text-gray-500">Time & Date</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {new Date(alarm.triggeredAt).toLocaleString('en-ZA')}
+                </p>
 
-            {/* Decision Log */}
-            <div className="col-start-3 col-end-5 gap-2">
-              <h3 className="text-lg font-semibold mb-4">Decision log</h3>
-              <div className="p-7 bg-primary rounded-xl text-base leading-7 text-light_gray">
-                The client was reached within 1 ring. The cancellation code was valid and
-                matched the system. No signs of duress or distress detected in tone. Alarm
-                was cancelled based on standard auto-handling protocol for intrusion alarm.
+                {client && (
+                  <>
+                    <p className="text-sm text-gray-500">Client</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {client.name} {client.surname}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* AI Call Transcript */}
-            <div className="col-start-1 col-end-5">
-              <h2 className="text-gray-700 font-semibold flex items-center gap-2 mb-4">
-                <CallIcon className="text-gray-600" />
-                AI Call Transcript
-              </h2>
-              <div className="bg-light_gray rounded-lg border border-gray p-4">
+            {/* Right — decision log */}
+            <div className="bg-gray-900 rounded-xl p-6 text-white">
+              <h3 className="font-semibold text-white mb-4">Decision log</h3>
+              {hasAiCall ? (
+                <div className="space-y-3 text-sm leading-relaxed text-gray-300">
+                  <p className="font-medium text-white">
+                    {alarm.aiCalls![0].aiDecision ?? 'Pending'}
+                  </p>
+                  {alarm.aiCalls![0].confidenceScore && (
+                    <p>
+                      AI Confidence:{' '}
+                      <span className="font-semibold text-white">
+                        {(alarm.aiCalls![0].confidenceScore * 100).toFixed(0)}%
+                      </span>
+                    </p>
+                  )}
+                  {alarm.aiCalls![0].notes && (
+                    <div>
+                      <p className="text-gray-400 mb-1">Reasoning:</p>
+                      <ul className="space-y-1 list-disc list-inside text-gray-300">
+                        {alarm.aiCalls![0].notes.split('\n').map((line, i) => (
+                          <li key={i}>{line}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 mt-4">
+                    {alarm.aiCalls![0].evaluatedAt
+                      ? new Date(alarm.aiCalls![0].evaluatedAt).toLocaleTimeString('en-ZA')
+                      : ''}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 text-sm text-gray-300">
+                  <p className="font-medium text-white">No AI Call Made</p>
+                  <ul className="list-disc list-inside space-y-1 text-gray-400">
+                    <li>No AI verification call was triggered for this event</li>
+                    <li>Manual review or immediate dispatch may apply</li>
+                    <li>Check event type protocol for this alarm category</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* AI Call Transcript */}
+          <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+            <h2 className="text-gray-700 font-semibold flex items-center gap-2 mb-4">
+              <CallIcon className="text-gray-600" fontSize="small" />
+              AI Call Transcript
+            </h2>
+
+            {hasAiCall ? (
+              <>
                 <div className="space-y-3 text-sm leading-relaxed text-gray-800">
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> Hello, This is
-                    Sam Calling From SecureOps Security. We Have Received An Intrusion Alarm
-                    At Your Premises: Springs Fire Station – Main Entrance. Can You Please
-                    Confirm If Everything Is Okay?
+                    <span className="font-semibold text-gray-600">AI:</span> Hello, this is
+                    Sam calling from SecurePulse Security. We have received an{' '}
+                    {alarm.eventType} at your premises:{' '}
+                    {alarm.transmitter?.site?.name ?? 'your site'} – Main Entrance. Can you
+                    please confirm if everything is okay?
                   </p>
                   <p>
                     <span className="font-semibold text-gray-600">Client:</span> Yes,
-                    Everything Is Okay. Sorry, It Was A False Alarm.
+                    everything is okay. Sorry, it was a false alarm.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> Thank You. For
-                    Security Verification, Can You Please Provide Your Cancellation Code?
+                    <span className="font-semibold text-gray-600">AI:</span> Thank you. For
+                    security verification, can you please provide your cancellation code?
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">Client:</span> Sure, It's 4912.
+                    <span className="font-semibold text-gray-600">Client:</span> Sure, it's 4912.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> Thank You. Code 4912
-                    Has Been Verified. Your Alarm Has Been Cancelled And No Dispatch Will Occur.
-                    Have A Safe Evening.
+                    <span className="font-semibold text-gray-600">AI:</span> Thank you. Code
+                    4912 has been verified. Your alarm has been cancelled and no dispatch will
+                    occur. Have a safe evening.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">Client:</span> Thanks. Appreciate The Call.
+                    <span className="font-semibold text-gray-600">Client:</span> Thanks.
+                    Appreciate the call.
                   </p>
                   <p>
-                    <span className="font-semibold text-gray-600">AI:</span> You're Welcome. This Call Has Been Logged For Audit Purposes. Goodbye.
+                    <span className="font-semibold text-gray-600">AI:</span> You're welcome.
+                    This call has been logged for audit purposes. Goodbye.
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between mt-4 border-t pt-3 text-xs text-gray-600">
+                <div className="flex items-center justify-between mt-4 border-t pt-3 text-xs text-gray-500">
                   <div className="flex items-center gap-2">
-                    <PlayCircleOutlineIcon className="text-gray-600" />
+                    <PlayCircleOutlineIcon fontSize="small" />
                     <span>Audio Playback</span>
                   </div>
                   <div className="flex gap-4">
-                    <span><strong>Duration:</strong> 0:46s</span>
-                    <span><strong>Time:</strong> 03:17 AM</span>
+                    <span>
+                      <strong>Duration:</strong>{' '}
+                      {alarm.aiCalls![0].callDuration ?? '0:46s'}
+                    </span>
+                    <span>
+                      <strong>Time:</strong>{' '}
+                      {alarm.aiCalls![0].calledAt
+                        ? new Date(alarm.aiCalls![0].calledAt).toLocaleTimeString('en-ZA')
+                        : '—'}
+                    </span>
                   </div>
                 </div>
+              </>
+            ) : (
+              <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-500 text-sm">
+                <p className="font-medium mb-1">No AI call was made for this event</p>
+                <p className="text-xs text-gray-400">
+                  This event type does not trigger an automatic verification call.
+                </p>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 mt-8 justify-end">
-            {/* Dispatch — only when active */}
+          <div className="flex gap-3 justify-end">
             {isActive && (
               <button
-                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 disabled:opacity-50"
+                className="bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 disabled:opacity-50 font-medium transition"
                 onClick={handleDispatch}
                 disabled={dispatching}
               >
-                {dispatching ? 'Dispatching...' : 'Dispatch Unit'}
+                {dispatching ? 'Dispatching...' : ' Dispatch Unit'}
               </button>
             )}
 
-            {/* Resolve — only when dispatched */}
             {isDispatched && (
               <button
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+                className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 font-medium transition"
                 onClick={handleResolve}
                 disabled={resolving}
               >
@@ -271,24 +333,17 @@ const AlarmDetail = () => {
             )}
 
             <button
-              className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-primary text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-medium transition"
               onClick={() => setEditing(true)}
             >
               Edit
             </button>
 
             <button
-              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 font-medium transition"
               onClick={handleDelete}
             >
               Delete
-            </button>
-
-            <button
-              className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              onClick={() => navigate("/alarms")}
-            >
-              Back to Alarms
             </button>
           </div>
         </>

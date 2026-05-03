@@ -1,4 +1,3 @@
-// src/types/index.ts
 export * from './client';
 export * from './site';
 export * from './alarm';

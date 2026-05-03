@@ -9,21 +9,23 @@ import type { Alarm } from "@/types/alarm";
 import type { AiCall } from "@/types/aiCall";
 import { format } from "date-fns";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import BoltIcon from '@mui/icons-material/Bolt';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const eventTypeColors: Record<string, string> = {
-  "Panic Alarm":     "bg-red-500",
-  "Fire Alarm":      "bg-orange-500",
+  "Panic Alarm": "bg-red-500",
+  "Fire Alarm": "bg-orange-500",
   "Intrusion Alarm": "bg-purple-600",
-  "Open Alarm":      "bg-blue-500",
+  "Open Alarm": "bg-blue-500",
 };
 
 const eventTypeAccent: Record<string, string> = {
-  "Panic Alarm":     "bg-red-500",
-  "Fire Alarm":      "bg-orange-400",
+  "Panic Alarm": "bg-red-500",
+  "Fire Alarm": "bg-orange-400",
   "Intrusion Alarm": "bg-purple-600",
-  "Open Alarm":      "bg-blue-400",
+  "Open Alarm": "bg-blue-400",
 };
 
 const criticalTypes = ["Panic Alarm", "Fire Alarm"];
@@ -82,10 +84,10 @@ function StatCard({ title, value, change }: { title: string; value: number; chan
 
 function CallStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    "No call":       "bg-yellow-100 text-yellow-700 border border-yellow-200",
-    "No answer":     "bg-red-100 text-red-600 border border-red-200",
+    "No call": "bg-yellow-100 text-yellow-700 border border-yellow-200",
+    "No answer": "bg-red-100 text-red-600 border border-red-200",
     "Code verified": "bg-green-100 text-green-700 border border-green-200",
-    "Dialing":       "bg-gray-100 text-gray-600 border border-gray-200",
+    "Dialing": "bg-gray-100 text-gray-600 border border-gray-200",
   };
   if (status === "—") return <span className="text-gray-300">—</span>;
   return (
@@ -98,9 +100,9 @@ function CallStatusBadge({ status }: { status: string }) {
 function ResultBadge({ result }: { result: string | null }) {
   if (!result) return <span className="text-gray-300">—</span>;
   const styles: Record<string, string> = {
-    Cancelled:  "bg-red-100 text-red-600 border border-red-200",
+    Cancelled: "bg-red-100 text-red-600 border border-red-200",
     Dispatched: "bg-blue-100 text-blue-600 border border-blue-200",
-    Resolved:   "bg-green-100 text-green-700 border border-green-200",
+    Resolved: "bg-green-100 text-green-700 border border-green-200",
   };
   return (
     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${styles[result] ?? "bg-gray-100 text-gray-600"}`}>
@@ -230,9 +232,9 @@ export default function Dashboard() {
   const criticalAlarms = alarms.filter((a) => criticalTypes.includes(a.eventType)).slice(0, 3);
 
   const tabCounts: Record<FilterTab, number> = {
-    All:        alarms.length,
-    Active:     alarms.filter((a) => getAlarmStatus(a, aiCalls) === "Active").length,
-    Handled:    alarms.filter((a) => getAlarmStatus(a, aiCalls) === "Handled").length,
+    All: alarms.length,
+    Active: alarms.filter((a) => getAlarmStatus(a, aiCalls) === "Active").length,
+    Handled: alarms.filter((a) => getAlarmStatus(a, aiCalls) === "Handled").length,
     Dispatched: alarms.filter((a) => getAlarmStatus(a, aiCalls) === "Dispatched").length,
   };
 
@@ -252,7 +254,7 @@ export default function Dashboard() {
             disabled={simulating}
             className="bg-yellow-400 hover:bg-yellow-300 disabled:opacity-50 text-black font-bold text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
           >
-            <span>⚡</span>
+            <BoltIcon fontSize="small" />
             {simulating ? "Simulating..." : "Simulate Alarm"}
           </button>
         </div>
@@ -265,10 +267,10 @@ export default function Dashboard() {
 
             {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard title="Alarms Today"        value={totalAlarms}     change={calcChange(totalAlarms, 20)} />
-              <StatCard title="Canceled by Client"  value={cancelled}       change={calcChange(cancelled, 5)} />
-              <StatCard title="Unanswered Calls"    value={unansweredCalls} change={calcChange(unansweredCalls, 3)} />
-              <StatCard title="Armed Response Sent" value={dispatched}      change={calcChange(dispatched, 5)} />
+              <StatCard title="Alarms Today" value={totalAlarms} change={calcChange(totalAlarms, 20)} />
+              <StatCard title="Canceled by Client" value={cancelled} change={calcChange(cancelled, 5)} />
+              <StatCard title="Unanswered Calls" value={unansweredCalls} change={calcChange(unansweredCalls, 3)} />
+              <StatCard title="Armed Response Sent" value={dispatched} change={calcChange(dispatched, 5)} />
             </div>
 
             {/* Alarm table card */}
@@ -280,16 +282,14 @@ export default function Dashboard() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
-                      activeTab === tab
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${activeTab === tab
                         ? "bg-gray-900 text-white"
                         : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                    }`}
+                      }`}
                   >
                     {tab}
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
-                      activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
-                    }`}>
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${activeTab === tab ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+                      }`}>
                       {tabCounts[tab]}
                     </span>
                   </button>
@@ -315,7 +315,7 @@ export default function Dashboard() {
               {/* Rows */}
               {filtered.length === 0 ? (
                 <div className="text-center py-16 text-gray-400">
-                  <p className="text-3xl mb-2">🔕</p>
+                  <NotificationsOffIcon className="mb-2 text-gray-300" style={{ fontSize: 40 }} />
                   <p className="text-sm">No alarms to display</p>
                 </div>
               ) : (
