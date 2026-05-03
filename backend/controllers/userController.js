@@ -5,7 +5,7 @@ async function createUser(req, res, next) {
     const user = await userService.createUser(req.body);
     res.status(201).json(user);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 }
 
@@ -14,7 +14,7 @@ async function getUsers(req, res, next) {
     const users = await userService.getAllUsers();
     res.json(users);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 }
 
@@ -24,25 +24,20 @@ async function getUserById(req, res, next) {
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 }
 
 async function updateUser(req, res, next) {
-  const { name, email, roleId } = req.body; 
-
   try {
+    const { name, email, roleId } = req.body;
     const updated = await userService.updateUser(req.params.id, { name, email, roleId });
-
     if (!updated) return res.status(404).json({ error: 'User not found' });
-
     res.json(updated);
   } catch (error) {
-    console.error("Update Error:", error);
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 }
-
 
 async function deleteUser(req, res, next) {
   try {
@@ -50,7 +45,7 @@ async function deleteUser(req, res, next) {
     if (!deleted) return res.status(404).json({ error: 'User not found' });
     res.json({ message: 'User deleted' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 }
 
