@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginAPI, logout as logoutAPI, restoreSession } from '@/lib/api/auth';
+import { disconnectSocket } from '@/hooks/useAlarmSocket';
 import type { User } from '@/types/user';
 
 interface AuthContextType {
@@ -43,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     logoutAPI();
+    disconnectSocket();
     setUser(null);
     setToken(null);
   };
