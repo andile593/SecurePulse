@@ -1,101 +1,147 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAiCalls } from "@/hooks/useAiCalls";
 import { useAlarms } from "@/hooks/useAlarms";
-import { SummaryCard } from "@/components/ui/SummaryCard";
 import { AiCallRow } from "@/components/ui/AiCallRow";
-import { useSites } from "@/hooks/useSites";
+import PhoneIcon from '@mui/icons-material/Phone';
+import CancelIcon from '@mui/icons-material/Cancel';
+import PhoneMissedIcon from '@mui/icons-material/PhoneMissed';
+import SecurityIcon from '@mui/icons-material/Security';
+
+type FilterTab = 'All calls' | 'Resolved' | 'Review Needed';
+
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="bg-gray-900 rounded-xl p-5 flex items-center gap-4 text-white">
+      <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-2xl font-bold">{value}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AiCallList() {
   const navigate = useNavigate();
   const { data: aiCalls = [], isLoading, error } = useAiCalls();
   const { data: alarms = [] } = useAlarms();
-  const { data: sites = [] } = useSites();
 
+  const [activeTab, setActiveTab] = useState<FilterTab>('All calls');
 
+  if (isLoading) return <div className="p-6">Loading call activity...</div>;
+  if (error) return <div className="p-6 text-red-600">{(error as Error).message}</div>;
 
-  if (isLoading) return <div className="p-4">Loading AI calls...</div>;
-  if (error) return <div className="p-4 text-red-600">{(error as Error).message}</div>;
+  const totalAiCalls = aiCalls.length;
+  const cancelled = aiCalls.filter((a) => a.aiDecision === 'Cancelled').length;
+  const unanswered = aiCalls.filter((a) => a.aiDecision === 'Unanswered').length;
+  const dispatched = aiCalls.filter((a) => a.aiDecision === 'Dispatched').length;
 
-  const totalAiCalls = aiCalls.length
-  const cancelled = aiCalls.filter((a) => a.aiDecision === "Cancelled").length;
-  const unansweredCalls = aiCalls.filter((a) => a.aiDecision === "Inconclusive").length;
-  // const escalatedAlarms = alarms.filter(
-  //   (a) => a.aiDecision?.toLowerCase() === "dispatched"
-  // ).length;
+  const resolved = aiCalls.filter((a) =>
+    a.aiDecision === 'Cancelled' || a.aiDecision === 'Dispatched'
+  );
+  const reviewNeeded = aiCalls.filter((a) =>
+    a.aiDecision === 'Unanswered' || a.aiDecision === 'Dialing' || !a.aiDecision
+  );
 
-  const prevTotalAiCalls = 8;
-  const prevCancelled = 5;
-  const prevUnansweredCalls = 3;
-  const prevEscalatedAlarms = 10;
+  const tabCounts: Record<FilterTab, number> = {
+    'All calls': totalAiCalls,
+    'Resolved': resolved.length,
+    'Review Needed': reviewNeeded.length,
+  };
 
-  const calcPercentageChange = (current: number, previous: number) =>
-    previous === 0 ? 0 : ((current - previous) / previous) * 100;
+  const filtered =
+    activeTab === 'All calls'
+      ? aiCalls
+      : activeTab === 'Resolved'
+      ? resolved
+      : reviewNeeded;
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between mb-4">
-        <h3 className="text-3xl font-bold ">Call Activity</h3>
-        <button
-          onClick={() => navigate("/ai-calls/new")}
-          className="bg-primary text-white px-4 py-2 rounded "
-        >
-          + New AI Call
-        </button>
-      </div>
+    <div className="p-6 space-y-6">
+
+      {/* Header */}
+      <h1 className="text-2xl font-bold text-gray-900">Call Activity</h1>
+
+      {/* Stat cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <SummaryCard
-          title="Total AI Calls"
+        <StatCard
+          icon={<PhoneIcon className="text-white" fontSize="small" />}
+          label="Total AI Calls"
           value={totalAiCalls}
-          color="bg-primary"
-          percentageChange={calcPercentageChange(totalAiCalls, prevTotalAiCalls)}
         />
-        <SummaryCard
-          title="Cancelled By Client"
+        <StatCard
+          icon={<CancelIcon className="text-white" fontSize="small" />}
+          label="Canceled by Client"
           value={cancelled}
-          color="bg-primary"
-          percentageChange={calcPercentageChange(cancelled, prevCancelled)}
         />
-        <SummaryCard
-          title="Unanswered Calls"
-          value={unansweredCalls}
-          color="bg-primary"
-          percentageChange={calcPercentageChange(
-            unansweredCalls,
-            prevUnansweredCalls
-          )}
+        <StatCard
+          icon={<PhoneMissedIcon className="text-white" fontSize="small" />}
+          label="Unanswered Calls"
+          value={unanswered}
         />
-        {/* <SummaryCard
-          title="Response Sent Out"
-          value={escalatedAlarms}
-          color="bg-primary"
-          percentageChange={calcPercentageChange(
-            escalatedAlarms,
-            prevEscalatedAlarms
-          )}
-        /> */}
+        <StatCard
+          icon={<SecurityIcon className="text-white" fontSize="small" />}
+          label="Armed Response Sent"
+          value={dispatched}
+        />
       </div>
 
-      {aiCalls.length === 0 ? (
-        <div className="p-4 text-gray-500 text-center">No AI calls found.</div>
-      ) : (
+      {/* Table card */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
-        <div className="w-full text-sm">
-          <div className="flex mb-3 rounded-sm font-medium bg-gray gap-2">
-            <div className="w-[10%] text-center py-2">Call ID</div>
-            <div className="w-[15%] py-2">Site Name</div>
-            <div className="w-[10%] text-center py-2">Time</div>
-            <div className="w-[10%] text-center py-2">Call Duration</div>
-            <div className="w-[20%] text-center py-2">Outcome</div>
-            <div className="w-[15%] text-center py-2">Code Provided</div>
-            <div className="w-[15%] text-center py-2">Results</div>
+        {/* Tabs */}
+        <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-gray-100">
+          {(['All calls', 'Resolved', 'Review Needed'] as FilterTab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+                activeTab === tab
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100'
+              }`}
+            >
+              {tab}
+              <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold ${
+                activeTab === tab ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+              }`}>
+                {tabCounts[tab]}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Table header */}
+        <div className="flex items-center bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <div className="w-[12%] pl-5 py-3">Call ID</div>
+          <div className="w-[20%] py-3">Site Name</div>
+          <div className="w-[10%] py-3 text-center">Time</div>
+          <div className="w-[12%] py-3 text-center">Call Duration</div>
+          <div className="w-[16%] py-3 text-center">Outcome</div>
+          <div className="w-[15%] py-3 text-center">Code Provided</div>
+          <div className="w-[15%] py-3 text-center">Results</div>
+        </div>
+
+        {/* Rows */}
+        {filtered.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 text-sm">
+            No calls to display.
           </div>
-          {aiCalls.map((aiCall) => {
-
+        ) : (
+          filtered.map((aiCall) => {
             const alarm = alarms.find((a) => a.id === aiCall.alarmId);
-
-            const siteName: string = alarm?.transmitter?.site?.name ?? "—";
-
-
+            const siteName = alarm?.transmitter?.site?.name ?? '—';
             return (
               <AiCallRow
                 key={aiCall.id}
@@ -105,10 +151,9 @@ export default function AiCallList() {
                 navigate={navigate}
               />
             );
-          })}
-
-        </div>
-      )}
+          })
+        )}
+      </div>
     </div>
   );
 }
