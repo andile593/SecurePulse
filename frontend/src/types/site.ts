@@ -16,5 +16,7 @@ export type SiteCreateInput = {
   name: string;
   address: string;
   clientId: string;
+  latitude?: number;
+  longitude?: number;
   transmitters?: TransmitterCreateInput[]; 
 };
