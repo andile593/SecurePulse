@@ -19,11 +19,13 @@ model Client {
 }
 
 model Site {
-  id       String @id @default(uuid())
-  shortId  Int    @unique @default(autoincrement())
-  name     String
-  address  String
-  clientId String
+  id        String @id @default(uuid())
+  shortId   Int    @unique @default(autoincrement())
+  name      String
+  address   String
+  clientId  String
+  latitude  Float?
+  longitude Float?
 
   client       Client        @relation(fields: [clientId], references: [id])
   transmitters Transmitter[]

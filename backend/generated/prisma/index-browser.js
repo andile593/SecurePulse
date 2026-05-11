@@ -135,7 +135,9 @@ exports.Prisma.SiteScalarFieldEnum = {
   shortId: 'shortId',
   name: 'name',
   address: 'address',
-  clientId: 'clientId'
+  clientId: 'clientId',
+  latitude: 'latitude',
+  longitude: 'longitude'
 };
 
 exports.Prisma.TransmitterScalarFieldEnum = {

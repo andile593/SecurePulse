@@ -1,13 +1,15 @@
 const prisma = require('../utils/prisma');
 
 async function createSite(data) {
-  const { name, address, clientId, transmitters } = data;
+  const { name, address, clientId, transmitters, latitude, longitude } = data;
 
   return await prisma.site.create({
     data: {
       name,
       address,
       clientId,
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       transmitters: {
         create: transmitters?.map(t => ({
           referenceCode: t.referenceCode,
@@ -35,9 +37,14 @@ async function getSiteById(id) {
 }
 
 async function updateSite(id, data) {
-  const { name, address, clientId, transmitters } = data;
+  const { name, address, clientId, transmitters, latitude, longitude } = data;
 
-  const updatePayload = { name, address };
+  const updatePayload = {
+    name,
+    address,
+    latitude: latitude ? parseFloat(latitude) : null,
+    longitude: longitude ? parseFloat(longitude) : null,
+  };
 
   if (clientId) {
     updatePayload.client = { connect: { id: clientId } };

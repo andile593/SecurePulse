@@ -3168,10 +3168,14 @@ export namespace Prisma {
 
   export type SiteAvgAggregateOutputType = {
     shortId: number | null
+    latitude: number | null
+    longitude: number | null
   }
 
   export type SiteSumAggregateOutputType = {
     shortId: number | null
+    latitude: number | null
+    longitude: number | null
   }
 
   export type SiteMinAggregateOutputType = {
@@ -3180,6 +3184,8 @@ export namespace Prisma {
     name: string | null
     address: string | null
     clientId: string | null
+    latitude: number | null
+    longitude: number | null
   }
 
   export type SiteMaxAggregateOutputType = {
@@ -3188,6 +3194,8 @@ export namespace Prisma {
     name: string | null
     address: string | null
     clientId: string | null
+    latitude: number | null
+    longitude: number | null
   }
 
   export type SiteCountAggregateOutputType = {
@@ -3196,16 +3204,22 @@ export namespace Prisma {
     name: number
     address: number
     clientId: number
+    latitude: number
+    longitude: number
     _all: number
   }
 
 
   export type SiteAvgAggregateInputType = {
     shortId?: true
+    latitude?: true
+    longitude?: true
   }
 
   export type SiteSumAggregateInputType = {
     shortId?: true
+    latitude?: true
+    longitude?: true
   }
 
   export type SiteMinAggregateInputType = {
@@ -3214,6 +3228,8 @@ export namespace Prisma {
     name?: true
     address?: true
     clientId?: true
+    latitude?: true
+    longitude?: true
   }
 
   export type SiteMaxAggregateInputType = {
@@ -3222,6 +3238,8 @@ export namespace Prisma {
     name?: true
     address?: true
     clientId?: true
+    latitude?: true
+    longitude?: true
   }
 
   export type SiteCountAggregateInputType = {
@@ -3230,6 +3248,8 @@ export namespace Prisma {
     name?: true
     address?: true
     clientId?: true
+    latitude?: true
+    longitude?: true
     _all?: true
   }
 
@@ -3325,6 +3345,8 @@ export namespace Prisma {
     name: string
     address: string
     clientId: string
+    latitude: number | null
+    longitude: number | null
     _count: SiteCountAggregateOutputType | null
     _avg: SiteAvgAggregateOutputType | null
     _sum: SiteSumAggregateOutputType | null
@@ -3352,6 +3374,8 @@ export namespace Prisma {
     name?: boolean
     address?: boolean
     clientId?: boolean
+    latitude?: boolean
+    longitude?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
     transmitters?: boolean | Site$transmittersArgs<ExtArgs>
     OBLogs?: boolean | Site$OBLogsArgs<ExtArgs>
@@ -3364,6 +3388,8 @@ export namespace Prisma {
     name?: boolean
     address?: boolean
     clientId?: boolean
+    latitude?: boolean
+    longitude?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -3373,6 +3399,8 @@ export namespace Prisma {
     name?: boolean
     address?: boolean
     clientId?: boolean
+    latitude?: boolean
+    longitude?: boolean
     client?: boolean | ClientDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -3382,9 +3410,11 @@ export namespace Prisma {
     name?: boolean
     address?: boolean
     clientId?: boolean
+    latitude?: boolean
+    longitude?: boolean
   }
 
-  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "name" | "address" | "clientId", ExtArgs["result"]["site"]>
+  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "shortId" | "name" | "address" | "clientId" | "latitude" | "longitude", ExtArgs["result"]["site"]>
   export type SiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     client?: boolean | ClientDefaultArgs<ExtArgs>
     transmitters?: boolean | Site$transmittersArgs<ExtArgs>
@@ -3411,6 +3441,8 @@ export namespace Prisma {
       name: string
       address: string
       clientId: string
+      latitude: number | null
+      longitude: number | null
     }, ExtArgs["result"]["site"]>
     composites: {}
   }
@@ -3842,6 +3874,8 @@ export namespace Prisma {
     readonly name: FieldRef<"Site", 'String'>
     readonly address: FieldRef<"Site", 'String'>
     readonly clientId: FieldRef<"Site", 'String'>
+    readonly latitude: FieldRef<"Site", 'Float'>
+    readonly longitude: FieldRef<"Site", 'Float'>
   }
     
 
@@ -14631,7 +14665,9 @@ export namespace Prisma {
     shortId: 'shortId',
     name: 'name',
     address: 'address',
-    clientId: 'clientId'
+    clientId: 'clientId',
+    latitude: 'latitude',
+    longitude: 'longitude'
   };
 
   export type SiteScalarFieldEnum = (typeof SiteScalarFieldEnum)[keyof typeof SiteScalarFieldEnum]
@@ -14913,6 +14949,8 @@ export namespace Prisma {
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
     clientId?: StringFilter<"Site"> | string
+    latitude?: FloatNullableFilter<"Site"> | number | null
+    longitude?: FloatNullableFilter<"Site"> | number | null
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
     transmitters?: TransmitterListRelationFilter
     OBLogs?: OBLogListRelationFilter
@@ -14924,6 +14962,8 @@ export namespace Prisma {
     name?: SortOrder
     address?: SortOrder
     clientId?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
     client?: ClientOrderByWithRelationInput
     transmitters?: TransmitterOrderByRelationAggregateInput
     OBLogs?: OBLogOrderByRelationAggregateInput
@@ -14938,6 +14978,8 @@ export namespace Prisma {
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
     clientId?: StringFilter<"Site"> | string
+    latitude?: FloatNullableFilter<"Site"> | number | null
+    longitude?: FloatNullableFilter<"Site"> | number | null
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
     transmitters?: TransmitterListRelationFilter
     OBLogs?: OBLogListRelationFilter
@@ -14949,6 +14991,8 @@ export namespace Prisma {
     name?: SortOrder
     address?: SortOrder
     clientId?: SortOrder
+    latitude?: SortOrderInput | SortOrder
+    longitude?: SortOrderInput | SortOrder
     _count?: SiteCountOrderByAggregateInput
     _avg?: SiteAvgOrderByAggregateInput
     _max?: SiteMaxOrderByAggregateInput
@@ -14965,6 +15009,8 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Site"> | string
     address?: StringWithAggregatesFilter<"Site"> | string
     clientId?: StringWithAggregatesFilter<"Site"> | string
+    latitude?: FloatNullableWithAggregatesFilter<"Site"> | number | null
+    longitude?: FloatNullableWithAggregatesFilter<"Site"> | number | null
   }
 
   export type TransmitterWhereInput = {
@@ -15645,6 +15691,8 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
     client: ClientCreateNestedOneWithoutSitesInput
     transmitters?: TransmitterCreateNestedManyWithoutSiteInput
     OBLogs?: OBLogCreateNestedManyWithoutSiteInput
@@ -15656,6 +15704,8 @@ export namespace Prisma {
     name: string
     address: string
     clientId: string
+    latitude?: number | null
+    longitude?: number | null
     transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
     OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
   }
@@ -15664,6 +15714,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     client?: ClientUpdateOneRequiredWithoutSitesNestedInput
     transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
     OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
@@ -15675,6 +15727,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
     OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
   }
@@ -15685,12 +15739,16 @@ export namespace Prisma {
     name: string
     address: string
     clientId: string
+    latitude?: number | null
+    longitude?: number | null
   }
 
   export type SiteUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type SiteUncheckedUpdateManyInput = {
@@ -15699,6 +15757,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type TransmitterCreateInput = {
@@ -16437,6 +16497,17 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type ClientScalarRelationFilter = {
     is?: ClientWhereInput
     isNot?: ClientWhereInput
@@ -16454,6 +16525,11 @@ export namespace Prisma {
     none?: OBLogWhereInput
   }
 
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type TransmitterOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -16468,10 +16544,14 @@ export namespace Prisma {
     name?: SortOrder
     address?: SortOrder
     clientId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type SiteAvgOrderByAggregateInput = {
     shortId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type SiteMaxOrderByAggregateInput = {
@@ -16480,6 +16560,8 @@ export namespace Prisma {
     name?: SortOrder
     address?: SortOrder
     clientId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type SiteMinOrderByAggregateInput = {
@@ -16488,10 +16570,30 @@ export namespace Prisma {
     name?: SortOrder
     address?: SortOrder
     clientId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
   }
 
   export type SiteSumOrderByAggregateInput = {
     shortId?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type SiteScalarRelationFilter = {
@@ -16600,17 +16702,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -16625,11 +16716,6 @@ export namespace Prisma {
   export type AlarmScalarRelationFilter = {
     is?: AlarmWhereInput
     isNot?: AlarmWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type AiCallCountOrderByAggregateInput = {
@@ -16697,22 +16783,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -17079,6 +17149,14 @@ export namespace Prisma {
     connect?: OBLogWhereUniqueInput | OBLogWhereUniqueInput[]
   }
 
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type ClientUpdateOneRequiredWithoutSitesNestedInput = {
     create?: XOR<ClientCreateWithoutSitesInput, ClientUncheckedCreateWithoutSitesInput>
     connectOrCreate?: ClientCreateOrConnectWithoutSitesInput
@@ -17295,14 +17373,6 @@ export namespace Prisma {
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
-  }
-
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -17729,6 +17799,44 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -17741,17 +17849,6 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
@@ -17782,33 +17879,6 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -17828,6 +17898,8 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
     transmitters?: TransmitterCreateNestedManyWithoutSiteInput
     OBLogs?: OBLogCreateNestedManyWithoutSiteInput
   }
@@ -17837,6 +17909,8 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
     transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
     OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
   }
@@ -17876,6 +17950,8 @@ export namespace Prisma {
     name?: StringFilter<"Site"> | string
     address?: StringFilter<"Site"> | string
     clientId?: StringFilter<"Site"> | string
+    latitude?: FloatNullableFilter<"Site"> | number | null
+    longitude?: FloatNullableFilter<"Site"> | number | null
   }
 
   export type ClientCreateWithoutSitesInput = {
@@ -18042,6 +18118,8 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
     client: ClientCreateNestedOneWithoutSitesInput
     OBLogs?: OBLogCreateNestedManyWithoutSiteInput
   }
@@ -18052,6 +18130,8 @@ export namespace Prisma {
     name: string
     address: string
     clientId: string
+    latitude?: number | null
+    longitude?: number | null
     OBLogs?: OBLogUncheckedCreateNestedManyWithoutSiteInput
   }
 
@@ -18107,6 +18187,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     client?: ClientUpdateOneRequiredWithoutSitesNestedInput
     OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
   }
@@ -18117,6 +18199,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
   }
 
@@ -18572,6 +18656,8 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
     client: ClientCreateNestedOneWithoutSitesInput
     transmitters?: TransmitterCreateNestedManyWithoutSiteInput
   }
@@ -18582,6 +18668,8 @@ export namespace Prisma {
     name: string
     address: string
     clientId: string
+    latitude?: number | null
+    longitude?: number | null
     transmitters?: TransmitterUncheckedCreateNestedManyWithoutSiteInput
   }
 
@@ -18635,6 +18723,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     client?: ClientUpdateOneRequiredWithoutSitesNestedInput
     transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
   }
@@ -18645,6 +18735,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
   }
 
@@ -19017,12 +19109,16 @@ export namespace Prisma {
     shortId?: number
     name: string
     address: string
+    latitude?: number | null
+    longitude?: number | null
   }
 
   export type SiteUpdateWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     transmitters?: TransmitterUpdateManyWithoutSiteNestedInput
     OBLogs?: OBLogUpdateManyWithoutSiteNestedInput
   }
@@ -19032,6 +19128,8 @@ export namespace Prisma {
     shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
     transmitters?: TransmitterUncheckedUpdateManyWithoutSiteNestedInput
     OBLogs?: OBLogUncheckedUpdateManyWithoutSiteNestedInput
   }
@@ -19041,6 +19139,8 @@ export namespace Prisma {
     shortId?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     address?: StringFieldUpdateOperationsInput | string
+    latitude?: NullableFloatFieldUpdateOperationsInput | number | null
+    longitude?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type TransmitterCreateManySiteInput = {

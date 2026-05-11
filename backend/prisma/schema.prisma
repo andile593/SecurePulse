@@ -24,6 +24,8 @@ model Site {
   name     String
   address  String
   clientId String
+  latitude  Float?
+  longitude Float?
 
   client       Client        @relation(fields: [clientId], references: [id])
   transmitters Transmitter[]
