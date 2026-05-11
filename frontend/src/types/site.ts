@@ -3,12 +3,14 @@ import type { Transmitter, TransmitterCreateInput } from './transmitter';
 
 export interface Site {
   id?: string;
-  shortId?: number;   
+  shortId?: number;
   name: string;
   address: string;
-  clientId?: string;
+  clientId: string;
+  latitude?: number;
+  longitude?: number;
   client?: Client;
-  transmitters?: Transmitter[];  
+  transmitters?: Transmitter[];
 }
 export type SiteCreateInput = {
   name: string;

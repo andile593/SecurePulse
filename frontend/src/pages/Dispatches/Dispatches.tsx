@@ -69,11 +69,10 @@ function DispatchCard({
           <span className="text-sm font-bold text-gray-800">
             #{dispatch.shortId}
           </span>
-          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-            isResolved
+          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isResolved
               ? "bg-green-100 text-green-700"
               : "bg-yellow-100 text-yellow-700"
-          }`}>
+            }`}>
             {isResolved ? "Resolved" : "Active"}
           </span>
         </div>
@@ -166,8 +165,8 @@ export default function DispatchList() {
     activeTab === "Active"
       ? activeDispatches
       : activeTab === "New"
-      ? newDispatches
-      : dispatches;
+        ? newDispatches
+        : dispatches;
 
   // Default map center — Johannesburg
   const mapCenter: [number, number] = [-26.2041, 28.0473];
@@ -195,11 +194,10 @@ export default function DispatchList() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition ${
-                  activeTab === tab
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition ${activeTab === tab
                     ? "bg-gray-100 text-gray-900 font-semibold"
                     : "text-gray-500 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <span className="flex items-center gap-2">
                   {tab === "New" && <AccessTimeIcon fontSize="small" className="text-gray-400" />}
@@ -264,11 +262,11 @@ export default function DispatchList() {
             const vehicle = vehicles.find((v) => v.id === dispatch.vehicleId);
             const isResolved = !!dispatch.resolvedAt;
 
-            // Use site coordinates if available, otherwise use default Joburg coords
-            // with slight offset per dispatch so markers don't stack
+            const site = alarm?.transmitter?.site;
             const idx = dispatches.indexOf(dispatch);
-            const lat = -26.2041 + idx * 0.01;
-            const lng = 28.0473 + idx * 0.01;
+            // Use real site coordinates if available, fall back to Joburg with offset
+            const lat = site?.latitude ?? (-26.2041 + idx * 0.01);
+            const lng = site?.longitude ?? (28.0473 + idx * 0.01);
 
             return (
               <Marker
