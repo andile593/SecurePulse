@@ -108,8 +108,3 @@ npm run dev
 - [ ] Analytics dashboard — incident trends by site
 
 ---
-
-## Author
-
-**Andile Mhlanga**
-[LinkedIn](https://linkedin.com/in/andile-mhlanga-370985316) · [GitHub](https://github.com/andile593)
