@@ -2,8 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../utils/prisma');
 
-// JWT secret must be in your .env file as JWT_SECRET.
-// Never hardcode this value.
 function generateToken(user) {
   return jwt.sign(
     {
@@ -51,6 +49,18 @@ async function register({ name, email, password, roleId }) {
   };
 }
 
+async function getAdmins() {
+  return await prisma.user.findMany({ include: { role: true } });
+}
+
+
+async function getAdminById(id) {
+  return await prisma.user.findUnique({
+    where: { id },
+    include: { role: true },
+  });
+}
+
 async function login({ email, password }) {
   const user = await prisma.user.findUnique({
     where: { email },
@@ -89,4 +99,12 @@ async function login({ email, password }) {
   };
 }
 
-module.exports = { register, login };
+async function updateAdmin(id, data) {
+  const { name, email, roleId } = data;
+  return await prisma.user.update({
+    where: { id },
+    data: { name, email, roleId },
+  });
+}
+
+module.exports = { register, login, updateAdmin };

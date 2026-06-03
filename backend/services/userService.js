@@ -1,5 +1,4 @@
 const prisma = require('../utils/prisma');
-// FIXED: bcrypt was used but never imported
 const bcrypt = require('bcryptjs');
 const { sendCredentialsEmail } = require('../utils/mailer');
 
