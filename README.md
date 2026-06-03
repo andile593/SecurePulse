@@ -76,7 +76,7 @@ Guards complete a structured incident form. The platform sends the captured data
 ### Prerequisites
 - Node.js 18+
 - PostgreSQL
-- OpenAI API key
+
 
 ### Installation
 
