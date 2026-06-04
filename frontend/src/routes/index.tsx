@@ -43,6 +43,8 @@ import Dispatches from "../pages/Dispatches/Dispatches";
 import DispatchDetail from "../pages/Dispatches/DispatchDetail";
 import NewDispatch from "../pages/Dispatches/newDispatch";
 
+import Settings from "../pages/Common/Settings";
+
 const Protected = ({ children }: { children: ReactNode }) => (
   <ProtectedRoute>
     <AppLayout>{children}</AppLayout>
@@ -93,6 +95,8 @@ export default function AppRoutes() {
       <Route path="/dispatches" element={<Protected><Dispatches /></Protected>} />
       <Route path="/dispatches/new" element={<Protected><NewDispatch /></Protected>} />
       <Route path="/dispatches/:id" element={<Protected><DispatchDetail /></Protected>} />
+
+      <Route path="/settings" element={<Protected><Settings /></Protected>} />
     </Routes>
   );
 }

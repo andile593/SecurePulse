@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as loginAPI, logout as logoutAPI, restoreSession } from '@/lib/api/auth';
+import { login as loginAPI, logout as logoutAPI, restoreSession, updateMe as updateMeAPI } from '@/lib/api/auth';
 import { disconnectSocket } from '@/hooks/useAlarmSocket';
 import type { User } from '@/types/user';
 
@@ -8,6 +8,7 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateMe: (data: { name?: string; email?: string; password?: string }) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
@@ -49,6 +50,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
   };
 
+  // CHANGED: Update profile and sync changes to localStorage
+  // so the nav reflects the new name/email immediately.
+  const updateMe = async (data: { name?: string; email?: string; password?: string }) => {
+    const updated = await updateMeAPI(data);
+    const updatedUser = { ...user, ...updated };
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -56,6 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         token,
         login,
         logout,
+        updateMe,
         isAuthenticated: !!token,
         isLoading,
       }}

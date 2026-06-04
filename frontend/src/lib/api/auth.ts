@@ -6,7 +6,6 @@ export const login = async (credentials: { email: string; password: string }) =>
 
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
-
   api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
   return user;
@@ -23,4 +22,13 @@ export const restoreSession = () => {
   if (token) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
+};
+
+export const updateMe = async (data: {
+  name?: string;
+  email?: string;
+  password?: string;
+}) => {
+  const response = await api.patch('/auth/me', data);
+  return response.data;
 };
