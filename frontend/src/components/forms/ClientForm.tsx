@@ -109,13 +109,14 @@ const ClientForm = ({
         email,
         phone,
         sites: sites.map(site => {
-          const siteId = site.id ?? "temp-" + Math.random().toString(36).slice(2); // temporary ID
+          const siteId = site.id ?? "temp-" + Math.random().toString(36).slice(2);
           return {
             ...site,
             id: siteId,
+            clientId: initialData.id ?? "", // add this
             transmitters: site.transmitters.map((t) => ({
               referenceCode: t.referenceCode,
-              siteId, 
+              siteId,
             })),
           };
         }),

@@ -10,6 +10,7 @@ export interface Alarm {
   triggeredAt: string;
   transmitterId: string;
   status?: string;
+  zone?: string;
   transmitter?: Transmitter;
   aiCalls?: AiCall[];
   dispatch?: Dispatch;

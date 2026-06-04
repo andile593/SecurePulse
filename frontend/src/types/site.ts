@@ -6,7 +6,7 @@ export interface Site {
   shortId?: number;
   name: string;
   address: string;
-  clientId: string;
+  clientId?: string;
   latitude?: number;
   longitude?: number;
   client?: Client;
