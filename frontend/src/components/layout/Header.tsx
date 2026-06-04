@@ -61,9 +61,8 @@ const Header = ({ className }: HeaderProps) => {
               <span className="text-gray-400">/</span>
               <Link
                 to={`/${pathSegments.slice(0, idx + 1).join("/")}`}
-                className={`${
-                  isLast ? "text-text_light text-base font-semibold" : "text-gray-400 text-sm"
-                } hover:underline`}
+                className={`${isLast ? "text-text_light text-base font-semibold" : "text-gray-400 text-sm"
+                  } hover:underline`}
               >
                 {seg}
               </Link>
@@ -75,7 +74,9 @@ const Header = ({ className }: HeaderProps) => {
       {/* Right side: Live + Settings */}
       <div className="flex items-center gap-4">
         <LiveIndicator />
-        <SettingsIcon className="text-gray-500 cursor-pointer hover:text-gray-300 transition-colors" />
+        <Link to="/settings">
+          <SettingsIcon className="text-gray-500 cursor-pointer hover:text-gray-300 transition-colors" />
+        </Link>
       </div>
     </header>
   );
