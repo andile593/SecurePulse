@@ -62,10 +62,14 @@ async function getAdminById(id) {
 }
 
 async function login({ email, password }) {
+
   const user = await prisma.user.findUnique({
     where: { email },
     include: { role: true },
   });
+
+  console.log("user", user);
+  
 
   if (!user) {
     const error = new Error('Invalid email or password');
