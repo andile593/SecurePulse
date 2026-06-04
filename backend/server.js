@@ -18,7 +18,8 @@ const PORT = process.env.SERVER_PORT || 5000;
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://cuddly-space-goldfish-9wgq65g6w6j27jvj-5173.app.github.dev"
+    "https://secure-pulse.vercel.app",
+    "https://securepulse-production-7ee5.up.railway.app"
   ],
   credentials: true,
 }));

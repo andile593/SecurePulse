@@ -8,7 +8,7 @@ function initSocket(httpServer) {
     cors: {
       origin: [
         "http://localhost:5173",
-        "https://cuddly-space-goldfish-9wgq65g6w6j27jvj-5173.app.github.dev"
+        "https://secure-pulse.vercel.app",
       ],
       methods: ["GET", "POST"],
       credentials: true,
