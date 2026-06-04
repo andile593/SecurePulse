@@ -99,12 +99,50 @@ async function login({ email, password }) {
   };
 }
 
-async function updateAdmin(id, data) {
-  const { name, email, roleId } = data;
-  return await prisma.user.update({
-    where: { id },
-    data: { name, email, roleId },
+
+async function updateMe(userId, { name, email, password }) {
+  const data = {};
+
+  if (name) data.name = name;
+
+  if (email) {
+    // Check email not already taken by another user
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing && existing.id !== userId) {
+      const error = new Error('Email already in use');
+      error.statusCode = 409;
+      throw error;
+    }
+    data.email = email;
+  }
+
+  if (password) {
+    if (password.length < 6) {
+      const error = new Error('Password must be at least 6 characters');
+      error.statusCode = 400;
+      throw error;
+    }
+    data.password = await bcrypt.hash(password, 10);
+  }
+
+  if (Object.keys(data).length === 0) {
+    const error = new Error('No fields provided to update');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data,
+    include: { role: true },
   });
+
+  return {
+    id: updated.id,
+    name: updated.name,
+    email: updated.email,
+    role: updated.role.name,
+  };
 }
 
-module.exports = { register, login, updateAdmin };
+module.exports = { register, login, updateMe };

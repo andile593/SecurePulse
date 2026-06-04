@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { authenticate } = require('../middlewares/authMiddleware');
 
 router.post('/register', authController.register);
-router.get('/', authController.getAdmins)
-router.get('/:id', authController.getAdminById)
-router.put('/:id', authController.updateAdmin)
 router.post('/login', authController.login);
+
+router.patch('/me', authenticate, authController.updateMe);
 
 module.exports = router;
